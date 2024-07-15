@@ -9,7 +9,7 @@
   "description": "Bancro Web App is the default web application built on top of the Fineract platform for the Mifos user community leveraging the popular Angular framework.",
   "icons": [
     {
-      "src": "assets/images/bancro.png",
+      "src": "assets/images/BancroLogo.png",
       "sizes": "182x184",
       "type": "image/png"
     }
