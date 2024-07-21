@@ -32,6 +32,7 @@
       "Login": "Connectez-vous",
       "Logout": "Se déconnecter",
       "Username": "Nom d'utilisateur",
+      "Token": "Jeton",
       "Password": "Mot de passe",
       "Remember me": "Souvenez-vous de moi",
       "Filter": "Filtre",

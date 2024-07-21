@@ -596,6 +596,7 @@
       "Logout": "Logout",
       "language": "language",
       "Username": "Username",
+      "Token": "Token",
       "Password": "Password",
       "Confirm Password": "Confirm Password",
       "Remember me": "Remember me",
