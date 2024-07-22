@@ -55,6 +55,7 @@ export class SidenavComponent implements OnInit {
    */
   ngOnInit() {
     const credentials = this.authenticationService.getCredentials();
+    console.log("🚀 ~ SidenavComponent ~ ngOnInit ~ credentials:", credentials)
 
     this.username = credentials.username;
     this.officeName = credentials.officeName;
