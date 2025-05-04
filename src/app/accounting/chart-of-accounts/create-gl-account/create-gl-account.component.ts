@@ -41,6 +41,8 @@ export class CreateGlAccountComponent implements OnInit, AfterViewInit {
   /** Cancel route. (depending on creation of gl account or sub-ledger account) */
   cancelRoute = '../../';
 
+  lastGlCode = 'Previous GL Code (GLC011)';
+
   /* Reference of accounts form */
   @ViewChild('accountFormRef') accountFormRef: ElementRef<any>;
   /* Template for popover on accounts form */
@@ -102,6 +104,10 @@ export class CreateGlAccountComponent implements OnInit, AfterViewInit {
     });
   }
 
+  // update Last GlCode
+  updateLastGlCode(newCode: string): void {
+    this.lastGlCode =  `Previous GL Code (${newCode})`;
+  }
   /**
    * Sets gl account form for selected account type.
    */
