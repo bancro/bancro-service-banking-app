@@ -43,7 +43,7 @@
 
             <div *ngIf="loanDetailsData.summary" class="loans-overview mat-typography" fxFlex="40%">
               <h3> Loan Account OverView </h3>
-              <span>Current Balance: {{loanDetailsData.currency.displaySymbol}}
+              <span>Current Balance: {{loanDetailsData.currency.code}}
                 {{loanDetailsData.summary.totalOutstanding | formatNumber}}</span><br>
               <div *ngIf="loanDisplayArrearsDelinquency < 2">
                 <span *ngIf="loanDetailsData.inArrears">Arrears By: {{loanDetailsData.summary.totalOverdue | currency:currencyCode:'symbol-narrow':'1.2-2' }}
@@ -53,7 +53,7 @@
                   dateFormat}}
                 </span>
                 <span *ngIf="loanDetailsData.totalOverpaid && loanDetailsData.totalOverpaid > 0">
-                  Overpaid By: {{loanDetailsData.currency.displaySymbol}} {{loanDetailsData.totalOverpaid | formatNumber }}
+                  Overpaid By: {{loanDetailsData.currency.code}} {{loanDetailsData.totalOverpaid | formatNumber }}
                 </span>
               </div>
             </div>

@@ -42,12 +42,12 @@
 
             <ng-container matColumnDef="Last Repayment">
                 <th mat-header-cell *matHeaderCellDef>Last Repayment</th>
-                <td mat-cell *matCellDef="let element"> {{element.lastRepayment}} </td>
+                <td mat-cell *matCellDef="let element"> {{element.lastRepayment | formatNumber}} </td>
             </ng-container>
 
             <ng-container matColumnDef="Remaining Amount">
                 <th mat-header-cell *matHeaderCellDef> Remaining Amount </th>
-                <td mat-cell *matCellDef="let element"> {{element.remainingAmount}} </td>
+                <td mat-cell *matCellDef="let element"> {{element.remainingAmount | formatNumber}} </td>
             </ng-container>
 
             <ng-container matColumnDef="Last Repayment Date">
