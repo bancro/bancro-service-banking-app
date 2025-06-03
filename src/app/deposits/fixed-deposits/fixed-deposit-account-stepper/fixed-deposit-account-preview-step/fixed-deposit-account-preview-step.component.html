@@ -167,7 +167,7 @@
 
       <ng-container matColumnDef="interest">
         <th mat-header-cell *matHeaderCellDef> Interest </th>
-        <td mat-cell *matCellDef="let chartSlab"> {{ chartSlab.annualInterestRate }} </td>
+        <td mat-cell *matCellDef="let chartSlab"> {{ fixedDepositsAccountTemplate?.customInterestRate || chartSlab.annualInterestRate }} </td>
       </ng-container>
 
       <ng-container matColumnDef="description">
