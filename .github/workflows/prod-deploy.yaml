@@ -1,0 +1,38 @@
+name: Build and Deploy Frontend to Production
+on:
+  push:
+    branches:
+      - CowryAssetsProd
+
+permissions:
+  id-token: write
+  contents: read
+jobs:
+  build-and-deploy:
+    if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - id: commit
+        uses: pr-mpt/actions-commit-hash@v1
+
+      - name: "Az CLI login"
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Build and deploy Container App
+        uses: azure/container-apps-deploy-action@v1
+        env:
+          IMAGE_TAG: ${{ steps.commit.outputs.short }}
+        with:
+          appSourcePath: ${{ github.workspace }}
+          acrName: bancroappfrontendprod
+          containerAppName: community-cowry-app-prod
+          resourceGroup: cowry-asset-fineract-prod
+          imageToBuild: bancroappfrontendprod.azurecr.io/frontend:$IMAGE_TAG
