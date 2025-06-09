@@ -138,7 +138,6 @@ export class CreateFixedDepositAccountComponent {
       locale,
     };
 
-    console.log("fixedDepositAccount", fixedDepositAccount);
 
     // Uncomment this to actually make the API call
 
@@ -146,7 +145,7 @@ export class CreateFixedDepositAccountComponent {
       this.externalApIService
         .addFixedDepositAccount({ ...fixedDepositAccount, customInterestRate })
         .subscribe((response: any) => {
-          this.router.navigate(["../", response.resourceId], { relativeTo: this.route });
+          this.router.navigate(["../", response.data?.data?.resourceId], { relativeTo: this.route });
         });
     } else {
       this.fixedDepositsService.createFixedDepositAccount(fixedDepositAccount).subscribe((response: any) => {
