@@ -82,4 +82,17 @@ export class ExternalApisService {
     const url = `${this.baseUrl}/FixedDepositAccount/add-account`;
     return this.http.post(url, payload);
   }
+
+  /**
+   * Import data by uploading a file (binary).
+   * @param {File} file The file to upload.
+   * @param {string} endpoint The endpoint to upload to (e.g., 'customers', 'transactions').
+   */
+  importData(file: File, endpoint: string): Observable<any> {
+    const url = `${this.baseUrl}/DataImport/${endpoint}`;
+    const formData = new FormData();
+    formData.append('importData', file);
+
+    return this.http.post(url, formData);
+  }
 }

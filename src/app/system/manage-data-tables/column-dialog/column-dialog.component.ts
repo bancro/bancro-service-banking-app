@@ -3,7 +3,7 @@ import { Component, OnInit, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 
-/** Data Imports */
+/** Data Import */
 import { columnTypeData } from '../column-type-data';
 
 /**

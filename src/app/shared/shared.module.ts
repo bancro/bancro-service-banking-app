@@ -57,6 +57,7 @@ import { ReportSvgComponent } from "assets/images/svgs/report/report.component";
 import { SettingsSvgComponent } from "assets/images/svgs/settings/settings.component";
 import { PlusSvgComponent } from "assets/images/svgs/plus/plus.component";
 import { MinusSvgComponent } from "assets/images/svgs/minus/minus.component";
+import { DataImportSvgComponent } from "assets/images/svgs/data-imports/data-import.component";
 
 /**
  * Shared Module
@@ -118,7 +119,8 @@ import { MinusSvgComponent } from "assets/images/svgs/minus/minus.component";
     ReportSvgComponent,
     SettingsSvgComponent,
     PlusSvgComponent,
-    MinusSvgComponent
+    MinusSvgComponent,
+    DataImportSvgComponent
   ],
   exports: [
     FileUploadComponent,
@@ -158,7 +160,8 @@ import { MinusSvgComponent } from "assets/images/svgs/minus/minus.component";
     ReportSvgComponent,
     SettingsSvgComponent,
     PlusSvgComponent,
-    MinusSvgComponent
+    MinusSvgComponent,
+    DataImportSvgComponent
   ],
 })
 export class SharedModule {}
