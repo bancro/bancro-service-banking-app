@@ -1,0 +1,72 @@
+<mat-card class="data-import-card">
+  <!-- Title Section -->
+  <mat-card-header class="bg-[#163300]">
+    <mat-card-title>Data Import</mat-card-title>
+  </mat-card-header>
+
+  <!-- Instructions Section -->
+  <mat-card-content>
+    <div>
+      <p class="data-note"><strong>Note:</strong> Please select the data type you wish to import.</p>
+
+      <!-- Data Type Selection -->
+      <mat-form-field class="form-field">
+        <mat-label>Select Data Type</mat-label>
+        <mat-select [(value)]="selectedDataType" (selectionChange)="onDataTypeChange()">
+          <mat-option *ngFor="let type of dataTypes" [value]="type">
+            {{ type.name }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <!-- Display Dynamic Note and Legal Form ID -->
+      <div *ngIf="selectedDataType">
+        <div class="mb-5">
+          <p><strong>Note:</strong> {{ selectedDataType.note }}</p>
+          <p *ngIf="selectedDataType?.note1"><strong>Note:</strong> {{ selectedDataType.note1 }}</p>
+        </div>
+      
+      </div>
+
+      <!-- File Upload Section -->
+      <div class="upload-input">
+        <mat-label>Upload Your Data File</mat-label>
+        <!-- Custom File Upload Component -->
+        <mifosx-file-upload
+          flex="60%"
+          (change)="onFileChange($event)"
+          acceptFilter=".png,.jpeg,.jpg,.xlsx,.csv"
+        ></mifosx-file-upload>
+        <button type="button" class="download-btn" (click)="downloadTemplate()">Download template</button>
+      </div>
+
+      <!-- Display Selected File Name -->
+      <div *ngIf="selectedFile">
+        <p>Selected File: {{ selectedFile.name }}</p>
+      </div>
+
+      <!-- Submit Button -->
+      <button
+        mat-raised-button
+        color="accent"
+        (click)="submitData()"
+        [disabled]="!selectedFile || loading"
+      >
+        <mat-icon>cloud_upload</mat-icon> Upload Data
+      </button>
+
+      <div class="mt-10">
+        <div *ngIf="loading" class="my-6">
+          <div class="mx-auto import-loader"></div>
+        </div>
+      </div>
+      <mat-card-footer class="error_footer">
+        <div *ngIf="successMessage" class="success-message">{{ successMessage }}</div>
+        <div *ngIf="failureMessage" class="failure-message">{{ failureMessage }}</div>
+        <ul  class="failure_message_text" *ngIf="errorList.length > 0">
+          <li *ngFor="let error of errorList">{{ error }}</li>
+        </ul>
+      </mat-card-footer>
+    </div>
+  </mat-card-content>
+</mat-card>

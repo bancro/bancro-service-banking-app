@@ -15,3 +15,7 @@ body {
     var(--tw-shadow);
   box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
 }
+
+.mat-primary .mat-option.mat-selected:not(.mat-option-disabled),.mat-option-text {
+  color: #0e0f0c !important;
+}

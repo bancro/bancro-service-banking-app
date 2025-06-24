@@ -25,6 +25,7 @@ export class ViewTransactionComponent {
               public dialog: MatDialog) {
     this.route.data.subscribe((data: { fixedDepositsAccountTransaction: any }) => {
       this.transactionData = data.fixedDepositsAccountTransaction;
+      console.log('transactionData',data.fixedDepositsAccountTransaction)
     });
   }
 

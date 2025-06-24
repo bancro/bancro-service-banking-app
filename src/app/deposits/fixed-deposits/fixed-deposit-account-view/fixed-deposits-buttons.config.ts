@@ -88,6 +88,9 @@ export class FixedDepositsButtonsConfiguration {
           },
           {
             name: 'Add Charge'
+          },
+          {
+            name: 'Download Deal Certificate'
           }
         ];
         break;

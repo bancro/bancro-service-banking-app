@@ -24,7 +24,7 @@
     "commons": {
       "is required": "est obligatoire"
     },
-    "inputs":{
+    "inputs": {
       "Tenant": "Locataire",
       "Language": "Langue",
       "Server": "Serveur",
@@ -105,7 +105,8 @@
       "Main Items": "Éléments principaux",
       "Checker Inbox and Tasks": "Boîte de réception et tâches du vérificateur",
       "Individual Collection Sheet": "Feuille de collecte individuelle",
-      "Keyboard Shortcuts": "Raccourcis clavier"
+      "Keyboard Shortcuts": "Raccourcis clavier",
+      "Imports": "Data Import"
     },
     "placeholders": {
       "Add new server": "Ajouter un nouveau serveur",

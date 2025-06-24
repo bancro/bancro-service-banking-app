@@ -55,8 +55,6 @@ export class SidenavComponent implements OnInit {
    */
   ngOnInit() {
     const credentials = this.authenticationService.getCredentials();
-    console.log("🚀 ~ SidenavComponent ~ ngOnInit ~ credentials:", credentials)
-
     this.username = credentials.username;
     this.officeName = credentials.officeName;
     this.setMappedAcitivites();
@@ -132,6 +130,8 @@ export class SidenavComponent implements OnInit {
         this.pushActivity('/templates');
       } else if (activity.includes('/self-service')) {
         this.pushActivity('/self-service');
+        } else if (activity.includes('/data-import')) {
+        this.pushActivity('/data-import');
       }
     });
     this.mappedActivities.reverse();

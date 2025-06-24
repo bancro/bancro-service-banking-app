@@ -1,5 +1,10 @@
-<div class="container">
+<div class="">
+ <div class="px-4">
+  <button class="!py-[4px]" mat-flat-button color="primary" mat-button (click)="downloadRepayment()">
+    Download Repayment Schedule
+  </button>
 
+ </div>
   <table mat-table [dataSource]="repaymentScheduleDetails.periods" *ngIf="!forEditing">
 
     <ng-container matColumnDef="number">

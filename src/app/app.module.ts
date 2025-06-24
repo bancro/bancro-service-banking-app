@@ -42,6 +42,7 @@ import { AppRoutingModule } from "./app-routing.module";
 import { DatePipe, LocationStrategy } from "@angular/common";
 import { TranslateLoader, TranslateModule } from "@ngx-translate/core";
 import { TranslateHttpLoader } from "@ngx-translate/http-loader";
+import { DataImportModule } from "./data-import/data-import.module";
 // import { NgApexchartsModule } from 'ng-apexcharts';
 
 /**
@@ -87,6 +88,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     CentersModule,
     AccountingModule,
     SelfServiceModule,
+    DataImportModule,
     SystemModule,
     ProductsModule,
     OrganizationModule,
@@ -97,7 +99,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     CollectionsModule,
     TasksModule,
     ConfigurationWizardModule,
-    AppRoutingModule,
+    AppRoutingModule
     // NgApexchartsModule,
     // TranslateModule.forRoot({
     //   loader: {

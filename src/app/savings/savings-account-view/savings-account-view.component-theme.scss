@@ -5,11 +5,13 @@
   mifosx-savings-account-view {
     .savings-account-card {
       .header {
-        background-color: mat.get-color-from-palette($primary, 500);
+        background-color:#f7f8fa;
+        color: #0e0f0c;
+        border:1px solid #DFE5EC;
       }
       .table-headers {
-        background-color: mat.get-color-from-palette($primary, 500);
-        color: mat.get-contrast-color-from-palette($primary, 500);
+        background-color:#f7f8fa;
+        color: #0e0f0c;
       }
     }
   }

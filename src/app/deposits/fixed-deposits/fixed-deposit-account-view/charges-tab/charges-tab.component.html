@@ -10,7 +10,7 @@
     </div>
   </div>
 
-  <div class="mat-elevation-z1 m-b-25">
+  <div class="mat-elevation-z1 shadow-none rounded-lg p-4 m-b-25">
 
     <table mat-table #chargesTable [dataSource]="dataSource" >
 
@@ -46,22 +46,22 @@
 
       <ng-container matColumnDef="due">
         <th mat-header-cell *matHeaderCellDef> Due </th>
-        <td mat-cell *matCellDef="let charge"> {{charge.currency.displaySymbol}}&nbsp;{{charge.amount}} </td>
+        <td mat-cell *matCellDef="let charge"> {{charge.currency.code}}&nbsp;{{charge.amount | formatNumber}} </td>
       </ng-container>
 
       <ng-container matColumnDef="paid">
         <th mat-header-cell *matHeaderCellDef> Paid </th>
-        <td mat-cell *matCellDef="let charge"> {{charge.currency.displaySymbol}}&nbsp;{{charge.amountPaid}} </td>
+        <td mat-cell *matCellDef="let charge"> {{charge.currency.code}}&nbsp;{{charge.amountPaid | formatNumber}} </td>
       </ng-container>
 
       <ng-container matColumnDef="waived">
         <th mat-header-cell *matHeaderCellDef> Waived </th>
-        <td mat-cell *matCellDef="let charge"> {{charge.currency.displaySymbol}}&nbsp;{{charge.amountWaived}} </td>
+        <td mat-cell *matCellDef="let charge"> {{charge.currency.code}}&nbsp;{{charge.amountWaived | formatNumber}} </td>
       </ng-container>
 
       <ng-container matColumnDef="outstanding">
         <th mat-header-cell *matHeaderCellDef> Outstanding </th>
-        <td mat-cell *matCellDef="let charge"> {{charge.currency.displaySymbol}}&nbsp;{{charge.amountOutstanding}} </td>
+        <td mat-cell *matCellDef="let charge"> {{charge.currency.code}}&nbsp;{{charge.amountOutstanding | formatNumber}} </td>
       </ng-container>
 
       <ng-container matColumnDef="actions">

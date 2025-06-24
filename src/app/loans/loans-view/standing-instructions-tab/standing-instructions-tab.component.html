@@ -4,7 +4,7 @@
     <h3>All Standing Instructions</h3>
   </div>
 
-  <div class="mat-elevation-z1 m-b-25">
+  <div class="mat-elevation-z1 shadow-none rounded-lg p-4 m-b-25">
 
     <table mat-table #instructionsTable [dataSource]="dataSource">
 
@@ -36,7 +36,7 @@
 
       <ng-container matColumnDef="amount">
         <th mat-header-cell *matHeaderCellDef> Amount </th>
-        <td mat-cell *matCellDef="let instruction">{{instruction.instructionType.value}}/{{instruction.amount}}</td>
+        <td mat-cell *matCellDef="let instruction">{{instruction.instructionType.value}}/{{instruction.amount | formatNumber}}</td>
       </ng-container>
 
       <ng-container matColumnDef="validity">
