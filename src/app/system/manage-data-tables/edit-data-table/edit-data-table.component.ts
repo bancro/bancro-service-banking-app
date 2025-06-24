@@ -10,7 +10,7 @@ import { MatTableDataSource } from '@angular/material/table';
 /** Custom Services */
 import { SystemService } from '../../system.service';
 
-/** Data Imports */
+/** Data Import */
 import { appTableData, entitySubTypeData } from '../app-table-data';
 
 /** Custom Components */

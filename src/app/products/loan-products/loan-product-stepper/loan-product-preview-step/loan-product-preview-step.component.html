@@ -614,7 +614,7 @@
       <ng-container matColumnDef="name">
         <th mat-header-cell *matHeaderCellDef> Name </th>
         <td mat-cell *matCellDef="let charge">
-          {{ charge.name + ', ' + charge.currency.displaySymbol }}
+          {{ charge.name + ', ' + charge.currency.code }}
         </td>
       </ng-container>
 
@@ -653,7 +653,7 @@
       <ng-container matColumnDef="name">
         <th mat-header-cell *matHeaderCellDef> Name </th>
         <td mat-cell *matCellDef="let overdueCharge">
-          {{ overdueCharge.name + ', ' + overdueCharge.currency.displaySymbol }}
+          {{ overdueCharge.name + ', ' + overdueCharge.currency.code }}
         </td>
       </ng-container>
 

@@ -16,7 +16,14 @@ body {
   box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
 }
 
-.shadow-none{
-    box-shadow: none;
-    border: 1px solid #E5E7EC;
-  }
+.shadow-none {
+  box-shadow: none;
+  border: 1px solid #e5e7ec;
+}
+.mat-primary .mat-option.mat-selected:not(.mat-option-disabled),
+.mat-option-text {
+  color: #0e0f0c !important;
+}
+.account-card-title {
+  color: #0e0f0c !important;
+}

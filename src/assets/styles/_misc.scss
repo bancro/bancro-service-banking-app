@@ -104,6 +104,24 @@ div {
   box-shadow: none;
   border: 1px solid #e5e7ec;
 }
+.rounded-lg{
+  border-radius: 8px;
+}
+.p-1{
+  padding:4px;
+}
+.p-2{
+  padding:8px;
+}
+.p-3{
+  padding:12px;
+}
+.p-4{
+  padding:16px;
+}
+.p-5{
+  padding:20px;
+}
 .accordion_class {
   display: grid;
   row-gap: 12px;
@@ -176,4 +194,15 @@ th.mat-header-cell {
 }
 tr.mat-header-row {
   height: 50px;
+}
+.cdk-overlay-pane{
+  min-width: 230px;
+}
+
+.mat-menu-item .mat-icon {
+  margin-right: 8px;
+}
+.tab-container{
+  max-width: 1280px;
+  margin: 0 auto !important;
 }

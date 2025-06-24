@@ -42,7 +42,7 @@
 
            <mat-form-field appearance="outline"  fxFlex="48%">
             <mat-label>{{"labels.inputs.GL Code" |translate}}</mat-label>
-            <input matInput required formControlName="glCode">
+            <input matInput required formControlName="glCode" [placeholder]="lastGlCode">
             <mat-error *ngIf="glAccountForm.controls.glCode.hasError('required')">
               {{"labels.inputs.GL Code" |translate}} {{ "labels.commons.is"  |translate}} <strong>{{ "labels.commons.required" | translate}}</strong>
             </mat-error>

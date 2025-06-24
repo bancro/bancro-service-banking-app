@@ -101,7 +101,7 @@ export class LoansAccountTermsStepComponent implements OnInit, OnChanges {
   ngOnChanges() {
     if (this.loansAccountProductTemplate) {
       this.loansAccountTermsData = this.loansAccountProductTemplate;
-      this.currencyDisplaySymbol = this.loansAccountTermsData.currency.displaySymbol;
+      this.currencyDisplaySymbol = this.loansAccountTermsData.currency.code;
       if (this.loanId != null && this.loansAccountTemplate.accountNo) {
         this.loansAccountTermsData = this.loansAccountTemplate;
       }

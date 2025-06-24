@@ -9,6 +9,8 @@ import { SettingsService } from 'app/settings/settings.service';
 import { ClientsService } from 'app/clients/clients.service';
 import { Dates } from 'app/core/utils/dates';
 
+/** Translation Imports */
+import { extract } from '../../core/i18n/i18n.service';
 
 /**
  * Create account transfers

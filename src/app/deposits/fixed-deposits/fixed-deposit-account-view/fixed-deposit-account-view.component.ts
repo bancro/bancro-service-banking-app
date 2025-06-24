@@ -1,31 +1,31 @@
 /** Angular Imports */
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { MatDialog } from '@angular/material/dialog';
+import { Component, OnInit } from "@angular/core";
+import { ActivatedRoute, Router } from "@angular/router";
+import { MatDialog } from "@angular/material/dialog";
 
 /** Custom Dialogs */
-import { DeleteDialogComponent } from 'app/shared/delete-dialog/delete-dialog.component';
-import { CalculateInterestDialogComponent } from './custom-dialogs/calculate-interest-dialog/calculate-interest-dialog.component';
-import { PostInterestDialogComponent } from './custom-dialogs/post-interest-dialog/post-interest-dialog.component';
-import { ToggleWithholdTaxDialogComponent } from './custom-dialogs/toggle-withhold-tax-dialog/toggle-withhold-tax-dialog.component';
+import { DeleteDialogComponent } from "app/shared/delete-dialog/delete-dialog.component";
+import { CalculateInterestDialogComponent } from "./custom-dialogs/calculate-interest-dialog/calculate-interest-dialog.component";
+import { PostInterestDialogComponent } from "./custom-dialogs/post-interest-dialog/post-interest-dialog.component";
+import { ToggleWithholdTaxDialogComponent } from "./custom-dialogs/toggle-withhold-tax-dialog/toggle-withhold-tax-dialog.component";
 
 /** Custom Button Config. */
-import { FixedDepositsButtonsConfiguration } from './fixed-deposits-buttons.config';
+import { FixedDepositsButtonsConfiguration } from "./fixed-deposits-buttons.config";
 
 /** Custom Services */
-import { FixedDepositsService } from '../fixed-deposits.service';
-import { SavingsService } from 'app/savings/savings.service';
+import { FixedDepositsService } from "../fixed-deposits.service";
+import { SavingsService } from "app/savings/savings.service";
+import { ExternalApisService } from "app/external-apis/external-apis.service";
 
 /**
  * Fixed Deposits Account View Component
  */
 @Component({
-  selector: 'mifosx-fixed-deposit-account-view',
-  templateUrl: './fixed-deposit-account-view.component.html',
-  styleUrls: ['./fixed-deposit-account-view.component.scss']
+  selector: "mifosx-fixed-deposit-account-view",
+  templateUrl: "./fixed-deposit-account-view.component.html",
+  styleUrls: ["./fixed-deposit-account-view.component.scss"],
 })
 export class FixedDepositAccountViewComponent implements OnInit {
-
   /** Fixed Deposits Account Data */
   fixedDepositsAccountData: any;
   /** Savings Data Tables */
@@ -41,12 +41,15 @@ export class FixedDepositAccountViewComponent implements OnInit {
    * @param {SavingsService} savingsService Savings Service
    * @param {MatDialog} dialog Mat Dialog
    */
-  constructor(private route: ActivatedRoute,
-              private router: Router,
-              private fixedDepositsService: FixedDepositsService,
-              private savingsService: SavingsService,
-              public dialog: MatDialog) {
-    this.route.data.subscribe((data: { fixedDepositsAccountData: any, savingsDatatables: any  }) => {
+  constructor(
+    private route: ActivatedRoute,
+    private router: Router,
+    private fixedDepositsService: FixedDepositsService,
+    private savingsService: SavingsService,
+    private externalApIService: ExternalApisService,
+    public dialog: MatDialog,
+  ) {
+    this.route.data.subscribe((data: { fixedDepositsAccountData: any; savingsDatatables: any }) => {
       this.fixedDepositsAccountData = data.fixedDepositsAccountData;
       this.savingsDatatables = data.savingsDatatables;
     });
@@ -62,14 +65,14 @@ export class FixedDepositAccountViewComponent implements OnInit {
   setConditionalButtons() {
     const status = this.fixedDepositsAccountData.status.value;
     this.buttonConfig = new FixedDepositsButtonsConfiguration(status);
-    if (this.fixedDepositsAccountData.taxGroup && status === 'Active') {
+    if (this.fixedDepositsAccountData.taxGroup && status === "Active") {
       if (this.fixedDepositsAccountData.withHoldTax) {
         this.buttonConfig.addOption({
-          name: 'Disable Withhold Tax'
+          name: "Disable Withhold Tax",
         });
       } else {
         this.buttonConfig.addOption({
-          name: 'Enable Withhold Tax'
+          name: "Enable Withhold Tax",
         });
       }
     }
@@ -82,7 +85,8 @@ export class FixedDepositAccountViewComponent implements OnInit {
   reload() {
     const clientId = this.fixedDepositsAccountData.clientId;
     const url: string = this.router.url;
-    this.router.navigateByUrl(`/clients/${clientId}/fixed-deposits-accounts`, {skipLocationChange: true})
+    this.router
+      .navigateByUrl(`/clients/${clientId}/fixed-deposits-accounts`, { skipLocationChange: true })
       .then(() => this.router.navigate([url]));
   }
 
@@ -92,33 +96,36 @@ export class FixedDepositAccountViewComponent implements OnInit {
    */
   doAction(name: string) {
     switch (name) {
-      case 'Approve':
-      case 'Reject':
-      case 'Activate':
-      case 'Close':
-      case 'Undo Approval':
-      case 'Add Charge':
-      case 'Withdraw By Client':
-      case 'Premature Close':
+      case "Approve":
+      case "Reject":
+      case "Activate":
+      case "Close":
+      case "Undo Approval":
+      case "Add Charge":
+      case "Withdraw By Client":
+      case "Premature Close":
         this.router.navigate([`actions/${name}`], { relativeTo: this.route });
         break;
-      case 'Modify Application':
-        this.router.navigate(['edit'], { relativeTo: this.route });
+      case "Modify Application":
+        this.router.navigate(["edit"], { relativeTo: this.route });
         break;
-      case 'Delete':
+      case "Delete":
         this.deleteFixedDepositsAccount();
         break;
-      case 'Calculate Interest':
+      case "Calculate Interest":
         this.calculateInterest();
         break;
-      case 'Post Interest':
+      case "Post Interest":
         this.postInterest();
         break;
-      case 'Enable Withhold Tax':
+      case "Enable Withhold Tax":
         this.enableWithHoldTax();
         break;
-      case 'Disable Withhold Tax':
+      case "Disable Withhold Tax":
         this.disableWithHoldTax();
+        break;
+      case "Download Deal Certificate":
+        this.downloadDealCertificate();
         break;
     }
   }
@@ -128,12 +135,12 @@ export class FixedDepositAccountViewComponent implements OnInit {
    */
   private deleteFixedDepositsAccount() {
     const deleteFixedDepositsAccountDialogRef = this.dialog.open(DeleteDialogComponent, {
-      data: { deleteContext: `fixed deposit account with id: ${this.fixedDepositsAccountData.id}` }
+      data: { deleteContext: `fixed deposit account with id: ${this.fixedDepositsAccountData.id}` },
     });
     deleteFixedDepositsAccountDialogRef.afterClosed().subscribe((response: any) => {
       if (response.delete) {
         this.fixedDepositsService.deleteFixedDepositsAccount(this.fixedDepositsAccountData.id).subscribe(() => {
-          this.router.navigate(['../../'], { relativeTo: this.route });
+          this.router.navigate(["../../"], { relativeTo: this.route });
         });
       }
     });
@@ -146,9 +153,11 @@ export class FixedDepositAccountViewComponent implements OnInit {
     const calculateInterestAccountDialogRef = this.dialog.open(CalculateInterestDialogComponent);
     calculateInterestAccountDialogRef.afterClosed().subscribe((response: any) => {
       if (response.confirm) {
-        this.fixedDepositsService.executeFixedDepositsAccountCommand(this.fixedDepositsAccountData.id, 'calculateInterest', {}).subscribe(() => {
-          this.reload();
-        });
+        this.fixedDepositsService
+          .executeFixedDepositsAccountCommand(this.fixedDepositsAccountData.id, "calculateInterest", {})
+          .subscribe(() => {
+            this.reload();
+          });
       }
     });
   }
@@ -160,13 +169,20 @@ export class FixedDepositAccountViewComponent implements OnInit {
     const postInterestAccountDialogRef = this.dialog.open(PostInterestDialogComponent);
     postInterestAccountDialogRef.afterClosed().subscribe((response: any) => {
       if (response.confirm) {
-        this.fixedDepositsService.executeFixedDepositsAccountCommand(this.fixedDepositsAccountData.id, 'postInterest', {}).subscribe(() => {
-          this.reload();
-        });
+        this.fixedDepositsService
+          .executeFixedDepositsAccountCommand(this.fixedDepositsAccountData.id, "postInterest", {})
+          .subscribe(() => {
+            this.reload();
+          });
       }
     });
   }
-
+  /**
+   * Download deal certficate externally
+   */
+  private downloadDealCertificate() {
+    this.externalApIService.downloadDealCertificate(this.fixedDepositsAccountData.id)
+  }
 
   /**
    * Enables withhold tax for fixed deposits account.
@@ -174,11 +190,14 @@ export class FixedDepositAccountViewComponent implements OnInit {
    */
   private enableWithHoldTax() {
     const deleteSavingsAccountDialogRef = this.dialog.open(ToggleWithholdTaxDialogComponent, {
-      data: { isEnable: true }
+      data: { isEnable: true },
     });
     deleteSavingsAccountDialogRef.afterClosed().subscribe((response: any) => {
       if (response.confirm) {
-        this.savingsService.executeSavingsAccountUpdateCommand(this.fixedDepositsAccountData.id, 'updateWithHoldTax', { withHoldTax: true})
+        this.savingsService
+          .executeSavingsAccountUpdateCommand(this.fixedDepositsAccountData.id, "updateWithHoldTax", {
+            withHoldTax: true,
+          })
           .subscribe(() => {
             this.reload();
           });
@@ -192,16 +211,18 @@ export class FixedDepositAccountViewComponent implements OnInit {
    */
   private disableWithHoldTax() {
     const disableWithHoldTaxDialogRef = this.dialog.open(ToggleWithholdTaxDialogComponent, {
-      data: { isEnable: false }
+      data: { isEnable: false },
     });
     disableWithHoldTaxDialogRef.afterClosed().subscribe((response: any) => {
       if (response.confirm) {
-        this.savingsService.executeSavingsAccountUpdateCommand(this.fixedDepositsAccountData.id, 'updateWithHoldTax', { withHoldTax: false})
+        this.savingsService
+          .executeSavingsAccountUpdateCommand(this.fixedDepositsAccountData.id, "updateWithHoldTax", {
+            withHoldTax: false,
+          })
           .subscribe(() => {
             this.reload();
           });
       }
     });
   }
-
 }

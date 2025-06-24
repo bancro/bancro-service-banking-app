@@ -7,10 +7,10 @@
     padding: 1%;
     .header-title-group {
       .account-card-title {
-        color: white;
+        color: #454745;
         width: 90%;
         p {
-          color: white;
+          color: #454745;
         }
       }
     }
@@ -31,23 +31,23 @@
     }
   }
   .navigation-tabs {
-    background-color: #F9FAFB;
+    background-color: #f9fafb;
     overflow: auto;
   }
   .content {
     .savings-account-tables {
-      padding: 1%;
-      margin: 1%;
+      border-radius: 8px;
       .table-headers {
         margin: 0;
-        padding: 6px;
+        padding: 10px 16px;
       }
-      td {
-        padding: 3px;
+      .td {
+        text-align: left;
       }
-    } 
+    }
   }
-  i, img:hover {
+  i,
+  img:hover {
     cursor: pointer;
   }
 }

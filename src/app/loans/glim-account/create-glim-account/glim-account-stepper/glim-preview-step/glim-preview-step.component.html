@@ -49,7 +49,7 @@
 
     <div fxFlexFill>
       <span fxFlex="40%">Principal:</span>
-      <span fxFlex="60%">{{ loansAccount.principal }} {{loansAccountProductTemplate.currency.DisplaySymbol}}</span>
+      <span fxFlex="60%">{{ loansAccount.principal }} {{loansAccountProductTemplate.currency.code}}</span>
     </div>
 
     <div fxFlexFill>
@@ -117,7 +117,7 @@
     <div fxFlexFill *ngIf="loansAccount.inArrearsTolerance">
       <span fxFlex="40%">Arrears tolerance: </span>
       <span
-        fxFlex="60%">{{loansAccount.inArrearsTolerance}}&nbsp;{{loansAccountProductTemplate.currency.displaySymbol}}</span>
+        fxFlex="60%">{{loansAccount.inArrearsTolerance}}&nbsp;{{loansAccountProductTemplate.currency.code}}</span>
     </div>
 
     <div fxFlexFill *ngIf="loansAccount.graceOnInterestCharged">
@@ -176,7 +176,7 @@
         <ng-container matColumnDef="name">
           <th mat-header-cell *matHeaderCellDef> Name </th>
           <td mat-cell *matCellDef="let charge">
-            {{ charge.name + ', ' + charge.currency.displaySymbol }}
+            {{ charge.name + ', ' + charge.currency.code }}
           </td>
         </ng-container>
 
@@ -236,7 +236,7 @@
 
         <ng-container matColumnDef="name">
           <th mat-header-cell *matHeaderCellDef> Name </th>
-          <td mat-cell *matCellDef="let charge"> {{ charge.name }},{{ charge.currency.displaySymbol }} </td>
+          <td mat-cell *matCellDef="let charge"> {{ charge.name }},{{ charge.currency.code }} </td>
         </ng-container>
 
         <ng-container matColumnDef="type">
