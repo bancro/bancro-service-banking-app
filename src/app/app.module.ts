@@ -88,6 +88,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     CentersModule,
     AccountingModule,
     SelfServiceModule,
+    DataImportModule,
     SystemModule,
     ProductsModule,
     OrganizationModule,
@@ -98,8 +99,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     CollectionsModule,
     TasksModule,
     ConfigurationWizardModule,
-    AppRoutingModule,
-    DataImportModule
+    AppRoutingModule
     // NgApexchartsModule,
     // TranslateModule.forRoot({
     //   loader: {
