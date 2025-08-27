@@ -14,7 +14,7 @@ import { of } from "rxjs"; // to handle errors gracefully
   providedIn: "root",
 })
 export class ExternalApisService {
-  private  baseUrl = "https://bancroapi.streams.com.ng";
+  private  baseUrl = "https://bancro-admin-api.azurewebsites.net";
 
   /**
    * @param {HttpClient} http Http Client to send requests.
