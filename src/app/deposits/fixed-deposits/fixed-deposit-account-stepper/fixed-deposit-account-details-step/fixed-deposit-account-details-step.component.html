@@ -13,6 +13,7 @@
         Product Name is <strong>required</strong>
       </mat-error>
     </mat-form-field>
+
      <mat-form-field appearance="outline"  fxFlex="48%" (click)="submittedOnDatePicker.open()">
       <mat-label>Submitted On</mat-label>
       <input matInput [min]="minDate" [max]="maxDate" [matDatepicker]="submittedOnDatePicker"
