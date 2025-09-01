@@ -27,6 +27,7 @@ export class FixedDepositProductsComponent implements OnInit, AfterViewInit {
   displayedColumns: string[] = ["name", "shortName"];
   /** Data source for fixed deposit products table. */
   dataSource: MatTableDataSource<any>;
+  canCreate: boolean = true
 
   /** Paginator for fixed deposit products table. */
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
@@ -88,10 +89,12 @@ export class FixedDepositProductsComponent implements OnInit, AfterViewInit {
         productsToDisplay = this.fixedDepositProductData.filter(
           (item: { name: string }) => item.name?.includes("_CUSTOM"),
         );
+        this.canCreate = false
       } else {
         productsToDisplay = this.fixedDepositProductData.filter(
           (item: { name: string }) => !item.name?.includes("_CUSTOM"),
         );
+        this.canCreate = true
       }
     });
 
