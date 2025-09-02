@@ -1,32 +1,29 @@
-<div *ngIf="canCreate" class="container m-b-20" fxLayout="row" fxLayoutAlign="end" fxLayoutGap="20px">
-  <div #buttonCreateFixedProduct class="in-block">
-    <button mat-raised-button color="primary" [routerLink]="['create']"
-      *mifosxHasPermission="'CREATE_FIXEDDEPOSITPRODUCT'">
-      <fa-icon icon="plus" class="m-r-10"></fa-icon>
-      Create Fixed Deposit Product
-    </button>
-  </div>
-</div>
-
 <div class="container">
 
-  <div #filter fxLayout="row" fxLayoutGap="20px">
-    <mat-form-field appearance="outline" fxFlex>
-      <mat-label>{{ 'labels.inputs.Filter' | translate }}</mat-label>
-      <input matInput (keyup)="applyFilter($event.target.value)">
-    </mat-form-field>
-  </div>
 
   <div fxLayout="row" fxLayoutAlign="space-between" class="mb-5 gap-x-5">
     <div #filter class="search-box">
       <input placeholder="Filter" (keyup)="applyFilter($event.target.value)"
         class="border border-[#DFE5EC] h-11 pl-[15px] min-w-[250px] flex-1 max-w-[400px] w-full rounded-lg focus:ring-0 focus:outline-none focus:border-gray-200 text-sm focus-within:outline-none placeholder:text-[#BEBEBE] focus:shadow-none" />
     </div>
-    <div #buttonAddEdit class="in-block">
-      <button mat-raised-button color="primary" [routerLink]="'manage'" *mifosxHasPermission="'UPDATE_CURRENCY'">
-        <fa-icon icon="plus" class="m-r-10"></fa-icon>
-        Add/Edit
-      </button>
+    <div class="" fxLayout="row" fxLayoutAlign="end" fxLayoutGap="20px">
+      <div *ngIf="!canCreate" #buttonCreateFixedProduct class="in-block">
+        <button mat-raised-button color="primary" (click)="handleImport()"
+          *mifosxHasPermission="'CREATE_FIXEDDEPOSITPRODUCT'">
+          <fa-icon icon="plus" class="m-r-10"></fa-icon>
+          Import Data
+        </button>
+        <input #hiddenFileInput type="file" accept=".png,.jpeg,.jpg,.xlsx,.csv" style="display: none"
+          (change)="onFileChange($event)" class="hidden" />
+      </div>
+      <div *ngIf="canCreate" #buttonCreateFixedProduct class="in-block">
+        <button mat-raised-button color="primary" [routerLink]="['create']"
+          *mifosxHasPermission="'CREATE_FIXEDDEPOSITPRODUCT'">
+          <fa-icon icon="plus" class="m-r-10"></fa-icon>
+          Create Fixed Deposit Product
+        </button>
+
+      </div>
     </div>
   </div>
 
