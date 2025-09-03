@@ -7,7 +7,7 @@
         class="border border-[#DFE5EC] h-11 pl-[15px] min-w-[250px] flex-1 max-w-[400px] w-full rounded-lg focus:ring-0 focus:outline-none focus:border-gray-200 text-sm focus-within:outline-none placeholder:text-[#BEBEBE] focus:shadow-none" />
     </div>
     <div class="" fxLayout="row" fxLayoutAlign="end" fxLayoutGap="20px">
-      <div *ngIf="!canCreate" #buttonCreateFixedProduct class="in-block">
+      <!-- <div *ngIf="!canCreate" #buttonCreateFixedProduct class="in-block">
         <button mat-raised-button color="primary" (click)="handleImport()"
           *mifosxHasPermission="'CREATE_FIXEDDEPOSITPRODUCT'">
           <fa-icon icon="plus" class="m-r-10"></fa-icon>
@@ -15,7 +15,7 @@
         </button>
         <input #hiddenFileInput type="file" accept=".png,.jpeg,.jpg,.xlsx,.csv" style="display: none"
           (change)="onFileChange($event)" class="hidden" />
-      </div>
+      </div> -->
       <div *ngIf="canCreate" #buttonCreateFixedProduct class="in-block">
         <button mat-raised-button color="primary" [routerLink]="['create']"
           *mifosxHasPermission="'CREATE_FIXEDDEPOSITPRODUCT'">
