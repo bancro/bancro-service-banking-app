@@ -95,4 +95,12 @@ export class ExternalApisService {
 
     return this.http.post(url, formData);
   }
+
+  importFdData(file: File): Observable<any> {
+    const url = `${this.baseUrl}/FixedDepositAccount/import-fd-accounts`;
+    const formData = new FormData();
+    formData.append('importData', file);
+
+    return this.http.post(url, formData);
+  }
 }
