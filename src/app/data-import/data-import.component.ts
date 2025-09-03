@@ -64,7 +64,7 @@ export class DataImportComponent implements OnInit {
     },
     {
       name: "Bancro Fixed Deposit Account Import",
-      note: "Deposit Frequency ID: 1 = Days, 2 = Weeks, 3 = Months, 4 = Years.",
+      note: "Deposit Frequency ID: 0 = Days, 1 = Week, 2 = Months, 3 = Years.",
       note1:
         "Deposit Period: This is the count that accompanies the frequency set. E.g. If you put 30 in the period field and set 1 in the frequency ID, it means the FD account is for 30 days",
       legalFormId: null,
