@@ -1,32 +1,32 @@
 /** Angular Imports */
-import { Injectable } from '@angular/core';
-import { HttpEvent, HttpInterceptor, HttpHandler, HttpRequest } from '@angular/common/http';
+import { Injectable } from "@angular/core";
+import { HttpEvent, HttpInterceptor, HttpHandler, HttpRequest } from "@angular/common/http";
 
 /** rxjs Imports */
-import { Observable } from 'rxjs';
+import { Observable } from "rxjs";
 
 /** Custom Imports */
-import { environment } from '../../../environments/environment';
-import { SettingsService } from 'app/settings/settings.service';
+import { environment } from "../../../environments/environment";
+import { SettingsService } from "app/settings/settings.service";
 
 /** Http request (default) options headers. */
 const httpOptions = {
   headers: {
-    'Fineract-Platform-TenantId': environment.fineractPlatformTenantId
-  }
+    "Fineract-Platform-TenantId": environment.fineractPlatformTenantId,
+    corvenid: "yellowstone",
+  },
 };
 
 /** Authorization header. */
-const authorizationHeader = 'Authorization';
+const authorizationHeader = "Authorization";
 /** Two factor access token header. */
-const twoFactorAccessTokenHeader = 'Fineract-Platform-TFA-Token';
+const twoFactorAccessTokenHeader = "Fineract-Platform-TFA-Token";
 
 /**
  * Http Request interceptor to set the request headers.
  */
 @Injectable()
 export class AuthenticationInterceptor implements HttpInterceptor {
-
   constructor(private settingsService: SettingsService) {}
 
   /**
@@ -34,7 +34,7 @@ export class AuthenticationInterceptor implements HttpInterceptor {
    */
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     if (this.settingsService.tenantIdentifier) {
-      httpOptions.headers['Fineract-Platform-TenantId'] = this.settingsService.tenantIdentifier;
+      httpOptions.headers["Fineract-Platform-TenantId"] = this.settingsService.tenantIdentifier;
     }
     request = request.clone({ setHeaders: httpOptions.headers });
     return next.handle(request);
@@ -73,5 +73,4 @@ export class AuthenticationInterceptor implements HttpInterceptor {
   removeTwoFactorAuthorization() {
     delete httpOptions.headers[twoFactorAccessTokenHeader];
   }
-
 }
