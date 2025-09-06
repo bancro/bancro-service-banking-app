@@ -23,8 +23,8 @@ export class DataImportComponent implements OnInit {
   legalFormId: number | null = null;
   selectedDataType: DataType | null = null;
   loading: boolean = false;
-  successMessage: string = '';
-  failureMessage: string = '';
+  successMessage: string = "";
+  failureMessage: string = "";
   errorList: string[] = [];
 
   // Data types with their corresponding notes and Legal Form ID placeholders
@@ -35,7 +35,7 @@ export class DataImportComponent implements OnInit {
       legalFormId: 1,
       legalFormIdPlaceholder: "Enter Legal Form ID for Customer Data",
       template: "assets/templates/Bancro_Person_Customer_Data_Import_Template.xlsx",
-      apiUrl: "import-clients",
+      apiUrl: "import-clients-cowry",
     },
     {
       name: "Bancro Staff Data Import",
@@ -97,6 +97,8 @@ export class DataImportComponent implements OnInit {
     if (file) {
       this.selectedFile = file;
     }
+    this.showFailureMessage([]);
+    this.showSuccessMessage("", 0);
   }
 
   // Function to handle template download
@@ -113,48 +115,48 @@ export class DataImportComponent implements OnInit {
     this.legalFormId = null;
     this.selectedDataType = this.dataTypes[0];
     this.loading = false;
+    this.showFailureMessage([]);
+    this.showSuccessMessage("", 0);
   }
 
   // Function to handle data submission
   submitData(): void {
     if (this.selectedFile && this.legalFormId === this.selectedDataType?.legalFormId) {
       this.loading = true;
-      this.externalApisService
-        .importData(this.selectedFile, this.selectedDataType.apiUrl)
-        .subscribe(
-          (response: any) => {
-            this.loading = false;
-            const parsedResponse = JSON.parse(response);
-            if (parsedResponse?.Success === false) {
-              this.showFailureMessage(parsedResponse.Errors || []);
-            }
-            if (parsedResponse?.Success === true) {
-              this.showSuccessMessage(parsedResponse.Message, parsedResponse.UploadedRecords);
-            }
-          },
-          (error) => {
-            this.loading = false;
-            this.showFailureMessage(['An unexpected error occurred. Please try again.']);
-            console.error('API Error:', error);
+      this.externalApisService.importData(this.selectedFile, this.selectedDataType.apiUrl).subscribe(
+        (response: any) => {
+          this.loading = false;
+          const parsedResponse = JSON.parse(response);
+          if (parsedResponse?.Success === false) {
+            this.showFailureMessage(parsedResponse.Errors || []);
           }
-        );
+          if (parsedResponse?.Success === true) {
+            this.showSuccessMessage(parsedResponse.Message, parsedResponse.UploadedRecords);
+          }
+        },
+        (error) => {
+          this.loading = false;
+          this.showFailureMessage(["An unexpected error occurred. Please try again."]);
+          console.error("API Error:", error);
+        },
+      );
     } else {
       this.loading = false;
       console.error("Invalid Legal Form ID or No File Selected");
-      this.showFailureMessage(['Please select a file and ensure the Legal Form ID is valid.']);
+      this.showFailureMessage(["Please select a file and ensure the Legal Form ID is valid."]);
     }
   }
 
   // Handle success message
   showSuccessMessage(message: string, uploadedRecords: number): void {
     this.successMessage = `${message} ${uploadedRecords} records were uploaded successfully.`;
-    this.failureMessage = '';
+    this.failureMessage = "";
   }
 
   // Handle failure message
   showFailureMessage(errors: string[]): void {
-    this.failureMessage = 'Errors occurred during upload:';
+    this.failureMessage = "Errors occurred during upload:";
     this.errorList = errors;
-    this.successMessage = '';
+    this.successMessage = "";
   }
 }
