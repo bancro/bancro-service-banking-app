@@ -97,8 +97,8 @@ export class DataImportComponent implements OnInit {
     if (file) {
       this.selectedFile = file;
     }
-    this.showFailureMessage([]);
-    this.showSuccessMessage("", 0);
+    this.successMessage = ""
+    this.failureMessage = ""
   }
 
   // Function to handle template download
@@ -115,8 +115,8 @@ export class DataImportComponent implements OnInit {
     this.legalFormId = null;
     this.selectedDataType = this.dataTypes[0];
     this.loading = false;
-    this.showFailureMessage([]);
-    this.showSuccessMessage("", 0);
+    this.successMessage = ""
+    this.failureMessage = ""
   }
 
   // Function to handle data submission
