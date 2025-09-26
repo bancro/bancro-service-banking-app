@@ -57,6 +57,7 @@
     "d3": "^7.6.1",
     "install": "^0.13.0",
     "lodash": "4.17.21",
+    "mat-table-exporter": "^10.2.4",
     "moment": "^2.29.4",
     "ng-apexcharts": "^1.9.0",
     "rxjs": "6.6.2",

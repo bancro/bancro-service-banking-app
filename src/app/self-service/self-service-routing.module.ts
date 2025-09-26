@@ -21,6 +21,7 @@ import { TaskManagementComponent } from './task-management/task-management.compo
 import { ViewUserResolver } from './users/view-user/view-user.resolver';
 import { OfficesResolver } from 'app/organization/offices/common-resolvers/offices.resolver';
 import { UsersResolver } from 'app/users/users.resolver';
+import { DataImportComponent } from 'app/data-import/data-import.component';
 
 /** Self Service Admin Portal Routes */
 const routes: Routes = [
@@ -78,7 +79,12 @@ const routes: Routes = [
           path: 'task-management',
           component: TaskManagementComponent,
           data: { title: extract('Self Service Task Management'), breadcrumb: 'Task Management' }
-        }
+        },
+         {
+              path: "data-import",
+              component: DataImportComponent,
+              data: { title: extract("Imports"), breadcrumb: "Data Import", routeParamBreadcrumb: false },
+            },
       ]
     }
   ])

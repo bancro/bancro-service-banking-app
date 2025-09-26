@@ -1,25 +1,26 @@
 /** Angular Imports */
-import { NgModule } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
+import { NgModule } from "@angular/core";
+import { Routes, RouterModule } from "@angular/router";
 
 /** Routing Imports */
-import { Route } from '../core/route/route.service';
+import { Route } from "../core/route/route.service";
 
 /** Translation Imports */
-import { extract } from '../core/i18n/i18n.service';
+import { extract } from "../core/i18n/i18n.service";
 
 /** Custom Components */
-import { SettingsComponent } from './settings.component';
+import { SettingsComponent } from "./settings.component";
+import { DataImportComponent } from "app/data-import/data-import.component";
 
 /** Settings Routes */
 const routes: Routes = [
   Route.withShell([
     {
-      path: 'settings',
+      path: "settings",
       component: SettingsComponent,
-      data: { title: extract('Settings'), breadcrumb: 'Settings' }
-    }
-  ])
+      data: { title: extract("Settings"), breadcrumb: "Settings" },
+    },
+  ]),
 ];
 
 /**
@@ -30,6 +31,6 @@ const routes: Routes = [
 @NgModule({
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule],
-  providers: []
+  providers: [],
 })
-export class SettingsRoutingModule { }
+export class SettingsRoutingModule {}

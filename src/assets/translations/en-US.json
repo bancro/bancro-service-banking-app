@@ -437,6 +437,7 @@
       "List of currencies available.": "List of currencies available.",
       "Create Employee": "Create Employee",
       "Import Employees": "Import Employees",
+      "Imports": "Imports",
       "List of employees in the organization.": "List of employees in the organization.",
       "Search bar to filter employees.": "Search bar to filter employees.",
       "Create Holiday": "Create Holiday",
@@ -1798,7 +1799,8 @@
       "Main Items": "Main Items",
       "Checker Inbox and Tasks": "Checker Inbox and Tasks",
       "Individual Collection Sheet": "Individual Collection Sheet",
-      "Keyboard Shortcuts": "Keyboard Shortcuts"
+      "Keyboard Shortcuts": "Keyboard Shortcuts",
+      "Data Import": "Data Import"
     },
     "placeholders": {
       "Add new server": "Add new server",

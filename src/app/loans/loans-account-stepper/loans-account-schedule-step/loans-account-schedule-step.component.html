@@ -1,13 +1,14 @@
 <div fxLayout="row wrap" fxLayout.lt-md="column">
+  <button class="!py-[4px]" mat-flat-button color="primary" mat-button (click)="showRepaymentInfo()">
+    {{ !showRepayment ? "Show" : "Hide" }} Repayment Info
+  </button>
 
-  <a mat-button (click)="showRepaymentInfo()">
-    Repayment Info
-  </a>
-
-  <mifosx-repayment-schedule-tab fxFlex="100%" [repaymentScheduleDetails]="repaymentScheduleDetails"
-    [currencyCode]="currencyCode">
+  <mifosx-repayment-schedule-tab
+    fxFlex="100%"
+    [repaymentScheduleDetails]="repaymentScheduleDetails"
+    [currencyCode]="currencyCode"
+  >
   </mifosx-repayment-schedule-tab>
-
 </div>
 
 <div fxLayout="row" class="margin-t" fxLayout.xs="column" fxLayoutAlign="center" fxLayoutGap="2%">
@@ -19,7 +20,5 @@
     Next
     <fa-icon icon="arrow-right" class="m-l-10"></fa-icon>
   </button>
-  <button mat-raised-button *ngIf="loanId" [routerLink]="['../', 'general']">
-    Cancel
-  </button>
+  <button mat-raised-button *ngIf="loanId" [routerLink]="['../', 'general']">Cancel</button>
 </div>

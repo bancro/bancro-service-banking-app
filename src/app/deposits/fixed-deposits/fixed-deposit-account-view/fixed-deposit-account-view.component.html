@@ -8,7 +8,8 @@
         <div>
           <img mat-card-md-image class="profile-image"
             matTooltip="Fixed Deposits Account"
-            [src]="'assets/images/fd_account_placeholder.png'">
+            [src]="'assets/images/fd_account_placeholder.png'"
+            alt="Fixed Deposits Account Placeholder">
         </div>
       </div>
 
@@ -23,8 +24,8 @@
           <p>
             Account #: {{fixedDepositsAccountData.accountNo}} | Client Name: {{fixedDepositsAccountData.clientName}}<br/>
             <span *ngIf="!fixedDepositsAccountData.status.rejected && !fixedDepositsAccountData.status.submittedAndPendingApproval">
-              Current Balance: {{fixedDepositsAccountData.currency.displaySymbol}}&nbsp;{{fixedDepositsAccountData.summary.accountBalance}}<br/>
-              Deposit Amount: {{fixedDepositsAccountData.currency.displaySymbol}}&nbsp;{{fixedDepositsAccountData.depositAmount}}<br/>
+              Current Balance: {{fixedDepositsAccountData.currency.code}}&nbsp;{{fixedDepositsAccountData.summary.accountBalance | formatNumber}}<br/>
+              Deposit Amount: {{fixedDepositsAccountData.currency.code}}&nbsp;{{fixedDepositsAccountData.depositAmount | formatNumber}}<br/>
             </span>
           </p>
         </mat-card-subtitle>
@@ -131,23 +132,23 @@
             <tbody>
               <tr>
                 <td>Principal Amount</td>
-                <td>{{fixedDepositsAccountData.currency.displaySymbol}}&nbsp;{{fixedDepositsAccountData.depositAmount}}</td>
+                <td>{{fixedDepositsAccountData.currency.code}}&nbsp;{{fixedDepositsAccountData.depositAmount | formatNumber}}</td>
               </tr>
               <tr>
                 <td>Maturity Amount</td>
-                <td>{{fixedDepositsAccountData.currency.displaySymbol}}&nbsp;{{fixedDepositsAccountData.maturityAmount}}</td>
+                <td>{{fixedDepositsAccountData.currency.code}}&nbsp;{{fixedDepositsAccountData.maturityAmount | formatNumber}}</td>
               </tr>
               <tr *ngIf="fixedDepositsAccountData.summary.totalDeposits">
                 <td>Total Deposits</td>
-                <td>{{fixedDepositsAccountData.currency.displaySymbol}}&nbsp;{{fixedDepositsAccountData.summary.totalDeposits}}</td>
+                <td>{{fixedDepositsAccountData.currency.code}}&nbsp;{{fixedDepositsAccountData.summary.totalDeposits | formatNumber}}</td>
               </tr>
               <tr *ngIf="fixedDepositsAccountData.summary.totalWithdrawals">
                 <td>Total Withdrawals</td>
-                <td>{{fixedDepositsAccountData.currency.displaySymbol}}&nbsp;{{fixedDepositsAccountData.summary.totalWithdrawals}}</td>
+                <td>{{fixedDepositsAccountData.currency.code}}&nbsp;{{fixedDepositsAccountData.summary.totalWithdrawals | formatNumber}}</td>
               </tr>
               <tr *ngIf="fixedDepositsAccountData.summary.totalInterestEarned >= 0">
                 <td>Total Interest Earned</td>
-                <td>{{fixedDepositsAccountData.currency.displaySymbol}}&nbsp;{{fixedDepositsAccountData.summary.totalInterestEarned}}</td>
+                <td>{{fixedDepositsAccountData.currency.code}}&nbsp;{{fixedDepositsAccountData.summary.totalInterestEarned | formatNumber}}</td>
               </tr>
           </table>
         </div>
@@ -159,11 +160,11 @@
               <tbody>
                 <tr>
                   <td>Principal Amount</td>
-                  <td>{{fixedDepositsAccountData.currency.displaySymbol}}&nbsp;{{fixedDepositsAccountData.depositAmount}}</td>
+                  <td>{{fixedDepositsAccountData.currency.code}}&nbsp;{{fixedDepositsAccountData.depositAmount | formatNumber}}</td>
                 </tr>
                 <tr>
                   <td>Maturity Amount</td>
-                  <td>{{fixedDepositsAccountData.currency.displaySymbol}}&nbsp;{{fixedDepositsAccountData.maturityAmount}}</td>
+                  <td>{{fixedDepositsAccountData.currency.code}}&nbsp;{{fixedDepositsAccountData.maturityAmount | formatNumber}}</td>
                 </tr>
               </tbody>
             </table>

@@ -22,7 +22,7 @@
         <mat-card-subtitle>
           <p>
             {{ 'labels.inputs.Account'  |translate}} #: {{sharesAccountData.accountNo}} | {{ 'labels.inputs.Client Name'  |translate}}: {{sharesAccountData.clientName}}<br/>
-            {{ 'labels.inputs.Current Market Price'  |translate}}: {{sharesAccountData.currency.displaySymbol}}&nbsp;{{sharesAccountData.currentMarketPrice}}<br/>
+            {{ 'labels.inputs.Current Market Price'  |translate}}: {{sharesAccountData.currency.code}}&nbsp;{{sharesAccountData.currentMarketPrice}}<br/>
             {{ 'labels.inputs.Lockin Period'  |translate}}: {{sharesAccountData.lockinPeriod ? sharesAccountData.lockinPeriod : 'N/A'}}
             {{sharesAccountData.lockinPeriod ? sharesAccountData.lockPeriodTypeEnum.value : ''}}
           </p>

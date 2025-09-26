@@ -12,7 +12,7 @@ import { SystemService } from "../../system.service";
 import { PopoverService } from "../../../configuration-wizard/popover/popover.service";
 import { ConfigurationWizardService } from "../../../configuration-wizard/configuration-wizard.service";
 
-/** Data Imports */
+/** Data Import */
 import { appTableData, entitySubTypeData, savingsSubTypeData } from "../app-table-data";
 
 /** Custom Components */

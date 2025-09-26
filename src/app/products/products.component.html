@@ -1,7 +1,8 @@
 <div class="container">
-  <mat-nav-list  class="grid grid-cols-3 gap-6 list-grid">
+  <mat-nav-list class="grid grid-cols-3 gap-6 list-grid">
     <div #loanProducts>
-      <mat-list-item   class="border border-[#E5E7EC] rounded-lg hover:bg-[#EDEFEB75] flex items-start gap-x-4" [routerLink]="['loan-products']" *mifosxHasPermission="'READ_LOANPRODUCT'">
+      <mat-list-item class="border border-[#E5E7EC] rounded-lg hover:bg-[#EDEFEB75] flex items-start gap-x-4"
+        [routerLink]="['loan-products']" *mifosxHasPermission="'READ_LOANPRODUCT'">
         <mat-icon matListIcon>
           <fa-icon icon="briefcase" size="xs" class="text-[#454745]"></fa-icon>
         </mat-icon>
@@ -11,7 +12,8 @@
     </div>
 
     <div #savingsProducts>
-      <mat-list-item   class="border border-[#E5E7EC] rounded-lg hover:bg-[#EDEFEB75] flex items-start gap-x-4" [routerLink]="['saving-products']" *mifosxHasPermission="'READ_SAVINGSPRODUCT'">
+      <mat-list-item class="border border-[#E5E7EC] rounded-lg hover:bg-[#EDEFEB75] flex items-start gap-x-4"
+        [routerLink]="['saving-products']" *mifosxHasPermission="'READ_SAVINGSPRODUCT'">
         <mat-icon matListIcon>
           <fa-icon icon="briefcase" size="xs" class="text-[#454745]"></fa-icon>
         </mat-icon>
@@ -21,7 +23,8 @@
     </div>
 
     <div #shareProducts>
-      <mat-list-item   class="border border-[#E5E7EC] rounded-lg hover:bg-[#EDEFEB75] flex items-start gap-x-4" [routerLink]="['share-products']" *mifosxHasPermission="'READ_SHAREPRODUCT'">
+      <mat-list-item class="border border-[#E5E7EC] rounded-lg hover:bg-[#EDEFEB75] flex items-start gap-x-4"
+        [routerLink]="['share-products']" *mifosxHasPermission="'READ_SHAREPRODUCT'">
         <mat-icon matListIcon>
           <fa-icon icon="briefcase" size="xs" class="text-[#454745]"></fa-icon>
         </mat-icon>
@@ -31,7 +34,8 @@
     </div>
 
     <div #charges>
-      <mat-list-item   class="border border-[#E5E7EC] rounded-lg hover:bg-[#EDEFEB75] flex items-start gap-x-4" [routerLink]="['charges']" *mifosxHasPermission="'READ_CHARGE'">
+      <mat-list-item class="border border-[#E5E7EC] rounded-lg hover:bg-[#EDEFEB75] flex items-start gap-x-4"
+        [routerLink]="['charges']" *mifosxHasPermission="'READ_CHARGE'">
         <mat-icon matListIcon>
           <fa-icon icon="money-bill-alt" size="xs" class="text-[#454745]"></fa-icon>
         </mat-icon>
@@ -40,7 +44,8 @@
       </mat-list-item>
     </div>
 
-    <mat-list-item   class="border border-[#E5E7EC] rounded-lg hover:bg-[#EDEFEB75] flex items-start gap-x-4" [routerLink]="['collaterals']">
+    <mat-list-item class="border border-[#E5E7EC] rounded-lg hover:bg-[#EDEFEB75] flex items-start gap-x-4"
+      [routerLink]="['collaterals']">
       <mat-icon matListIcon>
         <fa-icon icon="money-bill-alt" size="xs" class="text-[#454745]"></fa-icon>
       </mat-icon>
@@ -48,10 +53,8 @@
       <p matLine>Define collaterals for Collateral Management</p>
     </mat-list-item>
 
-    <mat-list-item   class="border border-[#E5E7EC] rounded-lg hover:bg-[#EDEFEB75] flex items-start gap-x-4"
-      [routerLink]="['delinquency-bucket-configurations']"
-      *mifosxHasPermission="'READ_DELINQUENCY_BUCKET'"
-    >
+    <mat-list-item class="border border-[#E5E7EC] rounded-lg hover:bg-[#EDEFEB75] flex items-start gap-x-4"
+      [routerLink]="['delinquency-bucket-configurations']" *mifosxHasPermission="'READ_DELINQUENCY_BUCKET'">
       <mat-icon matListIcon>
         <fa-icon icon="briefcase" size="xs" class="text-[#454745]"></fa-icon>
       </mat-icon>
@@ -59,7 +62,8 @@
       <p matLine>Define delinquency day ranges and bucket set for loan products</p>
     </mat-list-item>
 
-    <mat-list-item   class="border border-[#E5E7EC] rounded-lg hover:bg-[#EDEFEB75] flex items-start gap-x-4" [routerLink]="['products-mix']" *mifosxHasPermission="'READ_PRODUCTMIX'">
+    <mat-list-item class="border border-[#E5E7EC] rounded-lg hover:bg-[#EDEFEB75] flex items-start gap-x-4"
+      [routerLink]="['products-mix']" *mifosxHasPermission="'READ_PRODUCTMIX'">
       <mat-icon matListIcon>
         <fa-icon icon="random" size="xs" class="text-[#454745]"></fa-icon>
       </mat-icon>
@@ -68,7 +72,8 @@
     </mat-list-item>
 
     <div #fixedDepositProducts>
-      <mat-list-item   class="border border-[#E5E7EC] rounded-lg hover:bg-[#EDEFEB75] flex items-start gap-x-4" [routerLink]="['fixed-deposit-products']" *mifosxHasPermission="'READ_FIXEDDEPOSITPRODUCT'">
+      <mat-list-item class="border border-[#E5E7EC] rounded-lg hover:bg-[#EDEFEB75] flex items-start gap-x-4"
+        [routerLink]="['fixed-deposit-products']" *mifosxHasPermission="'READ_FIXEDDEPOSITPRODUCT'">
         <mat-icon matListIcon>
           <fa-icon icon="briefcase" size="xs" class="text-[#454745]"></fa-icon>
         </mat-icon>
@@ -76,12 +81,20 @@
         <p matLine>Add, modify or inactivate a Fixed deposit product</p>
       </mat-list-item>
     </div>
-
+    <div #fixedDepositProducts>
+      <mat-list-item class="border border-[#E5E7EC] rounded-lg hover:bg-[#EDEFEB75] flex items-start gap-x-4"
+        [routerLink]="['custom-fixed-deposit-products']"
+        *mifosxHasPermission="'READ_FIXEDDEPOSITPRODUCT'">
+        <mat-icon matListIcon>
+          <fa-icon icon="briefcase" size="xs" class="text-[#454745]"></fa-icon>
+        </mat-icon>
+        <h4 matLine>Custom Fixed Deposit Products</h4>
+        <p matLine>Add, modify or inactivate a Fixed deposit product</p>
+      </mat-list-item>
+    </div>
     <div #recurringDepositProducts>
-      <mat-list-item   class="border border-[#E5E7EC] rounded-lg hover:bg-[#EDEFEB75] flex items-start gap-x-4"
-        [routerLink]="['recurring-deposit-products']"
-        *mifosxHasPermission="'READ_RECURRINGDEPOSITPRODUCT'"
-      >
+      <mat-list-item class="border border-[#E5E7EC] rounded-lg hover:bg-[#EDEFEB75] flex items-start gap-x-4"
+        [routerLink]="['recurring-deposit-products']" *mifosxHasPermission="'READ_RECURRINGDEPOSITPRODUCT'">
         <mat-icon matListIcon>
           <fa-icon icon="briefcase" size="xs" class="text-[#454745]"></fa-icon>
         </mat-icon>
@@ -90,7 +103,8 @@
       </mat-list-item>
     </div>
 
-    <mat-list-item   class="border border-[#E5E7EC] rounded-lg hover:bg-[#EDEFEB75] flex items-start gap-x-4" [routerLink]="['tax-configurations']" *mifosxHasPermission="'READ_TAXGROUP'">
+    <mat-list-item class="border border-[#E5E7EC] rounded-lg hover:bg-[#EDEFEB75] flex items-start gap-x-4"
+      [routerLink]="['tax-configurations']" *mifosxHasPermission="'READ_TAXGROUP'">
       <mat-icon matListIcon>
         <fa-icon icon="cogs" size="xs" class="text-[#454745]"></fa-icon>
       </mat-icon>
@@ -98,7 +112,8 @@
       <p matLine>Define Tax components and Tax groups</p>
     </mat-list-item>
 
-    <mat-list-item   class="border border-[#E5E7EC] rounded-lg hover:bg-[#EDEFEB75] flex items-start gap-x-4" [routerLink]="['floating-rates']" *mifosxHasPermission="'READ_FLOATINGRATE'">
+    <mat-list-item class="border border-[#E5E7EC] rounded-lg hover:bg-[#EDEFEB75] flex items-start gap-x-4"
+      [routerLink]="['floating-rates']" *mifosxHasPermission="'READ_FLOATINGRATE'">
       <mat-icon matListIcon>
         <fa-icon icon="money-bill-alt" size="xs" class="text-[#454745]"></fa-icon>
       </mat-icon>

@@ -130,6 +130,8 @@ export class SidenavComponent implements OnInit {
         this.pushActivity('/templates');
       } else if (activity.includes('/self-service')) {
         this.pushActivity('/self-service');
+        } else if (activity.includes('/data-import')) {
+        this.pushActivity('/data-import');
       }
     });
     this.mappedActivities.reverse();
