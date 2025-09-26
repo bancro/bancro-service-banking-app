@@ -30,7 +30,7 @@ export class DataImportComponent implements OnInit {
   // Data types with their corresponding notes and Legal Form ID placeholders
   dataTypes: DataType[] = [
     {
-      name: "Bancro Person Customer",
+      name: "Person Customer",
       note: "Legal Form ID should be 1 for Customer Data.",
       legalFormId: 1,
       legalFormIdPlaceholder: "Enter Legal Form ID for Customer Data",
@@ -38,7 +38,7 @@ export class DataImportComponent implements OnInit {
       apiUrl: "import-clients-cowry",
     },
     {
-      name: "Bancro Staff Data Import",
+      name: "Staff Data Import",
       note: "",
       legalFormId: null,
       legalFormIdPlaceholder: "Enter Legal Form ID for Transaction Data",
@@ -46,7 +46,7 @@ export class DataImportComponent implements OnInit {
       apiUrl: "import-staffs",
     },
     {
-      name: "Bancro Entity Customer Data Import",
+      name: "Entity Customer Data Import",
       note: "Legal Form ID should be 2 for Account Data.",
       legalFormId: 2,
       legalFormIdPlaceholder: "Enter Legal Form ID for Account Data",
@@ -54,7 +54,7 @@ export class DataImportComponent implements OnInit {
       apiUrl: "import-entity-cowry",
     },
     {
-      name: "Bancro GL Account Import",
+      name: "GL Account Import",
       note: "Account Type: 1 = Asset, 2 = Liability, 3 = Equity, 4 = Income, 5 = Expense ",
       note1: " Account Usage: 1 = Detail, 2 = Header",
       legalFormId: null,
@@ -63,7 +63,7 @@ export class DataImportComponent implements OnInit {
       apiUrl: "import-glaccounts",
     },
     {
-      name: "Bancro Fixed Deposit Account Import",
+      name: "Fixed Deposit Account Import",
       note: "Deposit Frequency ID: 0 = Days, 1 = Week, 2 = Months, 3 = Years.",
       note1:
         "Deposit Period: This is the count that accompanies the frequency set. E.g. If you put 30 in the period field and set 1 in the frequency ID, it means the FD account is for 30 days",
