@@ -12,9 +12,9 @@ export const environment = {
   // For connecting to others servers running elsewhere update the base API URL
   baseApiUrls:
     window["env"]["fineractApiUrls"] ||
-    "https://bancro.io:8443,https://dev.mifos.io,https://demo.mifos.io,https://qa.mifos.io,https://staging.mifos.io,https://mobile.mifos.io,https://demo.fineract.dev,https://localhost:8443",
+    "https://core.oxidefinance.com:8443,https://dev.mifos.io,https://demo.mifos.io,https://qa.mifos.io,https://staging.mifos.io,https://mobile.mifos.io,https://demo.fineract.dev,https://localhost:8443",
   // For connecting to server running elsewhere set the base API URL
-  baseApiUrl: window["env"]["baseApiUrl"] || "https://bancro.io:8443",
+  baseApiUrl: window["env"]["baseApiUrl"] || "https://core.oxidefinance.com:8443",
   allowServerSwitch: env.allow_switching_backend_instance,
   apiProvider: window["env"]["apiProvider"] || "/fineract-provider/api",
   apiVersion: window["env"]["apiVersion"] || "/v1",

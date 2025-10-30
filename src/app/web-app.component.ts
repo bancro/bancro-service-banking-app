@@ -118,7 +118,7 @@ export class WebAppComponent implements OnInit {
       .subscribe(event => {
         const title = event['title'];
         if (title) {
-          this.titleService.setTitle(`${this.translateService.instant(title)} | Oxide`);
+          this.titleService.setTitle(`${this.translateService.instant(title)} | Oxide Core`);
         }
       });
 
