@@ -2,7 +2,7 @@
 
   <div fxLayout="row wrap" fxLayoutGap="2%" fxLayout.lt-md="column">
 
-     <mat-form-field appearance="outline"  fxFlex="48%">
+    <mat-form-field appearance="outline" fxFlex="48%">
       <mat-label>Product Name</mat-label>
       <mat-select formControlName="productId" required>
         <mat-option *ngFor="let product of productData" [value]="product.id">
@@ -13,8 +13,16 @@
         Product Name is <strong>required</strong>
       </mat-error>
     </mat-form-field>
+    <mat-form-field appearance="outline" fxFlex="48%">
+      <mat-label>Savings Account</mat-label>
+      <mat-select formControlName="fundingSavingsAccountId">
+        <mat-option *ngFor="let account of fundingSavingsAccountData" [value]="account.id">
+          {{ account.accountNo }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
 
-     <mat-form-field appearance="outline"  fxFlex="48%" (click)="submittedOnDatePicker.open()">
+    <mat-form-field appearance="outline" fxFlex="48%" (click)="submittedOnDatePicker.open()">
       <mat-label>Submitted On</mat-label>
       <input matInput [min]="minDate" [max]="maxDate" [matDatepicker]="submittedOnDatePicker"
         formControlName="submittedOnDate" required>
@@ -25,7 +33,7 @@
       </mat-error>
     </mat-form-field>
 
-     <mat-form-field appearance="outline"  fxFlex="48%">
+    <mat-form-field appearance="outline" fxFlex="48%">
       <mat-label>Field Officer</mat-label>
       <mat-select formControlName="fieldOfficerId">
         <mat-option *ngFor="let officer of fieldOfficerData" [value]="officer.id">

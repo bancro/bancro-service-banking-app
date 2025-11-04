@@ -141,16 +141,16 @@ export class CreateFixedDepositAccountComponent {
 
     // Uncomment this to actually make the API call
 
-    if (customInterestRate) {
+    // if (customInterestRate) {
       this.externalApIService
         .addFixedDepositAccount({ ...fixedDepositAccount, customInterestRate })
         .subscribe((response: any) => {
           this.router.navigate(["../", response.data?.data?.resourceId], { relativeTo: this.route });
         });
-    } else {
-      this.fixedDepositsService.createFixedDepositAccount(fixedDepositAccount).subscribe((response: any) => {
-        this.router.navigate(["../", response.resourceId], { relativeTo: this.route });
-      });
-    }
+    // } else {
+    //   this.fixedDepositsService.createFixedDepositAccount(fixedDepositAccount).subscribe((response: any) => {
+    //     this.router.navigate(["../", response.resourceId], { relativeTo: this.route });
+    //   });
+    // }
   }
 }
