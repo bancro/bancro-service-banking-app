@@ -15,8 +15,8 @@
     </mat-form-field>
     <mat-form-field appearance="outline" fxFlex="48%">
       <mat-label>Savings Account</mat-label>
-      <mat-select formControlName="fundingSavingsAccountId">
-        <mat-option *ngFor="let account of fundingSavingsAccountData" [value]="account.id">
+      <mat-select formControlName="fundingSavingsAccountId" required>
+        <mat-option *ngFor="let account of fundingSavingsAccountData|accountsFilter:'saving':'open':'isSavings'" [value]="account.id">
           {{ account.accountNo }}
         </mat-option>
       </mat-select>
