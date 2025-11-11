@@ -14,7 +14,7 @@ import { of } from "rxjs"; // to handle errors gracefully
   providedIn: "root",
 })
 export class ExternalApisService {
-  private  baseUrl = "https://bancroapi.streams.com.ng";
+  private baseUrl = "https://bancroapi.streams.com.ng";
 
   /**
    * @param {HttpClient} http Http Client to send requests.
@@ -78,8 +78,18 @@ export class ExternalApisService {
    * @param {any} payload .
    */
   addFixedDepositAccount(payload: any): Observable<any> {
-    console.log('Test data', payload)
-    const url = `${this.baseUrl}/FixedDepositAccount/add-account?fundingSavingsAccountId=${payload?.fundingSavingsAccountId}&isCustom=${!!payload?.customInterestRate}`;
+    console.log("Test data", payload);
+    const url = `${
+      this.baseUrl
+    }/FixedDepositAccount/add-account?fundingSavingsAccountId=${payload?.fundingSavingsAccountId}&isCustom=${!!payload?.customInterestRate}`;
+    return this.http.post(url, payload);
+  }
+
+   activateFixedDepositAccount(payload: any): Observable<any> {
+    console.log("Test data", payload);
+    const url = `${
+      this.baseUrl
+    }/FixedDepositAccount/activate-on-debit-fd-account/?fdAccountId=${payload.accountId} `;
     return this.http.post(url, payload);
   }
 
@@ -91,7 +101,7 @@ export class ExternalApisService {
   importData(file: File, endpoint: string): Observable<any> {
     const url = `${this.baseUrl}/DataImport/${endpoint}`;
     const formData = new FormData();
-    formData.append('importData', file);
+    formData.append("importData", file);
 
     return this.http.post(url, formData);
   }
@@ -99,7 +109,7 @@ export class ExternalApisService {
   importFdData(file: File): Observable<any> {
     const url = `${this.baseUrl}/FixedDepositAccount/import-fd-accounts`;
     const formData = new FormData();
-    formData.append('importData', file);
+    formData.append("importData", file);
 
     return this.http.post(url, formData);
   }
