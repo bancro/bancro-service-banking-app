@@ -78,7 +78,6 @@ export class ExternalApisService {
    * @param {any} payload .
    */
   addFixedDepositAccount(payload: any): Observable<any> {
-    console.log("Test data", payload);
     const url = `${
       this.baseUrl
     }/FixedDepositAccount/add-account?fundingSavingsAccountId=${payload?.fundingSavingsAccountId}&isCustom=${!!payload?.customInterestRate}`;
@@ -86,7 +85,6 @@ export class ExternalApisService {
   }
 
    activateFixedDepositAccount(payload: any): Observable<any> {
-    console.log("Test data", payload);
     const url = `${
       this.baseUrl
     }/FixedDepositAccount/activate-on-debit-fd-account/?fdAccountId=${payload.accountId} `;
