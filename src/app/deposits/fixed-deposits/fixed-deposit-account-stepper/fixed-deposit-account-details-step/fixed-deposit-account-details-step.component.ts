@@ -5,6 +5,7 @@ import { SettingsService } from "app/settings/settings.service";
 
 /** Custom Services */
 import { FixedDepositsService } from "../../fixed-deposits.service";
+import { ClientsService } from "app/clients/clients.service";
 
 /**
  * Fixed Deposits Account Details Step
@@ -31,6 +32,8 @@ export class FixedDepositAccountDetailsStepComponent implements OnInit {
   /** Fixed Deposits Account Details Form */
   fixedDepositAccountDetailsForm: UntypedFormGroup;
 
+  fundingSavingsAccountData: any[];
+
   /** Fixed Deposits Account Template with product data  */
   @Output() fixedDepositsAccountProductTemplate = new EventEmitter();
 
@@ -44,6 +47,7 @@ export class FixedDepositAccountDetailsStepComponent implements OnInit {
     private formBuilder: UntypedFormBuilder,
     private fixedDepositsService: FixedDepositsService,
     private settingsService: SettingsService,
+    private clientsService: ClientsService,
   ) {
     this.createFixedDepositsAccountDetailsForm();
   }
@@ -74,6 +78,7 @@ export class FixedDepositAccountDetailsStepComponent implements OnInit {
       productId: ["", Validators.required],
       submittedOnDate: ["", Validators.required],
       fieldOfficerId: [""],
+      fundingSavingsAccountId: [""],
     });
   }
 
@@ -95,6 +100,12 @@ export class FixedDepositAccountDetailsStepComponent implements OnInit {
           this.fixedDepositAccountDetailsForm.get("fieldOfficerId").patchValue("");
         }
       });
+    });
+
+    this.clientsService.getClientAccountData(clientId).subscribe((response: any) => {
+      this.fundingSavingsAccountData = response.savingsAccounts.filter(
+        (item: { status: { active: any } }) => item.status.active,
+      );
     });
   }
 
