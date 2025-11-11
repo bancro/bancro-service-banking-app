@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Dates } from 'app/core/utils/dates';
+import { ExternalApisService } from 'app/external-apis/external-apis.service';
 
 /** Custom Services */
 import { SavingsService } from 'app/savings/savings.service';
@@ -31,6 +32,7 @@ export class ActivateFixedDepositsAccountComponent implements OnInit {
    * Fixed deposits endpoint is not supported so using Savings endpoint.
    * @param {FormBuilder} formBuilder Form Builder
    * @param {SavingsService} savingsService Savings Service
+   * @param {ExternalApisService} externalService External Service
    * @param {Dates} dateUtils Date Utils
    * @param {ActivatedRoute} route Activated Route
    * @param {Router} router Router
@@ -38,6 +40,7 @@ export class ActivateFixedDepositsAccountComponent implements OnInit {
    */
   constructor(private formBuilder: UntypedFormBuilder,
               private savingsService: SavingsService,
+                private externalService: ExternalApisService,
               private dateUtils: Dates,
               private route: ActivatedRoute,
               private router: Router,
@@ -79,7 +82,10 @@ export class ActivateFixedDepositsAccountComponent implements OnInit {
       dateFormat,
       locale
     };
-    this.savingsService.executeSavingsAccountCommand(this.accountId, 'activate', data).subscribe(() => {
+    // this.savingsService.executeSavingsAccountCommand(this.accountId, 'activate', data).subscribe(() => {
+    //   this.router.navigate(['../../'], { relativeTo: this.route });
+    // });
+     this.externalService.activateFixedDepositAccount({...data, accountId:this.accountId}).subscribe(() => {
       this.router.navigate(['../../'], { relativeTo: this.route });
     });
   }
