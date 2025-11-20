@@ -39,12 +39,13 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
    */
   private handleError(response: HttpErrorResponse): Observable<HttpEvent<any>> {
     const status = response.status;
-    let errorMessage = (response.error.developerMessage || response.message);
+    let errorMessage = (response.error.developerMessage || response.error.message  || response.message);
     if (response.error.errors) {
       if (response.error.errors[0]) {
         errorMessage = response.error.errors[0].defaultUserMessage || response.error.errors[0].developerMessage;
       }
     }
+
 
     if (!environment.production) {
       log.error(`Request Error: ${errorMessage}`);
