@@ -8,6 +8,7 @@ import { DeleteDialogComponent } from "app/shared/delete-dialog/delete-dialog.co
 import { CalculateInterestDialogComponent } from "./custom-dialogs/calculate-interest-dialog/calculate-interest-dialog.component";
 import { PostInterestDialogComponent } from "./custom-dialogs/post-interest-dialog/post-interest-dialog.component";
 import { ToggleWithholdTaxDialogComponent } from "./custom-dialogs/toggle-withhold-tax-dialog/toggle-withhold-tax-dialog.component";
+import { BancroCommandDialogComponent } from "./custom-dialogs/bancro-command-dialog/bancro-command-dialog.component";
 
 /** Custom Button Config. */
 import { FixedDepositsButtonsConfiguration } from "./fixed-deposits-buttons.config";
@@ -57,6 +58,7 @@ export class FixedDepositAccountViewComponent implements OnInit {
 
   ngOnInit() {
     this.setConditionalButtons();
+    this.fetchBancroDetails();
   }
 
   /**
@@ -127,7 +129,41 @@ export class FixedDepositAccountViewComponent implements OnInit {
       case "Download Deal Certificate":
         this.downloadDealCertificate();
         break;
+      case "Pay Upfront Interest":
+        this.handleNewCommand({ command: 'payUpfrontInterest', accountId: this.fixedDepositsAccountData.id });
+        break;
+      case "Liquidate Interest":
+        this.handleNewCommand({ command: 'liquidateInterest', accountId: this.fixedDepositsAccountData.id });
+        break;
+      case "Liquidate Principal":
+        this.handleNewCommand({ command: 'liquidatePrincipal', accountId: this.fixedDepositsAccountData.id });
+        break;
+      case "Liquidate Principal + Interest":
+        this.handleNewCommand({ command: 'liquidatePrincipalAndInterest', accountId: this.fixedDepositsAccountData.id });
+        break;
+      case "Top Up Principal":
+        this.handleNewCommand({ command: 'topUpPrincipal', accountId: this.fixedDepositsAccountData.id });
+        break;
+      case "Change Interest Rate":
+        this.handleNewCommand({ command: 'changeInterestRate', accountId: this.fixedDepositsAccountData.id });
+        break;
+      case "Post Accounting":
+        this.handleNewCommand({ command: 'postAccounting', accountId: this.fixedDepositsAccountData.id });
+        break;
+      case "Retry Accounting":
+        this.handleNewCommand({ command: 'retryAccounting', accountId: this.fixedDepositsAccountData.id });
+        break;
+      case "Reverse Bancro Event":
+        this.handleNewCommand({ command: 'reverseBancroEvent',  accountId: this.fixedDepositsAccountData.id });
+        break;
     }
+  }
+
+  fetchBancroDetails() {
+    this.externalApIService.getFdAccountBancroDetails(this.fixedDepositsAccountData.id).subscribe((response: any) => {
+      this.fixedDepositsAccountData.bancroDetails = response;
+      this.buttonConfig.applyBancroCapabilities(response);
+    });
   }
 
   /**
@@ -181,7 +217,34 @@ export class FixedDepositAccountViewComponent implements OnInit {
    * Download deal certficate externally
    */
   private downloadDealCertificate() {
-    this.externalApIService.downloadDealCertificate(this.fixedDepositsAccountData.id)
+    this.externalApIService.downloadDealCertificate(this.fixedDepositsAccountData.id);
+  }
+
+  private readonly commandTitles: Record<string, string> = {
+    payUpfrontInterest: 'Pay Upfront Interest',
+    liquidateInterest: 'Liquidate Interest',
+    liquidatePrincipal: 'Liquidate Principal',
+    liquidatePrincipalAndInterest: 'Liquidate Principal + Interest',
+    topUpPrincipal: 'Top Up Principal',
+    changeInterestRate: 'Change Interest Rate',
+    postAccounting: 'Post Accounting',
+    retryAccounting: 'Retry Accounting',
+    reverseBancroEvent: 'Reverse Bancro Event',
+  };
+
+  private handleNewCommand(meta: { command: string; accountId: string | number }) {
+    const title = this.commandTitles[meta.command] ?? meta.command;
+    const dialogRef = this.dialog.open(BancroCommandDialogComponent, {
+      width: '480px',
+      data: { command: meta.command, title, accountId: meta.accountId }
+    });
+    dialogRef.afterClosed().subscribe((result: any) => {
+      if (result?.confirm) {
+        this.externalApIService.handleBancroCommand(result.payload).subscribe(() => {
+          this.reload();
+        });
+      }
+    });
   }
 
   /**

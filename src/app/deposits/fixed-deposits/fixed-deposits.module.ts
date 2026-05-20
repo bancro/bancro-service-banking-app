@@ -26,6 +26,7 @@ import { WithdrawByClientFixedDepositsAccountComponent } from './fixed-deposits-
 import { ViewTransactionComponent } from './fixed-deposit-account-view/view-transaction/view-transaction.component';
 import { WaiveChargeDialogComponent } from './fixed-deposit-account-view/custom-dialogs/waive-charge-dialog/waive-charge-dialog.component';
 import { InactivateChargeDialogComponent } from './fixed-deposit-account-view/custom-dialogs/inactivate-charge-dialog/inactivate-charge-dialog.component';
+import { BancroCommandDialogComponent } from './fixed-deposit-account-view/custom-dialogs/bancro-command-dialog/bancro-command-dialog.component';
 import { AddChargeFixedDepositsAccountComponent } from './fixed-deposits-account-actions/add-charge-fixed-deposits-account/add-charge-fixed-deposits-account.component';
 import { PrematureCloseFixedDepositsAccountComponent } from './fixed-deposits-account-actions/premature-close-fixed-deposits-account/premature-close-fixed-deposits-account.component';
 import { CloseFixedDepositsAccountComponent } from './fixed-deposits-account-actions/close-fixed-deposits-account/close-fixed-deposits-account.component';
@@ -64,6 +65,7 @@ import { EditFixedDepositAccountComponent } from './edit-fixed-deposit-account/e
     ViewTransactionComponent,
     WaiveChargeDialogComponent,
     InactivateChargeDialogComponent,
+    BancroCommandDialogComponent,
     AddChargeFixedDepositsAccountComponent,
     PrematureCloseFixedDepositsAccountComponent,
     CloseFixedDepositsAccountComponent,

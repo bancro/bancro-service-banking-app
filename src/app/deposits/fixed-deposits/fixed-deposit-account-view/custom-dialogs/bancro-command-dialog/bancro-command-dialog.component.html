@@ -1,0 +1,66 @@
+<h1 mat-dialog-title>{{ data.title }}</h1>
+
+<form [formGroup]="form" (ngSubmit)="submit()">
+  <div mat-dialog-content>
+
+    <!-- Transaction-style commands: date, amount, paymentTypeId, note -->
+    <ng-container *ngIf="isTransactionCommand">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Transaction Date</mat-label>
+        <input matInput [matDatepicker]="txDatePicker" formControlName="transactionDate" required />
+        <mat-datepicker-toggle matSuffix [for]="txDatePicker"></mat-datepicker-toggle>
+        <mat-datepicker #txDatePicker></mat-datepicker>
+        <mat-error *ngIf="form.get('transactionDate').hasError('required')">Transaction date is required.</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Amount</mat-label>
+        <input matInput type="number" formControlName="amount" required />
+        <mat-error *ngIf="form.get('amount').hasError('required')">Amount is required.</mat-error>
+        <mat-error *ngIf="form.get('amount').hasError('min')">Amount must be greater than 0.</mat-error>
+      </mat-form-field>
+
+
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Note</mat-label>
+        <textarea matInput formControlName="note" rows="2"></textarea>
+      </mat-form-field>
+    </ng-container>
+
+    <!-- Interest rate change command: effectiveDate, newAnnualInterestRate, reason -->
+    <ng-container *ngIf="isInterestRateCommand">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Effective Date</mat-label>
+        <input matInput [matDatepicker]="effDatePicker" formControlName="effectiveDate" required />
+        <mat-datepicker-toggle matSuffix [for]="effDatePicker"></mat-datepicker-toggle>
+        <mat-datepicker #effDatePicker></mat-datepicker>
+        <mat-error *ngIf="form.get('effectiveDate').hasError('required')">Effective date is required.</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>New Annual Interest Rate (%)</mat-label>
+        <input matInput type="number" formControlName="newAnnualInterestRate" required />
+        <mat-error *ngIf="form.get('newAnnualInterestRate').hasError('required')">Interest rate is required.</mat-error>
+        <mat-error *ngIf="form.get('newAnnualInterestRate').hasError('min')">Rate must be 0 or above.</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Reason</mat-label>
+        <textarea matInput formControlName="reason" rows="2" required></textarea>
+        <mat-error *ngIf="form.get('reason').hasError('required')">Reason is required.</mat-error>
+      </mat-form-field>
+    </ng-container>
+
+    <!-- No-payload commands: just a confirmation message -->
+    <ng-container *ngIf="isNoPayloadCommand">
+      <p>Are you sure you want to execute <strong>{{ data.title }}</strong>?</p>
+    </ng-container>
+
+  </div>
+
+  <mat-dialog-actions align="end">
+    <button mat-button type="button" mat-dialog-close>Cancel</button>
+    <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid">Submit</button>
+  </mat-dialog-actions>
+</form>

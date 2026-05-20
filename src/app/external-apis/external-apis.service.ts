@@ -84,10 +84,8 @@ export class ExternalApisService {
     return this.http.post(url, payload);
   }
 
-   activateFixedDepositAccount(payload: any): Observable<any> {
-    const url = `${
-      this.baseUrl
-    }/FixedDepositAccount/activate-on-debit-fd-account/?fdAccountId=${payload.accountId} `;
+  activateFixedDepositAccount(payload: any): Observable<any> {
+    const url = `${this.baseUrl}/FixedDepositAccount/activate-on-debit-fd-account/?fdAccountId=${payload.accountId} `;
     return this.http.post(url, payload);
   }
 
@@ -110,5 +108,16 @@ export class ExternalApisService {
     formData.append("importData", file);
 
     return this.http.post(url, formData);
+  }
+
+  getFdAccountBancroDetails(accountId: string): Observable<any> {
+    console.log("Loaded", accountId);
+    const url = `/fixeddepositaccounts/${accountId}/bancro-details`;
+    return this.http.get(url);
+  }
+  handleBancroCommand(payload: any): Observable<any> {
+    const url = `/fixeddepositaccounts/${payload.accountId}/bancro-command?command=${payload.command}`;
+
+    return this.http.post(url, payload);
   }
 }
