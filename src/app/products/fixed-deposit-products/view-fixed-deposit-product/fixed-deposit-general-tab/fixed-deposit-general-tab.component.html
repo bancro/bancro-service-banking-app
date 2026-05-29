@@ -140,7 +140,41 @@
 
         <div *ngIf="fixedDepositProductData.activeChart" fxFlexFill fxLayout="row wrap" fxLayout.lt-md="column" >
 
-          <h3 class="mat-h3" fxFlexFill>Interest Rate Chart</h3>
+          <h3 class="mat-h3" fxFlexFill>Bancro Fixed Deposit Options</h3>
+
+        <mat-divider fxFlexFill></mat-divider>
+
+        <div fxFlexFill>
+          <span fxFlex="40%">Allow Upfront Interest:</span>
+          <span fxFlex="60%">{{ fixedDepositProductData.allowUpfrontInterest ? 'Yes' : 'No' }}</span>
+        </div>
+
+        <div fxFlexFill>
+          <span fxFlex="40%">Allow Partial Interest Liquidation:</span>
+          <span fxFlex="60%">{{ fixedDepositProductData.allowInterestLiquidation ? 'Yes' : 'No' }}</span>
+        </div>
+
+        <div fxFlexFill>
+          <span fxFlex="40%">Allow Partial Principal Liquidation:</span>
+          <span fxFlex="60%">{{ fixedDepositProductData.allowPrincipalLiquidation ? 'Yes' : 'No' }}</span>
+        </div>
+
+        <div fxFlexFill>
+          <span fxFlex="40%">Allow Principal + Interest Liquidation:</span>
+          <span fxFlex="60%">{{ fixedDepositProductData.allowPrincipalInterestLiquidation ? 'Yes' : 'No' }}</span>
+        </div>
+
+        <div fxFlexFill>
+          <span fxFlex="40%">Allow Principal Top-up:</span>
+          <span fxFlex="60%">{{ fixedDepositProductData.allowPrincipalTopup ? 'Yes' : 'No' }}</span>
+        </div>
+
+        <div fxFlexFill>
+          <span fxFlex="40%">Allow Interest Rate Change:</span>
+          <span fxFlex="60%">{{ fixedDepositProductData.allowInterestRateChange ? 'Yes' : 'No' }}</span>
+        </div>
+
+        <h3 class="mat-h3" fxFlexFill>Interest Rate Chart</h3>
 
           <mat-divider [inset]="true"></mat-divider>
 

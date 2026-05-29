@@ -112,6 +112,45 @@
       </mat-error>
     </mat-form-field>
 
+    <mat-divider fxFlex="98%"></mat-divider>
+
+    <div fxFlex="98%" fxLayout="column" class="margin-v">
+      <h4 class="mat-h4">Bancro Fixed Deposit Options</h4>
+      <p class="mat-caption">
+        Enable the additional Bancro actions that can be performed after a customer fixed deposit account has been created from this product.
+      </p>
+    </div>
+
+    <mat-checkbox fxFlex="48%" labelPosition="before" formControlName="allowUpfrontInterest" class="margin-v"
+      matTooltip="Allows paying projected interest upfront while principal remains locked.">
+      Allow Upfront Interest
+    </mat-checkbox>
+
+    <mat-checkbox fxFlex="48%" labelPosition="before" formControlName="allowInterestLiquidation" class="margin-v"
+      matTooltip="Allows partial liquidation of available interest only.">
+      Allow Partial Liquidation of Interest
+    </mat-checkbox>
+
+    <mat-checkbox fxFlex="48%" labelPosition="before" formControlName="allowPrincipalLiquidation" class="margin-v"
+      matTooltip="Allows partial liquidation of principal during the tenor.">
+      Allow Partial Liquidation of Principal
+    </mat-checkbox>
+
+    <mat-checkbox fxFlex="48%" labelPosition="before" formControlName="allowPrincipalInterestLiquidation" class="margin-v"
+      matTooltip="Allows liquidation of principal and interest together.">
+      Allow Liquidation of Principal + Interest
+    </mat-checkbox>
+
+    <mat-checkbox fxFlex="48%" labelPosition="before" formControlName="allowPrincipalTopup" class="margin-v"
+      matTooltip="Allows principal top-ups during the tenor.">
+      Allow Principal Top-up During Tenor
+    </mat-checkbox>
+
+    <mat-checkbox fxFlex="48%" labelPosition="before" formControlName="allowInterestRateChange" class="margin-v"
+      matTooltip="Allows changing the interest rate during the tenor using the Bancro rate schedule.">
+      Allow Interest Rate Change During Tenor
+    </mat-checkbox>
+
   </div>
 
   <div fxLayout="row" class="margin-t" fxLayout.xs="column" fxLayoutAlign="center" fxLayoutGap="2%">
