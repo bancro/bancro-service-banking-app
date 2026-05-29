@@ -111,7 +111,7 @@ export class ExternalApisService {
   }
 
   getFdAccountBancroDetails(accountId: string): Observable<any> {
-
+    console.log("Loaded", accountId);
     const url = `/fixeddepositaccounts/${accountId}/bancro-details`;
     return this.http.get(url);
   }
@@ -119,15 +119,5 @@ export class ExternalApisService {
     const url = `/fixeddepositaccounts/${payload.accountId}/bancro-command?command=${payload.command}`;
 
     return this.http.post(url, payload);
-  }
-
-  getFDGlMapppings(): Observable<any> {
-    const url = `/fixeddepositaccounts/bancro-accounting-mappings`;
-    return this.http.get(url);
-  }
-  postFfGlMapping(payload: any): Observable<any> {
-    const url = `/fixeddepositaccounts/bancro-accounting-mappings`;
-
-    return this.http.post(url,payload);
   }
 }

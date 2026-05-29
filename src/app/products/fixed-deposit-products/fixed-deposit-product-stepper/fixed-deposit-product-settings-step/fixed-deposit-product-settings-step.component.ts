@@ -45,13 +45,7 @@ export class FixedDepositProductSettingsStepComponent implements OnInit {
         'preClosurePenalApplicable': this.fixedDepositProductsTemplate.preClosurePenalApplicable,
         'preClosurePenalInterest': this.fixedDepositProductsTemplate.preClosurePenalInterest,
         'preClosurePenalInterestOnTypeId': this.fixedDepositProductsTemplate.preClosurePenalInterestOnType ? this.fixedDepositProductsTemplate.preClosurePenalInterestOnType.id : '',
-        'withHoldTax': this.fixedDepositProductsTemplate.withHoldTax,
-        'allowUpfrontInterest': this.fixedDepositProductsTemplate.allowUpfrontInterest,
-        'allowInterestLiquidation': this.fixedDepositProductsTemplate.allowInterestLiquidation,
-        'allowPrincipalLiquidation': this.fixedDepositProductsTemplate.allowPrincipalLiquidation,
-        'allowPrincipalInterestLiquidation': this.fixedDepositProductsTemplate.allowPrincipalInterestLiquidation,
-        'allowPrincipalTopup': this.fixedDepositProductsTemplate.allowPrincipalTopup,
-        'allowInterestRateChange': this.fixedDepositProductsTemplate.allowInterestRateChange
+        'withHoldTax': this.fixedDepositProductsTemplate.withHoldTax
       });
     }
   }
@@ -69,13 +63,7 @@ export class FixedDepositProductSettingsStepComponent implements OnInit {
       'preClosurePenalApplicable': [false],
       'preClosurePenalInterest': [''],
       'preClosurePenalInterestOnTypeId': [''],
-      'withHoldTax': [false],
-      'allowUpfrontInterest': [false],
-      'allowInterestLiquidation': [false],
-      'allowPrincipalLiquidation': [false],
-      'allowPrincipalInterestLiquidation': [false],
-      'allowPrincipalTopup': [false],
-      'allowInterestRateChange': [false]
+      'withHoldTax': [false]
     });
   }
 
