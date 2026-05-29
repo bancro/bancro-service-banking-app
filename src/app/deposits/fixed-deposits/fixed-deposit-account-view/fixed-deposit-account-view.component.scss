@@ -51,3 +51,18 @@
     cursor: pointer;
   }
 }
+
+.bancro-status-message,
+.bancro-warning-message {
+  margin: 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 4px;
+}
+
+.bancro-status-message {
+  background: #eef7ff;
+}
+
+.bancro-warning-message {
+  background: #fff8e1;
+}

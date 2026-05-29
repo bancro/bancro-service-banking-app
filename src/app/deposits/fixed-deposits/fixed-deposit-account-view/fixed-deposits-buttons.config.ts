@@ -117,60 +117,59 @@ export class FixedDepositsButtonsConfiguration {
   }
 
   addOption(option: {name: string}) {
-    this.optionArray.push(option);
+    if (!this.optionArray.some(existing => existing.name === option.name)) {
+      this.optionArray.push(option);
+    }
   }
 
   /**
    * Conditionally adds Bancro action options based on capabilities
    * and event accounting statuses returned from the bancro-details API.
+   * Supports both flat allow* response fields and a nested capabilities object.
    */
   applyBancroCapabilities(bancroDetails: any) {
     if (!bancroDetails) { return; }
 
-    const caps = bancroDetails.capabilities ?? {};
-    const events: any[] = bancroDetails.events ?? [];
+    const caps = bancroDetails.capabilities ?? bancroDetails;
+    const events: any[] = bancroDetails.events ?? bancroDetails.bancroEvents ?? [];
 
     if (caps.allowUpfrontInterest) {
-      this.optionArray.push({ name: 'Pay Upfront Interest' });
+      this.addOption({ name: 'Pay Upfront Interest' });
     }
     if (caps.allowInterestLiquidation) {
-      this.optionArray.push({ name: 'Liquidate Interest' });
+      this.addOption({ name: 'Liquidate Interest' });
     }
     if (caps.allowPrincipalLiquidation) {
-      this.optionArray.push({ name: 'Liquidate Principal' });
+      this.addOption({ name: 'Liquidate Principal' });
     }
     if (caps.allowPrincipalInterestLiquidation) {
-      this.optionArray.push({ name: 'Liquidate Principal + Interest' });
+      this.addOption({ name: 'Liquidate Principal + Interest' });
     }
-    if (caps.allowPrincipalTopup) {
-      this.optionArray.push({ name: 'Top Up Principal' });
+    if (caps.allowPrincipalTopup || caps.allowPrincipalTopUp) {
+      this.addOption({ name: 'Top Up Principal' });
     }
     if (caps.allowInterestRateChange) {
-      this.optionArray.push({ name: 'Change Interest Rate' });
+      this.addOption({ name: 'Change Interest Rate' });
     }
 
-    // Event-based: Post Accounting — any event with PENDING or FAILED accounting status
     const hasPendingOrFailed = events.some(
       e => e.accountingStatus === 'PENDING' || e.accountingStatus === 'FAILED'
     );
     if (hasPendingOrFailed) {
-      this.optionArray.push({ name: 'Post Accounting' });
+      this.addOption({ name: 'Post Accounting' });
     }
 
-    // Event-based: Retry Accounting — any event with FAILED accounting status
     const hasFailed = events.some(e => e.accountingStatus === 'FAILED');
     if (hasFailed) {
-      this.optionArray.push({ name: 'Retry Accounting' });
+      this.addOption({ name: 'Retry Accounting' });
     }
 
-    // Event-based: Reverse Bancro Event — any event POSTED and reversible
     const hasReversible = events.some(
-      e => e.accountingStatus === 'POSTED' && e.isReversible === true
+      e => e.accountingStatus === 'POSTED' && (e.isReversible === true || e.reversible === true)
     );
     if (hasReversible) {
-      this.optionArray.push({ name: 'Reverse Bancro Event' });
+      this.addOption({ name: 'Reverse Bancro Event' });
     }
   }
 
 }
-

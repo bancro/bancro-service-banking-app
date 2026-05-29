@@ -59,6 +59,14 @@
 
   <mat-card-content class="content">
 
+    <div class="bancro-status-message" *ngIf="isBancroDetailsLoading">
+      Loading Bancro fixed deposit details...
+    </div>
+
+    <div class="bancro-warning-message" *ngIf="bancroDetailsError">
+      {{ bancroDetailsError }}
+    </div>
+
     <div class="fixed-deposits-account-tables" fxLayout="row" fxLayoutGap="2%">
 
       <div fxFlex="49%" fxLayout="column" fxLayoutGap="4%">
@@ -141,44 +149,47 @@
           <h4 class="table-headers">Performance History</h4>
           <table>
             <tbody>
-              <!-- "depositAmount": 13589206.09,
-  "interestAmountAtMaturity": 1990354.41,
-  "withholdTaxAmountAtMaturity": 199035.44,
-  "principalAndInterestAmountAtMaturity": 15579560.50,
-  "netMaturityAmount": 15380525.06,
-  "maturityAmount": 15579560.50 -->
               <tr>
                 <td>Principal Amount</td>
-                <td>{{fixedDepositsAccountData.currency.code}}&nbsp;{{fixedDepositsAccountData.depositAmount |
+                <td>{{fixedDepositsAccountData.currency.code}}&nbsp;{{getBancroValue('depositAmount') |
                   formatNumber}}</td>
               </tr>
 
               <tr>
                 <td>Maturity Amount</td>
-                <td>{{fixedDepositsAccountData.currency.code}}&nbsp;{{fixedDepositsAccountData.maturityAmount |
+                <td>{{fixedDepositsAccountData.currency.code}}&nbsp;{{getBancroValue('maturityAmount') |
                   formatNumber}}</td>
               </tr>
               <tr>
                 <td>Net Maturity Amount</td>
-                <td>{{fixedDepositsAccountData.currency.code}}&nbsp;{{fixedDepositsAccountData.netMaturityAmount |
+                <td>{{fixedDepositsAccountData.currency.code}}&nbsp;{{getBancroValue('netMaturityAmount') |
                   formatNumber}}</td>
               </tr>
               <tr>
                 <td>Principal & Interest Amount at Maturity</td>
                 <td>
-                  {{fixedDepositsAccountData.currency.code}}&nbsp;{{fixedDepositsAccountData.principalAndInterestAmountAtMaturity
+                  {{fixedDepositsAccountData.currency.code}}&nbsp;{{getBancroValue('principalAndInterestAmountAtMaturity')
                   | formatNumber}}</td>
               </tr>
               <tr>
                 <td>Interest Amount at Maturity</td>
-                <td>{{fixedDepositsAccountData.currency.code}}&nbsp;{{fixedDepositsAccountData.interestAmountAtMaturity
+                <td>{{fixedDepositsAccountData.currency.code}}&nbsp;{{getBancroValue('interestAmountAtMaturity')
                   | formatNumber}}</td>
               </tr>
               <tr>
                 <td>Withhold Tax Amount at Maturity</td>
                 <td>
-                  {{fixedDepositsAccountData.currency.code}}&nbsp;{{fixedDepositsAccountData.withholdTaxAmountAtMaturity
+                  {{fixedDepositsAccountData.currency.code}}&nbsp;{{getBancroValue('withholdTaxAmountAtMaturity')
                   | formatNumber}}</td>
+              </tr>
+
+              <tr *ngIf="bancroDetails?.accountingStatus">
+                <td>Bancro Accounting Status</td>
+                <td>{{bancroDetails.accountingStatus}}</td>
+              </tr>
+              <tr *ngIf="bancroDetails?.latestAccountingErrorMessage">
+                <td>Bancro Accounting Error</td>
+                <td>{{bancroDetails.latestAccountingErrorMessage}}</td>
               </tr>
 
               <tr *ngIf="fixedDepositsAccountData.summary.totalDeposits">
@@ -207,12 +218,12 @@
               <tbody>
                 <tr>
                   <td>Principal Amount</td>
-                  <td>{{fixedDepositsAccountData.currency.code}}&nbsp;{{fixedDepositsAccountData.depositAmount |
+                  <td>{{fixedDepositsAccountData.currency.code}}&nbsp;{{getBancroValue('depositAmount') |
                     formatNumber}}</td>
                 </tr>
                 <tr>
                   <td>Maturity Amount</td>
-                  <td>{{fixedDepositsAccountData.currency.code}}&nbsp;{{fixedDepositsAccountData.maturityAmount |
+                  <td>{{fixedDepositsAccountData.currency.code}}&nbsp;{{getBancroValue('maturityAmount') |
                     formatNumber}}</td>
                 </tr>
               </tbody>

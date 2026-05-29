@@ -134,4 +134,41 @@ export class FixedDepositsService {
     return this.http.get(`/standinginstructions`, { params: httpParams });
   }
 
+
+  /**
+   * Retrieves Bancro-specific fixed deposit maturity, capability, event, and accounting details.
+   * This call is additive and should be made after the generic fixed deposit account endpoint loads.
+   * @param accountId Fixed Deposit Account Id.
+   */
+  getBancroDetails(accountId: string | number): Observable<any> {
+    return this.http.get(`/fixeddepositaccounts/${accountId}/bancro-details`);
+  }
+
+  /**
+   * Executes a Bancro fixed deposit command such as topupPrincipal, liquidateInterest,
+   * changeInterestRate, postAccounting, retryAccounting, or reverseBancroEvent.
+   * @param accountId Fixed Deposit Account Id.
+   * @param command Bancro command name.
+   * @param data Command payload.
+   */
+  executeBancroCommand(accountId: string | number, command: string, data: any): Observable<any> {
+    const httpParams = new HttpParams().set('command', command);
+    return this.http.post(`/fixeddepositaccounts/${accountId}/bancro-command`, data, { params: httpParams });
+  }
+
+  /**
+   * Retrieves configured Bancro GL/accounting mappings.
+   */
+  getBancroAccountingMappings(): Observable<any> {
+    return this.http.get('/fixeddepositaccounts/bancro-accounting-mappings');
+  }
+
+  /**
+   * Creates or updates a Bancro GL/accounting mapping.
+   * @param mapping Mapping payload.
+   */
+  saveBancroAccountingMapping(mapping: any): Observable<any> {
+    return this.http.post('/fixeddepositaccounts/bancro-accounting-mappings', mapping);
+  }
+
 }

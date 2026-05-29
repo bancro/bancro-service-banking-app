@@ -2,6 +2,8 @@
 import { Component, OnInit } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
 import { MatDialog } from "@angular/material/dialog";
+import { of } from "rxjs";
+import { catchError } from "rxjs/operators";
 
 /** Custom Dialogs */
 import { DeleteDialogComponent } from "app/shared/delete-dialog/delete-dialog.component";
@@ -29,10 +31,28 @@ import { ExternalApisService } from "app/external-apis/external-apis.service";
 export class FixedDepositAccountViewComponent implements OnInit {
   /** Fixed Deposits Account Data */
   fixedDepositsAccountData: any;
+  /** Bancro Fixed Deposit extension data */
+  bancroDetails: any;
+  /** Tracks whether the Bancro add-on details endpoint is loading */
+  isBancroDetailsLoading = false;
+  /** Stores non-blocking Bancro details load errors */
+  bancroDetailsError: string | null = null;
   /** Savings Data Tables */
   savingsDatatables: any;
   /** Button Configurations */
   buttonConfig: FixedDepositsButtonsConfiguration;
+
+  private readonly commandTitles: Record<string, string> = {
+    payUpfrontInterest: "Pay Upfront Interest",
+    liquidateInterest: "Liquidate Interest",
+    liquidatePrincipal: "Liquidate Principal",
+    liquidatePrincipalAndInterest: "Liquidate Principal + Interest",
+    topupPrincipal: "Top Up Principal",
+    changeInterestRate: "Change Interest Rate",
+    postAccounting: "Post Accounting",
+    retryAccounting: "Retry Accounting",
+    reverseBancroEvent: "Reverse Bancro Event",
+  };
 
   /**
    * Fetches fixed deposits account data from `resolve`
@@ -62,7 +82,7 @@ export class FixedDepositAccountViewComponent implements OnInit {
   }
 
   /**
-   * Adds options to button config. conditionaly.
+   * Adds options to button config conditionally.
    */
   setConditionalButtons() {
     const status = this.fixedDepositsAccountData.status.value;
@@ -81,7 +101,7 @@ export class FixedDepositAccountViewComponent implements OnInit {
   }
 
   /**
-   * Refetches data fot the component
+   * Refetches data for the component.
    * TODO: Replace by a custom reload component instead of hard-coded back-routing.
    */
   reload() {
@@ -90,6 +110,17 @@ export class FixedDepositAccountViewComponent implements OnInit {
     this.router
       .navigateByUrl(`/clients/${clientId}/fixed-deposits-accounts`, { skipLocationChange: true })
       .then(() => this.router.navigate([url]));
+  }
+
+  /**
+   * Returns Bancro detail value with fallback to the generic fixed deposit account data.
+   * @param key Field name.
+   */
+  getBancroValue(key: string): any {
+    if (this.bancroDetails && this.bancroDetails[key] !== undefined && this.bancroDetails[key] !== null) {
+      return this.bancroDetails[key];
+    }
+    return this.fixedDepositsAccountData ? this.fixedDepositsAccountData[key] : null;
   }
 
   /**
@@ -130,40 +161,61 @@ export class FixedDepositAccountViewComponent implements OnInit {
         this.downloadDealCertificate();
         break;
       case "Pay Upfront Interest":
-        this.handleNewCommand({ command: 'payUpfrontInterest', accountId: this.fixedDepositsAccountData.id });
+        this.handleBancroCommand("payUpfrontInterest");
         break;
       case "Liquidate Interest":
-        this.handleNewCommand({ command: 'liquidateInterest', accountId: this.fixedDepositsAccountData.id });
+        this.handleBancroCommand("liquidateInterest");
         break;
       case "Liquidate Principal":
-        this.handleNewCommand({ command: 'liquidatePrincipal', accountId: this.fixedDepositsAccountData.id });
+        this.handleBancroCommand("liquidatePrincipal");
         break;
       case "Liquidate Principal + Interest":
-        this.handleNewCommand({ command: 'liquidatePrincipalAndInterest', accountId: this.fixedDepositsAccountData.id });
+        this.handleBancroCommand("liquidatePrincipalAndInterest");
         break;
       case "Top Up Principal":
-        this.handleNewCommand({ command: 'topUpPrincipal', accountId: this.fixedDepositsAccountData.id });
+        this.handleBancroCommand("topupPrincipal");
         break;
       case "Change Interest Rate":
-        this.handleNewCommand({ command: 'changeInterestRate', accountId: this.fixedDepositsAccountData.id });
+        this.handleBancroCommand("changeInterestRate");
         break;
       case "Post Accounting":
-        this.handleNewCommand({ command: 'postAccounting', accountId: this.fixedDepositsAccountData.id });
+        this.handleBancroCommand("postAccounting");
         break;
       case "Retry Accounting":
-        this.handleNewCommand({ command: 'retryAccounting', accountId: this.fixedDepositsAccountData.id });
+        this.handleBancroCommand("retryAccounting");
         break;
       case "Reverse Bancro Event":
-        this.handleNewCommand({ command: 'reverseBancroEvent',  accountId: this.fixedDepositsAccountData.id });
+        this.handleBancroCommand("reverseBancroEvent");
         break;
     }
   }
 
+  /**
+   * Loads the Bancro fixed deposit extension details after the generic fixed deposit endpoint succeeds.
+   * Failure here is intentionally non-blocking so the generic Fineract fixed deposit page still works.
+   */
   fetchBancroDetails() {
-    this.externalApIService.getFdAccountBancroDetails(this.fixedDepositsAccountData.id).subscribe((response: any) => {
-      this.fixedDepositsAccountData.bancroDetails = response;
-      this.buttonConfig.applyBancroCapabilities(response);
-    });
+    if (!this.fixedDepositsAccountData?.id) { return; }
+
+    this.isBancroDetailsLoading = true;
+    this.bancroDetailsError = null;
+
+    this.fixedDepositsService.getBancroDetails(this.fixedDepositsAccountData.id)
+      .pipe(
+        catchError((error: any) => {
+          this.bancroDetailsError = error?.error?.defaultUserMessage || error?.error?.developerMessage || "Bancro details are not available.";
+          return of(null);
+        })
+      )
+      .subscribe((response: any) => {
+        this.isBancroDetailsLoading = false;
+        if (!response) { return; }
+
+        this.bancroDetails = response;
+        this.fixedDepositsAccountData.bancroDetails = response;
+        this.setConditionalButtons();
+        this.buttonConfig.applyBancroCapabilities(response);
+      });
   }
 
   /**
@@ -213,6 +265,7 @@ export class FixedDepositAccountViewComponent implements OnInit {
       }
     });
   }
+
   /**
    * Download deal certficate externally
    */
@@ -220,27 +273,29 @@ export class FixedDepositAccountViewComponent implements OnInit {
     this.externalApIService.downloadDealCertificate(this.fixedDepositsAccountData.id);
   }
 
-  private readonly commandTitles: Record<string, string> = {
-    payUpfrontInterest: 'Pay Upfront Interest',
-    liquidateInterest: 'Liquidate Interest',
-    liquidatePrincipal: 'Liquidate Principal',
-    liquidatePrincipalAndInterest: 'Liquidate Principal + Interest',
-    topUpPrincipal: 'Top Up Principal',
-    changeInterestRate: 'Change Interest Rate',
-    postAccounting: 'Post Accounting',
-    retryAccounting: 'Retry Accounting',
-    reverseBancroEvent: 'Reverse Bancro Event',
-  };
-
-  private handleNewCommand(meta: { command: string; accountId: string | number }) {
-    const title = this.commandTitles[meta.command] ?? meta.command;
+  /**
+   * Opens the reusable Bancro command modal and posts the command to the Bancro endpoint.
+   * @param command Bancro command.
+   */
+  private handleBancroCommand(command: string) {
+    const title = this.commandTitles[command] ?? command;
     const dialogRef = this.dialog.open(BancroCommandDialogComponent, {
-      width: '480px',
-      data: { command: meta.command, title, accountId: meta.accountId }
+      width: "540px",
+      data: {
+        command,
+        title,
+        accountId: this.fixedDepositsAccountData.id,
+        bancroDetails: this.bancroDetails
+      }
     });
+
     dialogRef.afterClosed().subscribe((result: any) => {
       if (result?.confirm) {
-        this.externalApIService.handleBancroCommand(result.payload).subscribe(() => {
+        const payload = { ...result.payload };
+        delete payload.command;
+        delete payload.accountId;
+
+        this.fixedDepositsService.executeBancroCommand(this.fixedDepositsAccountData.id, command, payload).subscribe(() => {
           this.reload();
         });
       }

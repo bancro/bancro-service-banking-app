@@ -111,13 +111,13 @@ export class ExternalApisService {
   }
 
   getFdAccountBancroDetails(accountId: string): Observable<any> {
-    console.log("Loaded", accountId);
     const url = `/fixeddepositaccounts/${accountId}/bancro-details`;
     return this.http.get(url);
   }
-  handleBancroCommand(payload: any): Observable<any> {
-    const url = `/fixeddepositaccounts/${payload.accountId}/bancro-command?command=${payload.command}`;
 
-    return this.http.post(url, payload);
+  handleBancroCommand(payload: any): Observable<any> {
+    const { accountId, command, ...body } = payload;
+    const url = `/fixeddepositaccounts/${accountId}/bancro-command?command=${command}`;
+    return this.http.post(url, body);
   }
 }
