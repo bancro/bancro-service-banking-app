@@ -160,6 +160,9 @@ export class FixedDepositAccountViewComponent implements OnInit {
   }
 
   fetchBancroDetails() {
+    this.externalApIService.getFDGlMapppings().subscribe((response: any) => {
+    console.log(response);
+    })
     this.externalApIService.getFdAccountBancroDetails(this.fixedDepositsAccountData.id).subscribe((response: any) => {
       this.fixedDepositsAccountData.bancroDetails = response;
       this.buttonConfig.applyBancroCapabilities(response);
