@@ -12,6 +12,32 @@
         <mat-error *ngIf="form.get('transactionDate').hasError('required')">Transaction date is required.</mat-error>
       </mat-form-field>
 
+      <mat-form-field appearance="outline" class="full-width" *ngIf="requiresFundingAccount">
+        <mat-label>Funding Account to Debit</mat-label>
+        <mat-select formControlName="fundingSavingsAccountId" required>
+          <mat-option *ngFor="let account of customerFundingAccounts" [value]="account.id">
+            {{ account.accountNo }} - {{ account.productName }} ({{ account.accountBalance | number:'1.2-2' }} {{ account.currencyCode }})
+          </mat-option>
+        </mat-select>
+        <mat-hint>Select the customer savings/current account that will fund this top-up.</mat-hint>
+        <mat-error *ngIf="form.get('fundingSavingsAccountId').hasError('required')">Funding account is required.</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width" *ngIf="requiresPayoutAccount">
+        <mat-label>Payout Account to Credit</mat-label>
+        <mat-select formControlName="payoutSavingsAccountId" required>
+          <mat-option *ngFor="let account of customerFundingAccounts" [value]="account.id">
+            {{ account.accountNo }} - {{ account.productName }} ({{ account.accountBalance | number:'1.2-2' }} {{ account.currencyCode }})
+          </mat-option>
+        </mat-select>
+        <mat-hint>Select the customer savings/current account to receive this payout.</mat-hint>
+        <mat-error *ngIf="form.get('payoutSavingsAccountId').hasError('required')">Payout account is required.</mat-error>
+      </mat-form-field>
+
+      <div class="alert alert-warning" *ngIf="(requiresFundingAccount || requiresPayoutAccount) && !customerFundingAccounts.length">
+        No active non-fixed-deposit savings/current account was returned for this customer. Create or activate a customer account before posting this command.
+      </div>
+
       <mat-form-field appearance="outline" class="full-width" *ngIf="isTransactionAmountCommand">
         <mat-label>Amount</mat-label>
         <input matInput type="number" formControlName="amount" required />

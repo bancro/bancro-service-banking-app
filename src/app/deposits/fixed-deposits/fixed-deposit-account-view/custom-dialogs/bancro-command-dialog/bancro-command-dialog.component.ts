@@ -43,6 +43,9 @@ export class BancroCommandDialogComponent implements OnInit {
   /** Accounting commands can optionally/mandatorily target a Bancro event id. */
   readonly accountingCommands = ['postAccounting', 'retryAccounting', 'reverseBancroEvent'];
 
+  /** Active non-FD savings/current accounts returned by /bancro-details for funding and payouts. */
+  customerFundingAccounts: any[] = [];
+
   get isTransactionWithoutAmountCommand(): boolean {
     return this.transactionWithoutAmountCommands.includes(this.data.command);
   }
@@ -67,6 +70,14 @@ export class BancroCommandDialogComponent implements OnInit {
     return this.accountingCommands.includes(this.data.command);
   }
 
+  get requiresFundingAccount(): boolean {
+    return this.data.command === 'topupPrincipal';
+  }
+
+  get requiresPayoutAccount(): boolean {
+    return ['payUpfrontInterest', 'liquidateInterest', 'liquidatePrincipal', 'liquidatePrincipalAndInterest'].includes(this.data.command);
+  }
+
   get requiresEventId(): boolean {
     return this.data.command === 'reverseBancroEvent';
   }
@@ -78,6 +89,8 @@ export class BancroCommandDialogComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.customerFundingAccounts = this.data?.bancroDetails?.customerFundingAccounts || [];
+
     if (this.isTransactionDateCommand) {
       this.form = this.fb.group({
         transactionDate: [null, Validators.required],
@@ -85,6 +98,8 @@ export class BancroCommandDialogComponent implements OnInit {
         principalAmount: [null],
         interestAmount: [null],
         paymentTypeId: [1],
+        fundingSavingsAccountId: [null],
+        payoutSavingsAccountId: [null],
         note: ['']
       });
 
@@ -95,9 +110,17 @@ export class BancroCommandDialogComponent implements OnInit {
         this.form.get('principalAmount').setValidators([Validators.required, Validators.min(0.01)]);
         this.form.get('interestAmount').setValidators([Validators.required, Validators.min(0.01)]);
       }
+      if (this.requiresFundingAccount) {
+        this.form.get('fundingSavingsAccountId').setValidators([Validators.required]);
+      }
+      if (this.requiresPayoutAccount) {
+        this.form.get('payoutSavingsAccountId').setValidators([Validators.required]);
+      }
       this.form.get('amount').updateValueAndValidity();
       this.form.get('principalAmount').updateValueAndValidity();
       this.form.get('interestAmount').updateValueAndValidity();
+      this.form.get('fundingSavingsAccountId').updateValueAndValidity();
+      this.form.get('payoutSavingsAccountId').updateValueAndValidity();
     } else if (this.isInterestRateCommand) {
       this.form = this.fb.group({
         effectiveDate: [null, Validators.required],
@@ -143,6 +166,13 @@ export class BancroCommandDialogComponent implements OnInit {
         paymentTypeId: raw.paymentTypeId || 1,
         note: raw.note
       };
+
+      if (this.requiresFundingAccount) {
+        payload.fundingSavingsAccountId = raw.fundingSavingsAccountId;
+      }
+      if (this.requiresPayoutAccount) {
+        payload.payoutSavingsAccountId = raw.payoutSavingsAccountId;
+      }
 
       if (this.isTransactionAmountCommand) {
         payload.amount = raw.amount;
