@@ -2,6 +2,7 @@
 import { Component, OnInit } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
 import { MatDialog } from "@angular/material/dialog";
+import { MatSnackBar } from "@angular/material/snack-bar";
 import { of } from "rxjs";
 import { catchError } from "rxjs/operators";
 
@@ -69,6 +70,7 @@ export class FixedDepositAccountViewComponent implements OnInit {
     private savingsService: SavingsService,
     private externalApIService: ExternalApisService,
     public dialog: MatDialog,
+    private snackBar: MatSnackBar,
   ) {
     this.route.data.subscribe((data: { fixedDepositsAccountData: any; savingsDatatables: any }) => {
       this.fixedDepositsAccountData = data.fixedDepositsAccountData;
@@ -295,8 +297,28 @@ export class FixedDepositAccountViewComponent implements OnInit {
         delete payload.command;
         delete payload.accountId;
 
-        this.fixedDepositsService.executeBancroCommand(this.fixedDepositsAccountData.id, command, payload).subscribe(() => {
-          this.reload();
+        this.fixedDepositsService.executeBancroCommand(this.fixedDepositsAccountData.id, command, payload).subscribe({
+          next: (response: any) => {
+            const accountingStatus = response?.accountingStatus || response?.accounting?.accountingStatus;
+            const accountingError = response?.accounting?.error || response?.accountingErrorMessage;
+            if (accountingStatus === "FAILED") {
+              this.snackBar.open(
+                accountingError || "Bancro command was recorded, but accounting posting failed and can be retried.",
+                "Close",
+                { duration: 8000 }
+              );
+            } else {
+              this.snackBar.open("Bancro fixed deposit command completed.", "Close", { duration: 4000 });
+            }
+            this.reload();
+          },
+          error: (error: any) => {
+            const message = error?.error?.defaultUserMessage
+              || error?.error?.developerMessage
+              || error?.error?.errors?.[0]?.defaultUserMessage
+              || "Bancro fixed deposit command failed.";
+            this.snackBar.open(message, "Close", { duration: 8000 });
+          }
         });
       }
     });
