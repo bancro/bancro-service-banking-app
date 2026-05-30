@@ -125,6 +125,167 @@ export class FixedDepositAccountViewComponent implements OnInit {
     return this.fixedDepositsAccountData ? this.fixedDepositsAccountData[key] : null;
   }
 
+
+
+  /**
+   * Original Fineract product/account interest rate from the generic fixed deposit endpoint.
+   * This remains the base/product chart rate and is kept for backward compatibility.
+   */
+  get displayOriginalInterestRate(): any {
+    return this.fixedDepositsAccountData?.nominalAnnualInterestRate
+      ?? this.fixedDepositsAccountData?.interestRate
+      ?? this.fixedDepositsAccountData?.annualInterestRate
+      ?? null;
+  }
+
+  /**
+   * Interest rate to display on the Bancro-enabled account page.
+   * Bancro rate changes are stored separately from the original Fineract interest chart,
+   * so this prefers the Bancro effective/current rate and safely falls back to the generic rate.
+   */
+  get displayInterestRate(): any {
+    const bancroRate = this.resolveBancroInterestRate();
+    if (bancroRate !== null && bancroRate !== undefined && bancroRate !== '') {
+      return bancroRate;
+    }
+
+    const originalRate = this.displayOriginalInterestRate;
+    return originalRate !== null && originalRate !== undefined && originalRate !== '' ? originalRate : '--';
+  }
+
+  /**
+   * True when the page is showing a Bancro rate override rather than the original product chart rate.
+   */
+  get hasBancroInterestRateOverride(): boolean {
+    const bancroRate = this.resolveBancroInterestRate();
+    const originalRate = this.displayOriginalInterestRate;
+
+    if (bancroRate === null || bancroRate === undefined || bancroRate === ''
+        || originalRate === null || originalRate === undefined || originalRate === '') {
+      return false;
+    }
+
+    return Number(bancroRate) !== Number(originalRate);
+  }
+
+  /**
+   * Returns Bancro rate history/schedule rows in a defensive way because backend response names may evolve.
+   */
+  get bancroRateChanges(): any[] {
+    if (!this.bancroDetails) { return []; }
+
+    const candidates = [
+      'rateSchedule',
+      'rateSchedules',
+      'interestRateSchedule',
+      'interestRateSchedules',
+      'rateChanges',
+      'rateChangeHistory',
+      'rateHistory'
+    ];
+
+    for (const key of candidates) {
+      const value = this.bancroDetails[key];
+      if (Array.isArray(value) && value.length) {
+        return value;
+      }
+    }
+
+    return [];
+  }
+
+  /**
+   * Resolves the Bancro current/effective interest rate from direct fields or from the latest rate schedule row.
+   */
+  private resolveBancroInterestRate(): any {
+    if (!this.bancroDetails) { return null; }
+
+    const directFields = [
+      'currentAnnualInterestRate',
+      'effectiveAnnualInterestRate',
+      'latestAnnualInterestRate',
+      'bancroAnnualInterestRate',
+      'newAnnualInterestRate',
+      'annualInterestRate',
+      'currentInterestRate',
+      'effectiveInterestRate',
+      'interestRate'
+    ];
+
+    for (const field of directFields) {
+      const value = this.bancroDetails[field];
+      if (value !== undefined && value !== null && value !== '') {
+        return value;
+      }
+    }
+
+    const rateRows = this.bancroRateChanges;
+    if (!rateRows.length) { return null; }
+
+    const sortedRows = [...rateRows].sort((a: any, b: any) => {
+      const aDate = this.resolveRateEffectiveDate(a);
+      const bDate = this.resolveRateEffectiveDate(b);
+      return aDate.getTime() - bDate.getTime();
+    });
+
+    const today = new Date();
+    const effectiveRows = sortedRows.filter((row: any) => this.resolveRateEffectiveDate(row).getTime() <= today.getTime());
+    const selected = effectiveRows.length ? effectiveRows[effectiveRows.length - 1] : sortedRows[sortedRows.length - 1];
+
+    return this.resolveRateValue(selected);
+  }
+
+  /**
+   * Resolves a rate value from a Bancro rate schedule/history row.
+   */
+  resolveRateValue(row: any): any {
+    if (!row) { return null; }
+
+    const fields = [
+      'newAnnualInterestRate',
+      'annualInterestRate',
+      'currentAnnualInterestRate',
+      'effectiveAnnualInterestRate',
+      'rate',
+      'interestRate'
+    ];
+
+    for (const field of fields) {
+      const value = row[field];
+      if (value !== undefined && value !== null && value !== '') {
+        return value;
+      }
+    }
+
+    return null;
+  }
+
+  /**
+   * Resolves an effective date from a Bancro rate schedule/history row.
+   */
+  resolveRateEffectiveDateText(row: any): any {
+    if (!row) { return null; }
+
+    return row.effectiveDate
+      ?? row.effectiveFromDate
+      ?? row.effective_from_date
+      ?? row.startDate
+      ?? row.createdDate
+      ?? null;
+  }
+
+  private resolveRateEffectiveDate(row: any): Date {
+    const rawDate = this.resolveRateEffectiveDateText(row);
+    if (!rawDate) { return new Date(0); }
+
+    if (Array.isArray(rawDate) && rawDate.length >= 3) {
+      return new Date(rawDate[0], rawDate[1] - 1, rawDate[2]);
+    }
+
+    const parsed = new Date(rawDate);
+    return isNaN(parsed.getTime()) ? new Date(0) : parsed;
+  }
+
   /**
    * Performs action button/option action.
    * @param {string} name action name.

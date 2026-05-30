@@ -114,7 +114,23 @@
             <tbody>
               <tr>
                 <td>Interest Rate</td>
-                <td>{{fixedDepositsAccountData.nominalAnnualInterestRate}}%</td>
+                <td>
+                  {{displayInterestRate}}%
+                  <span class="bancro-rate-badge" *ngIf="hasBancroInterestRateOverride">Bancro effective rate</span>
+                </td>
+              </tr>
+              <tr *ngIf="hasBancroInterestRateOverride">
+                <td>Original Product Rate</td>
+                <td>{{displayOriginalInterestRate}}%</td>
+              </tr>
+              <tr *ngIf="bancroRateChanges.length">
+                <td>Bancro Rate Changes</td>
+                <td>
+                  <div class="bancro-rate-change-row" *ngFor="let rateChange of bancroRateChanges">
+                    <span>{{ resolveRateEffectiveDateText(rateChange) || 'Effective date not set' }}</span>
+                    <strong>{{ resolveRateValue(rateChange) }}%</strong>
+                  </div>
+                </td>
               </tr>
               <tr>
                 <td>Interest Compounding Period</td>
@@ -261,6 +277,10 @@
         </a>
       </ng-container>
     </nav>
+
+    <div class="bancro-rate-note" *ngIf="hasBancroInterestRateOverride">
+      Bancro rate override is active for this account. The Interest Rate Chart tab continues to show the original product chart.
+    </div>
 
     <router-outlet></router-outlet>
 
