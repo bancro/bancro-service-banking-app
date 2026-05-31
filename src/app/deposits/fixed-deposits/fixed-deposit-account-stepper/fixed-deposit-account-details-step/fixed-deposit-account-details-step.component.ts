@@ -32,7 +32,9 @@ export class FixedDepositAccountDetailsStepComponent implements OnInit {
   /** Fixed Deposits Account Details Form */
   fixedDepositAccountDetailsForm: UntypedFormGroup;
 
-  fundingSavingsAccountData: any[];
+  fundingSavingsAccountData: any[] = [];
+  allFundingSavingsAccountData: any[] = [];
+  selectedProductCurrencyCode = "";
 
   /** Fixed Deposits Account Template with product data  */
   @Output() fixedDepositsAccountProductTemplate = new EventEmitter();
@@ -78,7 +80,7 @@ export class FixedDepositAccountDetailsStepComponent implements OnInit {
       productId: ["", Validators.required],
       submittedOnDate: ["", Validators.required],
       fieldOfficerId: [""],
-      fundingSavingsAccountId: [""],
+      fundingSavingsAccountId: ["", Validators.required],
     });
   }
 
@@ -90,6 +92,8 @@ export class FixedDepositAccountDetailsStepComponent implements OnInit {
     this.fixedDepositAccountDetailsForm.get("productId").valueChanges.subscribe((productId: string) => {
       this.fixedDepositsService.getFixedDepositsAccountTemplate(clientId, productId).subscribe((response: any) => {
         this.fixedDepositsAccountProductTemplate.emit(response);
+        this.selectedProductCurrencyCode = this.resolveCurrencyCode(response);
+        this.filterFundingAccountsForSelectedProduct();
         this.fieldOfficerData = response.fieldOfficerOptions;
         if (!this.isFieldOfficerPatched && this.fixedDepositsAccountTemplate.fieldOfficerId) {
           this.fixedDepositAccountDetailsForm
@@ -103,17 +107,38 @@ export class FixedDepositAccountDetailsStepComponent implements OnInit {
     });
 
     this.clientsService.getClientAccountData(clientId).subscribe((response: any) => {
-      this.fundingSavingsAccountData = response.savingsAccounts.filter(
-        (item: { status: { active: any } }) => item.status.active,
+      this.allFundingSavingsAccountData = (response.savingsAccounts || []).filter(
+        (item: { status: { active: any } }) => item.status && item.status.active,
       );
+      this.filterFundingAccountsForSelectedProduct();
     });
+  }
+
+  private resolveCurrencyCode(source: any): string {
+    return (source?.currency?.code || source?.currencyCode || source?.currency?.name || source?.currency || "").toString();
+  }
+
+  private filterFundingAccountsForSelectedProduct() {
+    const selectedCurrency = this.selectedProductCurrencyCode;
+    this.fundingSavingsAccountData = (this.allFundingSavingsAccountData || []).filter((account: any) => {
+      const accountCurrency = this.resolveCurrencyCode(account);
+      return !selectedCurrency || accountCurrency === selectedCurrency;
+    });
+
+    const selectedFundingAccountId = this.fixedDepositAccountDetailsForm.get("fundingSavingsAccountId").value;
+    if (selectedFundingAccountId && !this.fundingSavingsAccountData.some((account: any) => account.id === selectedFundingAccountId)) {
+      this.fixedDepositAccountDetailsForm.get("fundingSavingsAccountId").patchValue("");
+    }
   }
 
   /**
    * Returns fixed deposits account details form value.
    */
   get fixedDepositAccountDetails() {
-    const fixedDepositAccountDetails = this.fixedDepositAccountDetailsForm.value;
+    const fixedDepositAccountDetails = { ...this.fixedDepositAccountDetailsForm.value };
+    if (fixedDepositAccountDetails.fundingSavingsAccountId) {
+      fixedDepositAccountDetails.linkAccountId = fixedDepositAccountDetails.fundingSavingsAccountId;
+    }
     for (const key in fixedDepositAccountDetails) {
       if (fixedDepositAccountDetails[key] === "") {
         delete fixedDepositAccountDetails[key];

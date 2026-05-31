@@ -17,9 +17,11 @@
       <mat-label>Savings Account</mat-label>
       <mat-select formControlName="fundingSavingsAccountId" required>
         <mat-option *ngFor="let account of fundingSavingsAccountData|accountsFilter:'saving':'open':'isSavings'" [value]="account.id">
-          {{ account.accountNo }}
+          {{ account.accountNo }} <span *ngIf="account.currency || account.currencyCode">- {{ account.currency?.code || account.currencyCode }}</span>
         </mat-option>
       </mat-select>
+      <mat-hint *ngIf="selectedProductCurrencyCode">Only {{ selectedProductCurrencyCode }} accounts can fund this fixed deposit.</mat-hint>
+      <mat-error>Funding savings account is <strong>required</strong></mat-error>
     </mat-form-field>
 
     <mat-form-field appearance="outline" fxFlex="48%" (click)="submittedOnDatePicker.open()">
