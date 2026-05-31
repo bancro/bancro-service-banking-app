@@ -26,9 +26,9 @@
             <span
               *ngIf="!fixedDepositsAccountData.status.rejected && !fixedDepositsAccountData.status.submittedAndPendingApproval">
               Current Balance:
-              {{fixedDepositsAccountData.currency.code}}&nbsp;{{fixedDepositsAccountData.summary.accountBalance |
+              {{fixedDepositsAccountData.currency.code}}&nbsp;{{displayCurrentBalance |
               formatNumber}}<br />
-              Deposit Amount: {{fixedDepositsAccountData.currency.code}}&nbsp;{{fixedDepositsAccountData.depositAmount |
+              Deposit Amount: {{fixedDepositsAccountData.currency.code}}&nbsp;{{displayOriginalDepositAmount |
               formatNumber}}<br />
             </span>
           </p>
@@ -48,7 +48,10 @@
         <button mat-raised-button [matMenuTriggerFor]="More">More</button>
         <mat-menu #More="matMenu">
           <span *ngFor="let option of buttonConfig.options">
-            <button mat-menu-item (click)="doAction(option.name)">{{option.name}}</button>
+            <button mat-menu-item [disabled]="option.disabled" [attr.title]="option.message || null" (click)="doAction(option.name)">
+              {{option.name}}
+              <small class="bancro-option-note" *ngIf="option.disabled && option.message">{{option.message}}</small>
+            </button>
           </span>
         </mat-menu>
       </ng-container>
@@ -167,36 +170,40 @@
             <tbody>
               <tr>
                 <td>Principal Amount</td>
-                <td>{{fixedDepositsAccountData.currency.code}}&nbsp;{{getBancroValue('depositAmount') |
+                <td>{{fixedDepositsAccountData.currency.code}}&nbsp;{{displayOriginalDepositAmount |
                   formatNumber}}</td>
               </tr>
 
               <tr>
                 <td>Maturity Amount</td>
-                <td>{{fixedDepositsAccountData.currency.code}}&nbsp;{{getBancroValue('maturityAmount') |
+                <td>{{fixedDepositsAccountData.currency.code}}&nbsp;{{displayMaturityAmount |
                   formatNumber}}</td>
               </tr>
               <tr>
                 <td>Net Maturity Amount</td>
-                <td>{{fixedDepositsAccountData.currency.code}}&nbsp;{{getBancroValue('netMaturityAmount') |
+                <td>{{fixedDepositsAccountData.currency.code}}&nbsp;{{displayNetMaturityAmount |
                   formatNumber}}</td>
               </tr>
               <tr>
                 <td>Principal & Interest Amount at Maturity</td>
                 <td>
-                  {{fixedDepositsAccountData.currency.code}}&nbsp;{{getBancroValue('principalAndInterestAmountAtMaturity')
+                  {{fixedDepositsAccountData.currency.code}}&nbsp;{{displayPrincipalAndInterestAmountAtMaturity
                   | formatNumber}}</td>
               </tr>
               <tr>
                 <td>Interest Amount at Maturity</td>
-                <td>{{fixedDepositsAccountData.currency.code}}&nbsp;{{getBancroValue('interestAmountAtMaturity')
+                <td>{{fixedDepositsAccountData.currency.code}}&nbsp;{{displayInterestAmountAtMaturity
                   | formatNumber}}</td>
               </tr>
               <tr>
                 <td>Withhold Tax Amount at Maturity</td>
                 <td>
-                  {{fixedDepositsAccountData.currency.code}}&nbsp;{{getBancroValue('withholdTaxAmountAtMaturity')
+                  {{fixedDepositsAccountData.currency.code}}&nbsp;{{displayWithholdTaxAmountAtMaturity
                   | formatNumber}}</td>
+              </tr>
+              <tr *ngIf="bancroDetails?.withholdTaxRate">
+                <td>Withhold Tax Rate</td>
+                <td>{{bancroDetails.withholdTaxRate}}%</td>
               </tr>
 
               <tr *ngIf="bancroDetails?.accountingStatus">
@@ -208,9 +215,19 @@
                 <td>{{bancroDetails.latestAccountingErrorMessage}}</td>
               </tr>
 
-              <tr *ngIf="fixedDepositsAccountData.summary.totalDeposits">
+              <tr>
                 <td>Total Deposits</td>
-                <td>{{fixedDepositsAccountData.currency.code}}&nbsp;{{fixedDepositsAccountData.summary.totalDeposits |
+                <td>{{fixedDepositsAccountData.currency.code}}&nbsp;{{displayTotalDeposits |
+                  formatNumber}}</td>
+              </tr>
+              <tr *ngIf="hasBancroPrincipalAdjustments">
+                <td>Principal Top-ups</td>
+                <td>{{fixedDepositsAccountData.currency.code}}&nbsp;{{bancroDetails?.principalTopupAmount |
+                  formatNumber}}</td>
+              </tr>
+              <tr *ngIf="hasBancroPrincipalAdjustments">
+                <td>Principal Liquidated</td>
+                <td>{{fixedDepositsAccountData.currency.code}}&nbsp;{{bancroDetails?.principalLiquidatedAmount |
                   formatNumber}}</td>
               </tr>
               <tr *ngIf="fixedDepositsAccountData.summary.totalWithdrawals">
@@ -221,7 +238,7 @@
               <tr *ngIf="fixedDepositsAccountData.summary.totalInterestEarned >= 0">
                 <td>Total Interest Earned</td>
                 <td>
-                  {{fixedDepositsAccountData.currency.code}}&nbsp;{{fixedDepositsAccountData.summary.totalInterestEarned
+                  {{fixedDepositsAccountData.currency.code}}&nbsp;{{displayTotalInterestEarned
                   | formatNumber}}</td>
               </tr>
           </table>
@@ -234,12 +251,12 @@
               <tbody>
                 <tr>
                   <td>Principal Amount</td>
-                  <td>{{fixedDepositsAccountData.currency.code}}&nbsp;{{getBancroValue('depositAmount') |
+                  <td>{{fixedDepositsAccountData.currency.code}}&nbsp;{{displayOriginalDepositAmount |
                     formatNumber}}</td>
                 </tr>
                 <tr>
                   <td>Maturity Amount</td>
-                  <td>{{fixedDepositsAccountData.currency.code}}&nbsp;{{getBancroValue('maturityAmount') |
+                  <td>{{fixedDepositsAccountData.currency.code}}&nbsp;{{displayMaturityAmount |
                     formatNumber}}</td>
                 </tr>
               </tbody>

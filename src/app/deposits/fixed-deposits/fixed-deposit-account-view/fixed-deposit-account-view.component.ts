@@ -125,6 +125,83 @@ export class FixedDepositAccountViewComponent implements OnInit {
     return this.fixedDepositsAccountData ? this.fixedDepositsAccountData[key] : null;
   }
 
+  /**
+   * Customer-facing current FD balance. Bancro-enabled accounts use the adjusted principal balance
+   * so top-ups and principal liquidations do not leave the header/performance values stale.
+   */
+  get displayCurrentBalance(): any {
+    return this.bancroDetails?.principalBalance
+      ?? this.bancroDetails?.currentPrincipalBalance
+      ?? this.fixedDepositsAccountData?.summary?.accountBalance
+      ?? this.fixedDepositsAccountData?.accountBalance
+      ?? this.fixedDepositsAccountData?.depositAmount
+      ?? 0;
+  }
+
+  /** Original booked deposit amount. */
+  get displayOriginalDepositAmount(): any {
+    return this.bancroDetails?.depositAmount
+      ?? this.bancroDetails?.originalDepositAmount
+      ?? this.fixedDepositsAccountData?.depositAmount
+      ?? 0;
+  }
+
+  /** Adjusted current principal/total deposit value after Bancro top-ups and liquidations. */
+  get displayTotalDeposits(): any {
+    return this.bancroDetails?.principalBalance
+      ?? this.bancroDetails?.currentPrincipalBalance
+      ?? this.bancroDetails?.totalDeposits
+      ?? this.fixedDepositsAccountData?.summary?.totalDeposits
+      ?? this.fixedDepositsAccountData?.depositAmount
+      ?? 0;
+  }
+
+  /** Maturity amount shown to customers. Bancro-enabled accounts use the net maturity amount. */
+  get displayMaturityAmount(): any {
+    return this.bancroDetails?.netMaturityAmount
+      ?? this.bancroDetails?.maturityAmount
+      ?? this.fixedDepositsAccountData?.maturityAmount
+      ?? 0;
+  }
+
+  get displayNetMaturityAmount(): any {
+    return this.bancroDetails?.netMaturityAmount
+      ?? this.fixedDepositsAccountData?.netMaturityAmount
+      ?? this.fixedDepositsAccountData?.maturityAmount
+      ?? 0;
+  }
+
+  get displayPrincipalAndInterestAmountAtMaturity(): any {
+    return this.bancroDetails?.principalAndInterestAmountAtMaturity
+      ?? this.fixedDepositsAccountData?.principalAndInterestAmountAtMaturity
+      ?? this.fixedDepositsAccountData?.maturityAmount
+      ?? 0;
+  }
+
+  get displayInterestAmountAtMaturity(): any {
+    return this.bancroDetails?.interestAmountAtMaturity
+      ?? this.fixedDepositsAccountData?.interestAmountAtMaturity
+      ?? 0;
+  }
+
+  get displayWithholdTaxAmountAtMaturity(): any {
+    return this.bancroDetails?.withholdTaxAmountAtMaturity
+      ?? this.fixedDepositsAccountData?.withholdTaxAmountAtMaturity
+      ?? 0;
+  }
+
+  get displayTotalInterestEarned(): any {
+    return this.bancroDetails?.availableInterestAmount
+      ?? this.fixedDepositsAccountData?.summary?.totalInterestEarned
+      ?? 0;
+  }
+
+  get hasBancroPrincipalAdjustments(): boolean {
+    return !!this.bancroDetails
+      && (Number(this.bancroDetails?.principalTopupAmount || 0) !== 0
+        || Number(this.bancroDetails?.principalLiquidatedAmount || 0) !== 0);
+  }
+
 
 
   /**
@@ -441,6 +518,17 @@ export class FixedDepositAccountViewComponent implements OnInit {
    * @param command Bancro command.
    */
   private handleBancroCommand(command: string) {
+    const availability = this.bancroDetails?.commandAvailability?.[command];
+    if (availability && availability.available === false) {
+      this.snackBar.open(availability.reason || 'This Bancro action is not currently available for this fixed deposit.', 'Close', { duration: 7000 });
+      return;
+    }
+
+    if (command === 'payUpfrontInterest' && this.bancroDetails?.upfrontInterestAlreadyTriggered) {
+      this.snackBar.open(this.bancroDetails?.payUpfrontInterestBlockReason || 'Upfront interest has already been triggered for this fixed deposit.', 'Close', { duration: 7000 });
+      return;
+    }
+
     const title = this.commandTitles[command] ?? command;
     const dialogRef = this.dialog.open(BancroCommandDialogComponent, {
       width: "540px",
@@ -460,6 +548,12 @@ export class FixedDepositAccountViewComponent implements OnInit {
 
         this.fixedDepositsService.executeBancroCommand(this.fixedDepositsAccountData.id, command, payload).subscribe({
           next: (response: any) => {
+            if (response?.succeeded === false || response?.status === 'ALREADY_TRIGGERED' || response?.alreadyTriggered === true) {
+              this.snackBar.open(response?.message || 'This Bancro command was not processed.', 'Close', { duration: 8000 });
+              this.fetchBancroDetails();
+              return;
+            }
+
             const accountingStatus = response?.accountingStatus || response?.accounting?.accountingStatus;
             const accountingError = response?.accounting?.error || response?.accountingErrorMessage;
             if (accountingStatus === "FAILED") {

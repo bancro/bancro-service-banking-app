@@ -2,7 +2,9 @@
 export class FixedDepositsButtonsConfiguration {
 
   optionArray: {
-    name: string
+    name: string,
+    disabled?: boolean,
+    message?: string
   }[];
 
   buttonsArray: {
@@ -116,10 +118,14 @@ export class FixedDepositsButtonsConfiguration {
     }
   }
 
-  addOption(option: {name: string}) {
-    if (!this.optionArray.some(existing => existing.name === option.name)) {
-      this.optionArray.push(option);
+  addOption(option: {name: string, disabled?: boolean, message?: string}) {
+    const existing = this.optionArray.find(item => item.name === option.name);
+    if (existing) {
+      existing.disabled = option.disabled;
+      existing.message = option.message;
+      return;
     }
+    this.optionArray.push(option);
   }
 
   /**
@@ -133,8 +139,18 @@ export class FixedDepositsButtonsConfiguration {
     const caps = bancroDetails.capabilities ?? bancroDetails;
     const events: any[] = bancroDetails.events ?? bancroDetails.bancroEvents ?? [];
 
-    if (caps.allowUpfrontInterest) {
-      this.addOption({ name: 'Pay Upfront Interest' });
+    const upfrontAvailability = bancroDetails.commandAvailability?.payUpfrontInterest;
+    const upfrontAlreadyTriggered = bancroDetails.upfrontInterestAlreadyTriggered === true
+      || events.some(e => e.eventType === 'payUpfrontInterest' && e.eventStatus === 'ACTIVE');
+
+    if (caps.allowUpfrontInterest || upfrontAlreadyTriggered || upfrontAvailability) {
+      this.addOption({
+        name: 'Pay Upfront Interest',
+        disabled: upfrontAvailability ? upfrontAvailability.available === false : upfrontAlreadyTriggered,
+        message: upfrontAvailability?.reason
+          || bancroDetails.payUpfrontInterestBlockReason
+          || (upfrontAlreadyTriggered ? 'Upfront interest has already been triggered for this fixed deposit.' : undefined)
+      });
     }
     if (caps.allowInterestLiquidation) {
       this.addOption({ name: 'Liquidate Interest' });
