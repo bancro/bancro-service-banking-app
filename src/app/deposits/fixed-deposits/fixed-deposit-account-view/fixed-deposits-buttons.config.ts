@@ -130,7 +130,7 @@ export class FixedDepositsButtonsConfiguration {
 
   /**
    * Conditionally adds Bancro action options based on capabilities
-   * and event accounting statuses returned from the bancro-details API.
+   * and command/event accounting statuses returned from the bancro-details API.
    * Supports both flat allow* response fields and a nested capabilities object.
    */
   applyBancroCapabilities(bancroDetails: any) {
@@ -138,35 +138,46 @@ export class FixedDepositsButtonsConfiguration {
 
     const caps = bancroDetails.capabilities ?? bancroDetails;
     const events: any[] = bancroDetails.events ?? bancroDetails.bancroEvents ?? [];
+    const availability = bancroDetails.commandAvailability ?? {};
 
-    const upfrontAvailability = bancroDetails.commandAvailability?.payUpfrontInterest;
+    const addBancroOption = (
+      label: string,
+      command: string,
+      capabilityEnabled: boolean,
+      fallbackDisabledReason?: string
+    ) => {
+      const commandAvailability = availability[command];
+      const hasAvailability = commandAvailability !== undefined && commandAvailability !== null;
+      const fallbackDisabled = !!fallbackDisabledReason && !hasAvailability;
+      const available = hasAvailability ? commandAvailability.available !== false : capabilityEnabled && !fallbackDisabled;
+
+      if (!capabilityEnabled && !hasAvailability) { return; }
+
+      this.addOption({
+        name: label,
+        disabled: !available,
+        message: commandAvailability?.reason || fallbackDisabledReason
+      });
+    };
+
     const upfrontAlreadyTriggered = bancroDetails.upfrontInterestAlreadyTriggered === true
       || events.some(e => e.eventType === 'payUpfrontInterest' && e.eventStatus === 'ACTIVE');
 
-    if (caps.allowUpfrontInterest || upfrontAlreadyTriggered || upfrontAvailability) {
-      this.addOption({
-        name: 'Pay Upfront Interest',
-        disabled: upfrontAvailability ? upfrontAvailability.available === false : upfrontAlreadyTriggered,
-        message: upfrontAvailability?.reason
-          || bancroDetails.payUpfrontInterestBlockReason
-          || (upfrontAlreadyTriggered ? 'Upfront interest has already been triggered for this fixed deposit.' : undefined)
-      });
-    }
-    if (caps.allowInterestLiquidation) {
-      this.addOption({ name: 'Liquidate Interest' });
-    }
-    if (caps.allowPrincipalLiquidation) {
-      this.addOption({ name: 'Liquidate Principal' });
-    }
-    if (caps.allowPrincipalInterestLiquidation) {
-      this.addOption({ name: 'Liquidate Principal + Interest' });
-    }
-    if (caps.allowPrincipalTopup || caps.allowPrincipalTopUp) {
-      this.addOption({ name: 'Top Up Principal' });
-    }
-    if (caps.allowInterestRateChange) {
-      this.addOption({ name: 'Change Interest Rate' });
-    }
+    addBancroOption(
+      'Pay Upfront Interest',
+      'payUpfrontInterest',
+      caps.allowUpfrontInterest === true,
+      upfrontAlreadyTriggered ? 'Upfront interest has already been triggered for this fixed deposit.' : bancroDetails.payUpfrontInterestBlockReason
+    );
+    addBancroOption('Liquidate Interest', 'liquidateInterest', caps.allowInterestLiquidation === true);
+    addBancroOption('Liquidate Principal', 'liquidatePrincipal', caps.allowPrincipalLiquidation === true);
+    addBancroOption(
+      'Liquidate Principal + Interest',
+      'liquidatePrincipalAndInterest',
+      caps.allowPrincipalInterestLiquidation === true
+    );
+    addBancroOption('Top Up Principal', 'topupPrincipal', caps.allowPrincipalTopup === true || caps.allowPrincipalTopUp === true);
+    addBancroOption('Change Interest Rate', 'changeInterestRate', caps.allowInterestRateChange === true);
 
     const hasPendingOrFailed = events.some(
       e => e.accountingStatus === 'PENDING' || e.accountingStatus === 'FAILED'
