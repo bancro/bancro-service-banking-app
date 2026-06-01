@@ -160,8 +160,14 @@ export class FixedDepositsButtonsConfiguration {
       });
     };
 
+    const activeEventTypes = events
+      .filter(e => e.eventStatus === 'ACTIVE')
+      .map(e => e.eventType);
     const upfrontAlreadyTriggered = bancroDetails.upfrontInterestAlreadyTriggered === true
-      || events.some(e => e.eventType === 'payUpfrontInterest' && e.eventStatus === 'ACTIVE');
+      || activeEventTypes.includes('payUpfrontInterest');
+    const interestAlreadySettled = upfrontAlreadyTriggered
+      || activeEventTypes.includes('liquidateInterest')
+      || activeEventTypes.includes('liquidatePrincipalAndInterest');
 
     addBancroOption(
       'Pay Upfront Interest',
@@ -169,12 +175,18 @@ export class FixedDepositsButtonsConfiguration {
       caps.allowUpfrontInterest === true,
       upfrontAlreadyTriggered ? 'Upfront interest has already been triggered for this fixed deposit.' : bancroDetails.payUpfrontInterestBlockReason
     );
-    addBancroOption('Liquidate Interest', 'liquidateInterest', caps.allowInterestLiquidation === true);
+    addBancroOption(
+      'Liquidate Interest',
+      'liquidateInterest',
+      caps.allowInterestLiquidation === true,
+      interestAlreadySettled ? 'Interest has already been settled for this fixed deposit.' : undefined
+    );
     addBancroOption('Liquidate Principal', 'liquidatePrincipal', caps.allowPrincipalLiquidation === true);
     addBancroOption(
       'Liquidate Principal + Interest',
       'liquidatePrincipalAndInterest',
-      caps.allowPrincipalInterestLiquidation === true
+      caps.allowPrincipalInterestLiquidation === true,
+      interestAlreadySettled ? 'Interest has already been settled. Use Liquidate Principal for any remaining principal.' : undefined
     );
     addBancroOption('Top Up Principal', 'topupPrincipal', caps.allowPrincipalTopup === true || caps.allowPrincipalTopUp === true);
     addBancroOption('Change Interest Rate', 'changeInterestRate', caps.allowInterestRateChange === true);

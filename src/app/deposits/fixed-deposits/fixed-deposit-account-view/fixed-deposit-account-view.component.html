@@ -235,7 +235,7 @@
                 <td>{{fixedDepositsAccountData.currency.code}}&nbsp;{{fixedDepositsAccountData.summary.totalWithdrawals
                   | formatNumber}}</td>
               </tr>
-              <tr *ngIf="fixedDepositsAccountData.summary.totalInterestEarned >= 0">
+              <tr *ngIf="displayTotalInterestEarned !== null && displayTotalInterestEarned !== undefined">
                 <td>Total Interest Earned</td>
                 <td>
                   {{fixedDepositsAccountData.currency.code}}&nbsp;{{displayTotalInterestEarned

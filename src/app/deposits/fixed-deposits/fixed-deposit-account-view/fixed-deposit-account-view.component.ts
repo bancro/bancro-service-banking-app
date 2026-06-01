@@ -191,7 +191,9 @@ export class FixedDepositAccountViewComponent implements OnInit {
   }
 
   get displayTotalInterestEarned(): any {
-    return this.bancroDetails?.availableInterestAmount
+    return this.bancroDetails?.totalInterestEarned
+      ?? this.bancroDetails?.interestAmountAtMaturity
+      ?? this.bancroDetails?.availableInterestAmount
       ?? this.fixedDepositsAccountData?.summary?.totalInterestEarned
       ?? 0;
   }
