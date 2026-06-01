@@ -5,7 +5,6 @@ import { ActivatedRoute, Router } from "@angular/router";
 /** Custom Services */
 import { FixedDepositsService } from "../fixed-deposits.service";
 import { SettingsService } from "app/settings/settings.service";
-import { ExternalApisService } from "app/external-apis/external-apis.service";
 
 /** Custom Components */
 import { FixedDepositAccountDetailsStepComponent } from "../fixed-deposit-account-stepper/fixed-deposit-account-details-step/fixed-deposit-account-details-step.component";
@@ -47,7 +46,6 @@ export class CreateFixedDepositAccountComponent {
   fixedDepositsAccountTemplate: any;
   fixedDepositsAccountProductTemplate: any;
   isSubmitting = false;
-  bancroApiCreateWarning: string | null = null;
 
   constructor(
     private route: ActivatedRoute,
@@ -55,7 +53,6 @@ export class CreateFixedDepositAccountComponent {
     private dateUtils: Dates,
     private fixedDepositsService: FixedDepositsService,
     private settingsService: SettingsService,
-    private externalApIService: ExternalApisService,
     private snackBar: MatSnackBar,
   ) {
     this.route.data.subscribe((data: { fixedDepositsAccountTemplate: any }) => {
@@ -144,23 +141,7 @@ export class CreateFixedDepositAccountComponent {
 
     const createPayload = this.withCustomInterestRate(fixedDepositAccount, customInterestRate);
     this.isSubmitting = true;
-    this.bancroApiCreateWarning = null;
-
-    this.externalApIService.addFixedDepositAccount(createPayload).subscribe({
-      next: (response: any) => {
-        this.isSubmitting = false;
-        this.navigateToCreatedAccount(response);
-      },
-      error: (error: any) => {
-        this.bancroApiCreateWarning = this.resolveCreateErrorMessage(error);
-        this.snackBar.open(
-          `${this.bancroApiCreateWarning} Retrying with the core fixed deposit creation endpoint.`,
-          "Close",
-          { duration: 8000 },
-        );
-        this.createFixedDepositThroughCoreApi(createPayload);
-      },
-    });
+    this.createFixedDepositThroughCoreApi(createPayload);
   }
 
   private withCustomInterestRate(fixedDepositAccount: any, customInterestRate: any) {
@@ -206,7 +187,7 @@ export class CreateFixedDepositAccountComponent {
       error?.error?.developerMessage ||
       error?.error?.defaultUserMessage ||
       error?.message ||
-      "The Bancro fixed deposit account creation service failed."
+      "Fixed deposit account creation failed."
     );
   }
 

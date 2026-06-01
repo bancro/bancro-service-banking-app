@@ -73,33 +73,6 @@ export class ExternalApisService {
       .subscribe();
   }
 
-  /**
-   * Create new fixed deposit account
-   * @param {any} payload .
-   */
-  addFixedDepositAccount(payload: any): Observable<any> {
-    const customInterestRate = this.toNullableNumber(payload?.customInterestRate);
-    const hasCustomInterestRate = customInterestRate !== null;
-    const requestPayload = {
-      ...payload,
-      customInterestRate: hasCustomInterestRate ? customInterestRate : null,
-      nominalAnnualInterestRate: hasCustomInterestRate ? customInterestRate : payload?.nominalAnnualInterestRate,
-    };
-    const url = `${this.baseUrl}/FixedDepositAccount/add-account`
-      + `?fundingSavingsAccountId=${encodeURIComponent(payload?.fundingSavingsAccountId ?? '')}`
-      + `&isCustom=${hasCustomInterestRate}`
-      + (hasCustomInterestRate ? `&customInterestRate=${encodeURIComponent(customInterestRate)}` : '');
-    return this.http.post(url, requestPayload);
-  }
-
-  private toNullableNumber(value: any): number | null {
-    if (value === null || value === undefined || value === '') {
-      return null;
-    }
-    const parsed = Number(value);
-    return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
-  }
-
   activateFixedDepositAccount(payload: any): Observable<any> {
     const url = `${this.baseUrl}/FixedDepositAccount/activate-on-debit-fd-account/?fdAccountId=${payload.accountId} `;
     return this.http.post(url, payload);
