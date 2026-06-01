@@ -14,6 +14,7 @@ import { FixedDepositAccountTermsStepComponent } from "../fixed-deposit-account-
 import { FixedDepositAccountSettingsStepComponent } from "../fixed-deposit-account-stepper/fixed-deposit-account-settings-step/fixed-deposit-account-settings-step.component";
 import { FixedDepositAccountChargesStepComponent } from "../fixed-deposit-account-stepper/fixed-deposit-account-charges-step/fixed-deposit-account-charges-step.component";
 import { Dates } from "app/core/utils/dates";
+import { MatSnackBar } from "@angular/material/snack-bar";
 import { FixedDepositAccountInterestRateChartStepComponent } from "../fixed-deposit-account-stepper/fixed-deposit-account-interest-rate-chart-step/fixed-deposit-account-interest-rate-chart-step.component";
 
 /**
@@ -45,6 +46,8 @@ export class CreateFixedDepositAccountComponent {
 
   fixedDepositsAccountTemplate: any;
   fixedDepositsAccountProductTemplate: any;
+  isSubmitting = false;
+  bancroApiCreateWarning: string | null = null;
 
   constructor(
     private route: ActivatedRoute,
@@ -53,6 +56,7 @@ export class CreateFixedDepositAccountComponent {
     private fixedDepositsService: FixedDepositsService,
     private settingsService: SettingsService,
     private externalApIService: ExternalApisService,
+    private snackBar: MatSnackBar,
   ) {
     this.route.data.subscribe((data: { fixedDepositsAccountTemplate: any }) => {
       this.fixedDepositsAccountTemplate = data.fixedDepositsAccountTemplate;
@@ -138,19 +142,79 @@ export class CreateFixedDepositAccountComponent {
       locale,
     };
 
+    const createPayload = this.withCustomInterestRate(fixedDepositAccount, customInterestRate);
+    this.isSubmitting = true;
+    this.bancroApiCreateWarning = null;
 
-    // Uncomment this to actually make the API call
+    this.externalApIService.addFixedDepositAccount(createPayload).subscribe({
+      next: (response: any) => {
+        this.isSubmitting = false;
+        this.navigateToCreatedAccount(response);
+      },
+      error: (error: any) => {
+        this.bancroApiCreateWarning = this.resolveCreateErrorMessage(error);
+        this.snackBar.open(
+          `${this.bancroApiCreateWarning} Retrying with the core fixed deposit creation endpoint.`,
+          "Close",
+          { duration: 8000 },
+        );
+        this.createFixedDepositThroughCoreApi(createPayload);
+      },
+    });
+  }
 
-    // if (customInterestRate) {
-      this.externalApIService
-        .addFixedDepositAccount({ ...fixedDepositAccount, customInterestRate })
-        .subscribe((response: any) => {
-          this.router.navigate(["../", response.data?.data?.resourceId], { relativeTo: this.route });
-        });
-    // } else {
-    //   this.fixedDepositsService.createFixedDepositAccount(fixedDepositAccount).subscribe((response: any) => {
-    //     this.router.navigate(["../", response.resourceId], { relativeTo: this.route });
-    //   });
-    // }
+  private withCustomInterestRate(fixedDepositAccount: any, customInterestRate: any) {
+    const parsedCustomRate = this.toNullableNumber(customInterestRate);
+    if (parsedCustomRate === null) {
+      return fixedDepositAccount;
+    }
+    return {
+      ...fixedDepositAccount,
+      customInterestRate: parsedCustomRate,
+      nominalAnnualInterestRate: parsedCustomRate,
+      isCustom: true,
+    };
+  }
+
+  private createFixedDepositThroughCoreApi(payload: any) {
+    this.fixedDepositsService.createFixedDepositAccount(payload).subscribe({
+      next: (response: any) => {
+        this.isSubmitting = false;
+        this.navigateToCreatedAccount(response);
+      },
+      error: (fallbackError: any) => {
+        this.isSubmitting = false;
+        this.snackBar.open(this.resolveCreateErrorMessage(fallbackError), "Close", { duration: 10000 });
+      },
+    });
+  }
+
+  private navigateToCreatedAccount(response: any) {
+    const resourceId = response?.data?.data?.resourceId || response?.data?.resourceId || response?.resourceId || response?.savingsId;
+    if (!resourceId) {
+      this.snackBar.open("Fixed deposit account was created but the response did not include the account id.", "Close", {
+        duration: 8000,
+      });
+      return;
+    }
+    this.router.navigate(["../", resourceId], { relativeTo: this.route });
+  }
+
+  private resolveCreateErrorMessage(error: any): string {
+    return (
+      error?.error?.message ||
+      error?.error?.developerMessage ||
+      error?.error?.defaultUserMessage ||
+      error?.message ||
+      "The Bancro fixed deposit account creation service failed."
+    );
+  }
+
+  private toNullableNumber(value: any): number | null {
+    if (value === null || value === undefined || value === "") {
+      return null;
+    }
+    const parsed = Number(value);
+    return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
   }
 }
