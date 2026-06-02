@@ -14,7 +14,6 @@ import { of } from "rxjs"; // to handle errors gracefully
   providedIn: "root",
 })
 export class ExternalApisService {
-  private baseUrl = "https://bancroapi.streams.com.ng";
 
   /**
    * @param {HttpClient} http Http Client to send requests.
@@ -26,7 +25,7 @@ export class ExternalApisService {
    * @param {string} id The ID of the certificate to download.
    */
   downloadDealCertificate(id: string): void {
-    const url = `${this.baseUrl}/Certificates/download/${id}`;
+    const url = `/Certificates/download/${id}`;
     this.http
       .get(url, { responseType: "blob" })
       .pipe(
@@ -52,7 +51,7 @@ export class ExternalApisService {
    * @param {string} id The ID of the loan to download.
    */
   downloadRepaymentSchedule(id: string): void {
-    const url = `${this.baseUrl}/Loan/${id}/export-csv`;
+    const url = `/Loan/${id}/export-csv`;
     this.http
       .get(url, { responseType: "blob" })
       .pipe(
@@ -73,10 +72,6 @@ export class ExternalApisService {
       .subscribe();
   }
 
-  activateFixedDepositAccount(payload: any): Observable<any> {
-    const url = `${this.baseUrl}/FixedDepositAccount/activate-on-debit-fd-account/?fdAccountId=${payload.accountId} `;
-    return this.http.post(url, payload);
-  }
 
   /**
    * Import data by uploading a file (binary).
@@ -84,7 +79,7 @@ export class ExternalApisService {
    * @param {string} endpoint The endpoint to upload to (e.g., 'customers', 'transactions').
    */
   importData(file: File, endpoint: string): Observable<any> {
-    const url = `${this.baseUrl}/DataImport/${endpoint}`;
+    const url = `/DataImport/${endpoint}`;
     const formData = new FormData();
     formData.append("importData", file);
 
@@ -92,7 +87,7 @@ export class ExternalApisService {
   }
 
   importFdData(file: File): Observable<any> {
-    const url = `${this.baseUrl}/FixedDepositAccount/import-fd-accounts`;
+    const url = `/FixedDepositAccount/import-fd-accounts`;
     const formData = new FormData();
     formData.append("importData", file);
 

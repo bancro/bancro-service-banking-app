@@ -3,10 +3,9 @@ import { Component, OnInit } from '@angular/core';
 import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Dates } from 'app/core/utils/dates';
-import { ExternalApisService } from 'app/external-apis/external-apis.service';
 
 /** Custom Services */
-import { SavingsService } from 'app/savings/savings.service';
+import { FixedDepositsService } from '../../fixed-deposits.service';
 import { SettingsService } from 'app/settings/settings.service';
 
 /**
@@ -29,18 +28,16 @@ export class ActivateFixedDepositsAccountComponent implements OnInit {
   accountId: any;
 
   /**
-   * Fixed deposits endpoint is not supported so using Savings endpoint.
+   * Activates the fixed deposit account using the Java/Fineract backend.
    * @param {FormBuilder} formBuilder Form Builder
-   * @param {SavingsService} savingsService Savings Service
-   * @param {ExternalApisService} externalService External Service
+   * @param {FixedDepositsService} fixedDepositsService Fixed Deposits Service
    * @param {Dates} dateUtils Date Utils
    * @param {ActivatedRoute} route Activated Route
    * @param {Router} router Router
    * @param {SettingsService} settingsService Settings Service
    */
   constructor(private formBuilder: UntypedFormBuilder,
-              private savingsService: SavingsService,
-                private externalService: ExternalApisService,
+              private fixedDepositsService: FixedDepositsService,
               private dateUtils: Dates,
               private route: ActivatedRoute,
               private router: Router,
@@ -82,10 +79,7 @@ export class ActivateFixedDepositsAccountComponent implements OnInit {
       dateFormat,
       locale
     };
-    // this.savingsService.executeSavingsAccountCommand(this.accountId, 'activate', data).subscribe(() => {
-    //   this.router.navigate(['../../'], { relativeTo: this.route });
-    // });
-     this.externalService.activateFixedDepositAccount({...data, accountId:this.accountId}).subscribe(() => {
+    this.fixedDepositsService.executeFixedDepositsAccountCommand(this.accountId, 'activate', data).subscribe(() => {
       this.router.navigate(['../../'], { relativeTo: this.route });
     });
   }
