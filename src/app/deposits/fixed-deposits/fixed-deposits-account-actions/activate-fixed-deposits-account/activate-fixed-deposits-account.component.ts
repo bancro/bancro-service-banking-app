@@ -26,6 +26,8 @@ export class ActivateFixedDepositsAccountComponent implements OnInit {
   activateFixedDepositsAccountForm: UntypedFormGroup;
   /** Fixed Deposits Account Id */
   accountId: any;
+  /** Fixed deposit account data resolved from the parent route. */
+  fixedDepositsAccountData: any;
 
   /**
    * Activates the fixed deposit account using the Java/Fineract backend.
@@ -43,6 +45,7 @@ export class ActivateFixedDepositsAccountComponent implements OnInit {
               private router: Router,
               private settingsService: SettingsService) {
     this.accountId = this.route.parent.snapshot.params['fixedDepositAccountId'];
+    this.fixedDepositsAccountData = this.resolveRouteData('fixedDepositsAccountData');
   }
 
   /**
@@ -74,14 +77,33 @@ export class ActivateFixedDepositsAccountComponent implements OnInit {
     if (activateFixedDepositsAccountFormData.activatedOnDate instanceof Date) {
       activateFixedDepositsAccountFormData.activatedOnDate = this.dateUtils.formatDate(prevActivatedOnDate, dateFormat);
     }
+    const linkedAccountId = this.resolveLinkedFundingAccountId();
     const data = {
       ...activateFixedDepositsAccountFormData,
       dateFormat,
-      locale
+      locale,
+      ...(linkedAccountId ? { fundingSavingsAccountId: linkedAccountId, linkAccountId: linkedAccountId } : {})
     };
     this.fixedDepositsService.executeFixedDepositsAccountCommand(this.accountId, 'activate', data).subscribe(() => {
       this.router.navigate(['../../'], { relativeTo: this.route });
     });
+  }
+
+
+  private resolveLinkedFundingAccountId(): any {
+    const linkedAccount = this.fixedDepositsAccountData?.linkedAccount || this.fixedDepositsAccountData?.transferToSavingsAccount;
+    return linkedAccount?.id || linkedAccount?.accountId || linkedAccount?.savingsAccountId || null;
+  }
+
+  private resolveRouteData(key: string): any {
+    let currentRoute: ActivatedRoute = this.route;
+    while (currentRoute) {
+      if (currentRoute.snapshot?.data && currentRoute.snapshot.data[key]) {
+        return currentRoute.snapshot.data[key];
+      }
+      currentRoute = currentRoute.parent;
+    }
+    return null;
   }
 
 }
