@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+set -euo pipefail
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+C="$ROOT/src/app/operations/operations.component.ts"
+H="$ROOT/src/app/operations/operations.component.html"
+S="$ROOT/src/app/operations/operations.service.ts"
+grep -q 'Integration Configuration' "$H"
+grep -q 'Production Activation Center' "$H"
+grep -q 'Teller Login & Access Readiness' "$H"
+grep -q 'Administration Areas' "$H"
+grep -q 'nameEnquiryPath' "$H"
+grep -q 'cancellationPath' "$H"
+grep -q 'networkPath' "$H"
+grep -q 'Configured Payment Policies' "$H"
+grep -q 'Webhook Delivery History' "$H"
+grep -q 'productionReadiness' "$S"
+grep -q 'integrationProfiles' "$S"
+grep -q 'webhookDeliveries' "$S"
+grep -q "lookup('MERCHANTS')" "$C"
+grep -q 'exportCsv' "$C"
+grep -q 'updateDisputeStatus' "$C"
+grep -q 'updateAlert' "$C"
+printf '%s\n' 'Bancro MVP12 frontend administration smoke: PASS'

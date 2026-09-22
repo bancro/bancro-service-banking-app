@@ -1,0 +1,253 @@
+<div class="container teller-page">
+  <div class="page-heading">
+    <div>
+      <h2>Teller Workstation</h2>
+      <p>Policy-aware customer cash transactions, internal transfers, and NIP/NPS external-bank transfers with maker-checker, dual control and Bancro activity audit.</p>
+    </div>
+    <button mat-stroked-button (click)="refresh()"><fa-icon icon="sync"></fa-icon> Refresh</button>
+  </div>
+
+  <div *ngIf="message" class="notice success">{{ message }}</div>
+  <div *ngIf="error" class="notice error">{{ error }}</div>
+  <div *ngIf="nibssStatus" class="notice" [class.success]="nibssStatus.enabled">NIBSS/NIP mode: <strong>{{ nibssStatus.mode }}</strong> · {{ nibssStatus.message }}</div>
+  <div *ngIf="npsStatus" class="notice" [class.success]="npsStatus.enabled">NPS/ISO 20022 mode: <strong>{{ npsStatus.mode }}</strong> · {{ npsStatus.message }}</div>
+
+  <div class="summary-grid" *ngIf="session">
+    <mat-card><small>Teller / Branch</small><strong>{{ session.tellerName }}</strong><span>{{ session.officeName }}</span></mat-card>
+    <mat-card><small>Cashier</small><strong>{{ session.cashierName }}</strong><span>Cashier #{{ session.cashierId }}</span></mat-card>
+    <mat-card><small>Opening / Allocated</small><strong>{{ session.drawer?.allocated | number:'1.2-2' }} {{ session.currencyCode }}</strong><span>Vault allocation</span></mat-card>
+    <mat-card><small>Cash In</small><strong>{{ session.drawer?.cashIn | number:'1.2-2' }} {{ session.currencyCode }}</strong><span>Customer deposits</span></mat-card>
+    <mat-card><small>Cash Out</small><strong>{{ session.drawer?.cashOut | number:'1.2-2' }} {{ session.currencyCode }}</strong><span>Customer withdrawals</span></mat-card>
+    <mat-card class="net"><small>Current Drawer</small><strong>{{ session.drawer?.netCash | number:'1.2-2' }} {{ session.currencyCode }}</strong><span>Allocated + in − out − settled</span></mat-card>
+  </div>
+
+  <mat-card class="balance-card" *ngIf="session">
+    <mat-card-title>Balance drawer</mat-card-title>
+    <mat-card-content>
+      <div class="balance-layout" [formGroup]="balanceForm">
+        <div class="balance-current">
+          <small>System cash</small>
+          <strong>{{ session.drawer?.netCash | number:'1.2-2' }} {{ session.currencyCode }}</strong>
+          <span *ngIf="session.lastBalance">Last count: {{ session.lastBalance.declaredCash | number:'1.2-2' }} · {{ session.lastBalance.status }} · variance {{ session.lastBalance.variance | number:'1.2-2' }}</span>
+          <span *ngIf="!session.lastBalance">No physical cash count has been recorded yet.</span>
+        </div>
+        <mat-form-field appearance="outline">
+          <mat-label>Physical cash counted</mat-label>
+          <input matInput type="number" formControlName="declaredCash">
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Balance note</mat-label>
+          <input matInput formControlName="note" placeholder="Optional shift/end-of-day note">
+        </mat-form-field>
+        <button mat-stroked-button type="button" (click)="balanceDrawer()" *mifosxHasPermission="'CREATE_BANCRO_TELLER_WORKSTATION'">Check balance</button>
+        <button mat-raised-button color="primary" type="button" (click)="closeDay()" *mifosxHasPermission="'UPDATE_BANCRO_TELLER_WORKSTATION'">Close teller day</button>
+      </div>
+      <p class="balance-help">This records the physical count and variance. Cash settlement/return to vault continues to use the existing Teller/Cashier settlement workflow.</p>
+    </mat-card-content>
+  </mat-card>
+
+  <div class="control-grid" *ngIf="session">
+    <mat-card class="control-card" *mifosxHasPermission="'READ_BANCRO_TELLER_CONTROL'">
+      <mat-card-title>Pending teller maker-checker</mat-card-title>
+      <mat-card-content>
+        <div class="control-row" *ngFor="let cmd of pendingCommands">
+          <div><strong>{{ cmd.operation_type }}</strong> · {{ cmd.amount | number:'1.2-2' }} {{ cmd.currency_code }}<br><small>{{ cmd.request_reference }} · maker {{ cmd.maker_username || cmd.requested_by }} · {{ cmd.risk_status }}</small></div>
+          <div *mifosxHasPermission="'UPDATE_BANCRO_TELLER_CONTROL'">
+            <button mat-button color="primary" (click)="decideCommand(cmd,'APPROVE')">Approve</button>
+            <button mat-button color="warn" (click)="decideCommand(cmd,'REJECT')">Reject</button>
+          </div>
+        </div>
+        <p *ngIf="!pendingCommands.length">No teller commands are awaiting approval.</p>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="control-card" *mifosxHasPermission="'READ_BANCRO_TELLER_CONTROL'">
+      <mat-card-title>Vault / teller dual control</mat-card-title>
+      <mat-card-content>
+        <form [formGroup]="cashControlForm" class="cash-control-form" *mifosxHasPermission="'CREATE_BANCRO_TELLER_CONTROL'">
+          <mat-form-field appearance="outline"><mat-label>Operation</mat-label><mat-select formControlName="operationType"><mat-option value="ALLOCATE">Allocate cash from vault</mat-option><mat-option value="SETTLE">Settle cash to vault</mat-option></mat-select></mat-form-field>
+          <mat-form-field appearance="outline"><mat-label>Amount</mat-label><input matInput type="number" formControlName="amount"></mat-form-field>
+          <mat-form-field appearance="outline"><mat-label>Note</mat-label><input matInput formControlName="note"></mat-form-field>
+          <button mat-stroked-button color="primary" type="button" (click)="requestCashControl()">Submit for approval</button>
+        </form>
+        <div class="control-row" *ngFor="let req of pendingCashControls">
+          <div><strong>{{ req.operation_type }}</strong> · {{ req.amount | number:'1.2-2' }} {{ req.currency_code }}<br><small>{{ req.request_reference }} · {{ req.teller_name }} · {{ req.cashier_name }}</small></div>
+          <div *mifosxHasPermission="'UPDATE_BANCRO_TELLER_CONTROL'">
+            <button mat-button color="primary" (click)="decideCashControl(req,'APPROVE')">Approve</button>
+            <button mat-button color="warn" (click)="decideCashControl(req,'REJECT')">Reject</button>
+          </div>
+        </div>
+        <p *ngIf="!pendingCashControls.length">No vault cash requests are awaiting a checker.</p>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <mat-card class="eod-card" *ngIf="eodReport">
+    <mat-card-title>Current business-day activity</mat-card-title>
+    <mat-card-content>
+      <div class="eod-grid">
+        <div><small>Allocated</small><strong>{{ eodReport.allocated | number:'1.2-2' }}</strong></div>
+        <div><small>Cash in</small><strong>{{ eodReport.cashIn | number:'1.2-2' }}</strong></div>
+        <div><small>Cash out</small><strong>{{ eodReport.cashOut | number:'1.2-2' }}</strong></div>
+        <div><small>Vault settlement</small><strong>{{ eodReport.settled | number:'1.2-2' }}</strong></div>
+        <div><small>System closing cash</small><strong>{{ eodReport.systemClosingCash | number:'1.2-2' }}</strong></div>
+        <div><small>Pending approvals</small><strong>{{ eodReport.pendingApprovals || 0 }}</strong></div>
+      </div>
+      <p *ngIf="eodReport.closure"><strong>Closed:</strong> {{ eodReport.closure.status }} · declared {{ eodReport.closure.declared_cash | number:'1.2-2' }} · variance {{ eodReport.closure.variance | number:'1.2-2' }}</p>
+    </mat-card-content>
+  </mat-card>
+
+  <div class="work-grid">
+    <mat-card>
+      <mat-card-title>Post transaction</mat-card-title>
+      <mat-card-content>
+        <form [formGroup]="form" class="teller-form">
+          <mat-form-field appearance="outline" class="wide">
+            <mat-label>Operation</mat-label>
+            <mat-select formControlName="operation">
+              <mat-option value="CASH_DEPOSIT">Cash Deposit</mat-option>
+              <mat-option value="CASH_WITHDRAWAL">Cash Withdrawal</mat-option>
+              <mat-option value="INTERNAL_TRANSFER">Internal Account Transfer</mat-option>
+              <mat-option value="EXTERNAL_TRANSFER">External Bank Transfer (NIP / NPS)</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <div class="lookup-row wide">
+            <mat-form-field appearance="outline">
+              <mat-label>{{ isInternalTransfer() || isExternalTransfer() ? 'Source account number' : 'Customer account number' }}</mat-label>
+              <input matInput formControlName="accountNo" (keyup.enter)="lookupSource()">
+            </mat-form-field>
+            <button mat-stroked-button type="button" (click)="lookupSource()">Find account</button>
+          </div>
+
+          <div *ngIf="account" class="account-card wide">
+            <strong>{{ account.clientName }}</strong>
+            <span>{{ account.accountNo }} · {{ account.productName }}</span>
+            <span>Balance: <b>{{ account.accountBalance | number:'1.2-2' }} {{ account.currencyCode }}</b></span>
+            <span *ngIf="!account.active" class="warning">Account is not active</span>
+          </div>
+
+          <ng-container *ngIf="isInternalTransfer()">
+            <div class="lookup-row wide">
+              <mat-form-field appearance="outline">
+                <mat-label>Destination account number</mat-label>
+                <input matInput formControlName="destinationAccountNo" (keyup.enter)="lookupDestination()">
+              </mat-form-field>
+              <button mat-stroked-button type="button" (click)="lookupDestination()">Find destination</button>
+            </div>
+            <div *ngIf="destinationAccount" class="account-card destination wide">
+              <strong>{{ destinationAccount.clientName }}</strong>
+              <span>{{ destinationAccount.accountNo }} · {{ destinationAccount.productName }}</span>
+            </div>
+          </ng-container>
+
+          <ng-container *ngIf="isExternalTransfer()">
+            <mat-form-field appearance="outline" class="wide">
+              <mat-label>External rail</mat-label>
+              <mat-select formControlName="externalRail">
+                <mat-option value="NIP">NIBSS Instant Payment (NIP)</mat-option>
+                <mat-option value="NPS">National Payment Stack (NPS / ISO 20022)</mat-option>
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="wide">
+              <mat-label>{{ isNpsExternal() ? 'NPS participant' : 'Destination bank' }}</mat-label>
+              <mat-select formControlName="destinationBankCode">
+                <mat-option *ngFor="let institution of externalInstitutions()" [value]="institution.institutionCode">
+                  {{ institution.institutionName }} · {{ institution.institutionCode }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <div class="lookup-row wide">
+              <mat-form-field appearance="outline">
+                <mat-label>Beneficiary account number</mat-label>
+                <input matInput formControlName="beneficiaryAccount" (keyup.enter)="!isNpsExternal() && runNameEnquiry()">
+              </mat-form-field>
+              <button *ngIf="!isNpsExternal()" mat-stroked-button type="button" (click)="runNameEnquiry()" [disabled]="enquiring">{{ enquiring ? 'Checking…' : 'Name enquiry' }}</button>
+            </div>
+
+            <mat-form-field appearance="outline" class="wide" *ngIf="isNpsExternal()">
+              <mat-label>Beneficiary name</mat-label>
+              <input matInput formControlName="beneficiaryName">
+              <mat-hint>NPS participant routing comes from the bank-supplied directory. Beneficiary validation follows the official NPS onboarding profile.</mat-hint>
+            </mat-form-field>
+
+            <div *ngIf="nameEnquiryResult && !isNpsExternal()" class="account-card destination wide">
+              <small>Beneficiary confirmed</small><strong>{{ nameEnquiryResult.accountName }}</strong>
+              <span>{{ nameEnquiryResult.bankName }} · {{ nameEnquiryResult.accountNumber }}</span><span>Enquiry: {{ nameEnquiryResult.enquiryReference }}</span>
+            </div>
+
+            <mat-form-field appearance="outline" class="wide" *ngIf="externalMode()?.mode === 'SIMULATOR'">
+              <mat-label>Simulator outcome</mat-label>
+              <mat-select formControlName="simulationOutcome">
+                <mat-option value="SUCCESS">Success</mat-option><mat-option value="UNKNOWN">Timeout / Unknown (test requery)</mat-option><mat-option value="FAILED">Failed (test automatic core reversal)</mat-option>
+              </mat-select>
+              <mat-hint>Testing only. Live NIP/NPS adapters ignore this control.</mat-hint>
+            </mat-form-field>
+          </ng-container>
+
+          <mat-form-field appearance="outline"><mat-label>Amount</mat-label><input matInput type="number" formControlName="amount"></mat-form-field>
+          <mat-form-field appearance="outline" *ngIf="isCashOperation()">
+            <mat-label>Cash payment type</mat-label>
+            <mat-select formControlName="paymentTypeId">
+              <mat-option *ngFor="let p of session?.paymentTypes" [value]="p.id">{{ p.name }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="wide"><mat-label>Narration</mat-label><input matInput formControlName="narration"></mat-form-field>
+          <mat-form-field appearance="outline" class="wide"><mat-label>Idempotency key (optional)</mat-label><input matInput formControlName="idempotencyKey"><mat-hint>Leave blank and Bancro generates a safe request key in the UI.</mat-hint></mat-form-field>
+        </form>
+        <button mat-raised-button color="primary" (click)="post()" [disabled]="posting" *mifosxHasPermission="'CREATE_BANCRO_TELLER_WORKSTATION'">
+          {{ posting ? 'Submitting…' : 'Submit transaction' }}
+        </button>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="receipt" *ngIf="receipt">
+      <mat-card-title>Receipt</mat-card-title>
+      <mat-card-content>
+        <div class="receipt-brand">BANCRO</div>
+        <div class="receipt-line"><span>Reference</span><strong>{{ receipt.transactionReference }}</strong></div>
+        <div class="receipt-line"><span>Type</span><strong>{{ receipt.transactionType }}<span *ngIf="receipt.rail"> · {{ receipt.rail }}</span></strong></div>
+        <div class="receipt-line"><span>Account</span><strong>{{ receipt.accountNumber }}</strong></div>
+        <div class="receipt-line" *ngIf="receipt.destinationBankName"><span>Destination bank</span><strong>{{ receipt.destinationBankName }}</strong></div>
+        <div class="receipt-line" *ngIf="receipt.destinationAccountNumber"><span>Destination</span><strong>{{ receipt.destinationAccountNumber }}</strong></div>
+        <div class="receipt-line" *ngIf="receipt.providerReference"><span>Provider reference</span><strong>{{ receipt.providerReference }}</strong></div>
+        <div class="receipt-line"><span>Amount</span><strong>{{ receipt.amount | number:'1.2-2' }} {{ receipt.currencyCode }}</strong></div>
+        <div class="receipt-line"><span>Status</span><strong>{{ receipt.status }}</strong></div>
+        <div class="receipt-line"><span>Date</span><strong>{{ receipt.createdAt | date:'medium' }}</strong></div>
+        <div class="receipt-line" *ngIf="receipt.accountBalance !== undefined"><span>Balance</span><strong>{{ receipt.accountBalance | number:'1.2-2' }} {{ receipt.currencyCode }}</strong></div>
+        <p class="narration">{{ receipt.narration }}</p>
+        <p class="warning" *ngIf="receipt.status === 'UNKNOWN'">The source account remains debited until transaction-status requery confirms the final provider outcome.</p>
+        <p class="receipt-audit" *ngIf="receipt.receiptPrintCount">{{ receipt.reprint ? 'REPRINT' : 'ORIGINAL' }} · print count {{ receipt.receiptPrintCount }}<span *ngIf="receipt.lastReceiptPrintedAt"> · {{ receipt.lastReceiptPrintedAt | date:'short' }}</span></p>
+        <button mat-stroked-button (click)="printReceipt()"><fa-icon icon="print"></fa-icon> {{ receipt.receiptPrintCount ? 'Reprint receipt' : 'Print receipt' }}</button>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <mat-card class="transactions-card">
+    <mat-card-title>Recent cashier transactions</mat-card-title>
+    <mat-card-content class="table-wrap">
+      <table mat-table [dataSource]="transactions">
+        <ng-container matColumnDef="reference"><th mat-header-cell *matHeaderCellDef>Reference</th><td mat-cell *matCellDef="let row">{{ row.transactionReference }}</td></ng-container>
+        <ng-container matColumnDef="type"><th mat-header-cell *matHeaderCellDef>Type</th><td mat-cell *matCellDef="let row">{{ row.transactionType }}</td></ng-container>
+        <ng-container matColumnDef="account"><th mat-header-cell *matHeaderCellDef>Account</th><td mat-cell *matCellDef="let row">{{ row.accountNumber }}<span *ngIf="row.destinationAccountNumber"> → {{ row.destinationBankName ? row.destinationBankName + ' · ' : '' }}{{ row.destinationAccountNumber }}</span></td></ng-container>
+        <ng-container matColumnDef="amount"><th mat-header-cell *matHeaderCellDef>Amount</th><td mat-cell *matCellDef="let row">{{ row.amount | number:'1.2-2' }} {{ row.currencyCode }}</td></ng-container>
+        <ng-container matColumnDef="status"><th mat-header-cell *matHeaderCellDef>Status</th><td mat-cell *matCellDef="let row"><strong>{{ row.status }}</strong></td></ng-container>
+        <ng-container matColumnDef="created"><th mat-header-cell *matHeaderCellDef>Time</th><td mat-cell *matCellDef="let row">{{ row.createdAt | date:'short' }}</td></ng-container>
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef>Actions</th>
+          <td mat-cell *matCellDef="let row">
+            <ng-container *mifosxHasPermission="'UPDATE_BANCRO_TELLER_WORKSTATION'">
+              <button mat-button color="warn" *ngIf="row.status === 'SUCCESS' && row.transactionType !== 'INTERNAL_TRANSFER' && row.transactionType !== 'EXTERNAL_TRANSFER'" (click)="reverse(row)">Reverse</button>
+              <button mat-button *ngIf="row.transactionType === 'EXTERNAL_TRANSFER' && row.status === 'UNKNOWN'" (click)="requery(row)">Requery</button>
+              <button mat-button color="warn" *ngIf="row.transactionType === 'EXTERNAL_TRANSFER' && row.status === 'SUCCESS'" (click)="requestExternalReversal(row)">{{ row.rail === 'NPS' ? 'Request return' : 'Request reversal' }}</button>
+              <button mat-button color="warn" *ngIf="row.transactionType === 'EXTERNAL_TRANSFER' && row.rail === 'NPS' && (row.status === 'SUCCESS' || row.status === 'UNKNOWN')" (click)="requestNpsCancellation(row)">Request cancellation</button>
+            </ng-container>
+          </td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+      </table>
+    </mat-card-content>
+  </mat-card>
+</div>

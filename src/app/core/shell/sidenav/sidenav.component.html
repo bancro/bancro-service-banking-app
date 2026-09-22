@@ -135,6 +135,42 @@
               >
             </div>
           </mat-list-item> -->
+          <mat-list-item [routerLink]="['/payments']" [routerLinkActive]="'is-active'" matTooltipPosition="right" matTooltip="Payments" *mifosxHasPermission="'READ_BANCRO_PAYMENT'">
+            <div class="flex items-center gap-x-[10px] text-[#454745] px-[10px] font-medium">
+              <fa-icon icon="money-bill-alt"></fa-icon>
+              <a matLine [ngClass]="{ show: !sidenavCollapsed, '!hidden': sidenavCollapsed }" class="f14">Payments</a>
+            </div>
+          </mat-list-item>
+          <mat-list-item [routerLink]="['/reconciliation']" [routerLinkActive]="'is-active'" matTooltipPosition="right" matTooltip="Settlement & Reconciliation" *mifosxHasPermission="'READ_BANCRO_RECONCILIATION'">
+            <div class="flex items-center gap-x-[10px] text-[#454745] px-[10px] font-medium">
+              <fa-icon icon="money-bill-alt"></fa-icon>
+              <a matLine [ngClass]="{ show: !sidenavCollapsed, '!hidden': sidenavCollapsed }" class="f14">Settlement & Reconciliation</a>
+            </div>
+          </mat-list-item>
+          <mat-list-item [routerLink]="['/operations']" [routerLinkActive]="'is-active'" matTooltipPosition="right" matTooltip="Bancro Administration & Operations" *mifosxHasPermission="'READ_BANCRO_OPERATIONS'">
+            <div class="flex items-center gap-x-[10px] text-[#454745] px-[10px] font-medium">
+              <fa-icon icon="cogs"></fa-icon>
+              <a matLine [ngClass]="{ show: !sidenavCollapsed, '!hidden': sidenavCollapsed }" class="f14">Bancro Administration</a>
+            </div>
+          </mat-list-item>
+          <mat-list-item [routerLink]="['/activity-trail']" [routerLinkActive]="'is-active'" matTooltipPosition="right" matTooltip="Current Activity Trail" *mifosxHasPermission="'READ_BANCRO_ACTIVITY_TRAIL'">
+            <div class="flex items-center gap-x-[10px] text-[#454745] px-[10px] font-medium">
+              <fa-icon icon="list"></fa-icon>
+              <a matLine [ngClass]="{ show: !sidenavCollapsed, '!hidden': sidenavCollapsed }" class="f14">Current Activity Trail</a>
+            </div>
+          </mat-list-item>
+          <mat-list-item [routerLink]="['/teller-workstation']" [routerLinkActive]="'is-active'" matTooltipPosition="right" matTooltip="Teller Workstation" *mifosxHasPermission="'READ_BANCRO_TELLER_WORKSTATION'">
+            <div class="flex items-center gap-x-[10px] text-[#454745] px-[10px] font-medium">
+              <fa-icon icon="money-bill-alt"></fa-icon>
+              <a matLine [ngClass]="{ show: !sidenavCollapsed, '!hidden': sidenavCollapsed }" class="f14">Teller Workstation</a>
+            </div>
+          </mat-list-item>
+          <mat-list-item [routerLink]="['/organization/tellers']" [routerLinkActive]="'is-active'" matTooltipPosition="right" matTooltip="Teller Operations" *mifosxHasPermission="'READ_TELLER'">
+            <div class="flex items-center gap-x-[10px] text-[#454745] px-[10px] font-medium">
+              <fa-icon icon="university"></fa-icon>
+              <a matLine [ngClass]="{ show: !sidenavCollapsed, '!hidden': sidenavCollapsed }" class="f14">Teller Operations</a>
+            </div>
+          </mat-list-item>
           <mat-list-item [routerLink]="['/accounting']" [routerLinkActive]="'is-active'" matTooltipPosition="right" matTooltip="Accounting">
             <div class="flex items-center gap-x-[10px] text-[#454745] px-[10px] font-medium">
               <app-accounting-svg [routerLinkActive]="'svg-active'"></app-accounting-svg>

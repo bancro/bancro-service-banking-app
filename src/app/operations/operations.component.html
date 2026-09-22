@@ -1,0 +1,601 @@
+<div class="operations-page">
+  <div class="header-row">
+    <div><h2>Bancro Administration & Operations</h2><p>Administrator configuration for payment rails, financial controls, teller access, POS/PTSA, certification, risk, reconciliation and production readiness.</p></div>
+    <button mat-stroked-button color="primary" (click)="refresh()">Refresh</button>
+  </div>
+
+  <div *ngIf="error" class="error">{{ error }}</div>
+  <div *ngIf="message" class="message">{{ message }}</div>
+  <div class="message" *mifosxHasPermission="'READ_BANCRO_ACTIVITY_TRAIL'">Operational actions in this workspace are now captured in the <a [routerLink]="['/activity-trail']">Current Activity Trail</a>.</div>
+
+  <div class="kpis">
+    <mat-card><span>Pending approvals</span><strong>{{ summary?.pendingApprovals || 0 }}</strong></mat-card>
+    <mat-card><span>Open alerts</span><strong>{{ summary?.openAlerts || 0 }}</strong></mat-card>
+    <mat-card><span>Open disputes</span><strong>{{ summary?.openDisputes || 0 }}</strong></mat-card>
+    <mat-card><span>Pending events</span><strong>{{ summary?.pendingOutbox || 0 }}</strong></mat-card>
+  </div>
+
+  <mat-card class="section admin-area-nav">
+    <h3>Administration Areas</h3>
+    <div class="admin-nav-links">
+      <a href="#integration-config">Integration & activation</a> · <a href="#teller-readiness">Teller readiness</a> · <a href="#financial-controls">Financial controls</a> · <a href="#risk-operations">Risk & operations</a> · <a href="#pos-admin">POS</a> · <a href="#cards-admin">Cards/HSM</a> · <a href="#webhooks-admin">Webhooks</a>
+    </div>
+  </mat-card>
+
+  <mat-card class="section">
+    <h3>Production Readiness</h3>
+    <div class="readiness-grid">
+      <div>NIBSS live adapter <b>{{ readiness?.nibssLiveReady ? 'READY' : (readiness?.nibssLiveConfigured ? 'Configured but incomplete' : 'Safe-off') }}</b></div>
+      <div>NPS / ISO 20022 <b>{{ readiness?.npsIso20022Adapter }}</b><br><small>{{ readiness?.npsMode || '—' }} · live flag {{ readiness?.npsLiveConfigured ? 'ON' : 'OFF' }} · gateway {{ readiness?.npsGatewayConfigured ? 'configured' : 'incomplete' }}</small></div>
+      <div>Card processor <b>{{ readiness?.cardProcessorConfigured ? 'Configured' : 'Not configured' }}</b></div>
+      <div>HSM <b>{{ readiness?.hsmConfigured ? 'Configured' : 'Not configured' }}</b></div>
+      <div>POS acquiring <b>{{ readiness?.posLiveAcquiring }}</b></div>
+      <div>Webhook delivery <b>{{ readiness?.webhookDeliveryEnabled ? 'Enabled' : 'Safe-off' }}</b></div>
+    </div>
+  </mat-card>
+
+  <div class="two-col" id="integration-config" *mifosxHasPermission="'READ_BANCRO_OPERATIONS'">
+    <mat-card class="section">
+      <h3>Integration Configuration</h3>
+      <p>Manage non-secret NIP, NPS, POS, Cards, HSM and webhook connection settings here. Credentials, private keys and key material remain in the deployment secret store/HSM.</p>
+      <mat-form-field><mat-label>Integration</mat-label><mat-select [value]="selectedIntegrationRail" (selectionChange)="loadIntegrationProfile($event.value)"><mat-option *ngFor="let p of integrationProfiles" [value]="p.rail">{{ p.display_name || p.rail }}</mat-option></mat-select></mat-form-field>
+      <form [formGroup]="integrationProfileForm" (ngSubmit)="saveIntegrationProfile()" class="form-grid">
+        <mat-form-field><mat-label>Display name</mat-label><input matInput formControlName="displayName"></mat-form-field>
+        <mat-form-field><mat-label>Mode</mat-label><mat-select formControlName="mode"><mat-option value="SIMULATOR">Simulator</mat-option><mat-option value="SAFE_OFF">Safe-off</mat-option><mat-option value="LIVE">Live</mat-option><mat-option value="CERTIFIED_GATEWAY">Certified Gateway</mat-option></mat-select></mat-form-field>
+        <mat-form-field class="wide"><mat-label>HTTPS base URL</mat-label><input matInput formControlName="baseUrl"></mat-form-field>
+        <mat-form-field class="wide"><mat-label>Secondary HTTPS base URL</mat-label><input matInput formControlName="secondaryBaseUrl"></mat-form-field>
+        <mat-form-field><mat-label>Submit / financial path</mat-label><input matInput formControlName="operationPath"></mat-form-field>
+        <mat-form-field><mat-label>Name enquiry path</mat-label><input matInput formControlName="nameEnquiryPath"></mat-form-field>
+        <mat-form-field><mat-label>Status / requery path</mat-label><input matInput formControlName="statusPath"></mat-form-field>
+        <mat-form-field><mat-label>Reversal path</mat-label><input matInput formControlName="reversalPath"></mat-form-field>
+        <mat-form-field><mat-label>Return path</mat-label><input matInput formControlName="returnPath"></mat-form-field>
+        <mat-form-field><mat-label>Cancellation path</mat-label><input matInput formControlName="cancellationPath"></mat-form-field>
+        <mat-form-field><mat-label>Advice path</mat-label><input matInput formControlName="advicePath"></mat-form-field>
+        <mat-form-field><mat-label>Network / heartbeat path</mat-label><input matInput formControlName="networkPath"></mat-form-field>
+        <mat-form-field><mat-label>Health path</mat-label><input matInput formControlName="healthPath"></mat-form-field>
+        <mat-form-field><mat-label>Institution / participant ID</mat-label><input matInput formControlName="institutionId"></mat-form-field>
+        <mat-form-field><mat-label>Secret reference</mat-label><input matInput formControlName="secretReference" placeholder="vault/path or secret name"></mat-form-field>
+        <mat-form-field><mat-label>Client ID reference</mat-label><input matInput formControlName="clientIdReference"></mat-form-field>
+        <mat-checkbox formControlName="enabled">Enable profile for readiness evaluation</mat-checkbox>
+        <button mat-raised-button color="primary" *mifosxHasPermission="'UPDATE_BANCRO_OPERATIONS'">Save Integration Profile</button>
+      </form>
+    </mat-card>
+
+    <mat-card class="section">
+      <h3>Production Activation Center</h3>
+      <p>Activation is maker-checker controlled. Application approval never exposes or replaces deployment credentials, TLS/mTLS or HSM key controls.</p>
+      <div class="list-row" *ngFor="let r of productionReadiness?.rails">
+        <div><b>{{ r.rail }} · {{ r.readyForApproval ? 'READY FOR APPROVAL' : 'BLOCKED' }}</b><br><span *ngIf="r.blockers?.length"><small>{{ r.blockers.join(' · ') }}</small></span><span *ngIf="!r.blockers?.length"><small>All application readiness gates passed.</small></span></div>
+        <button mat-stroked-button color="primary" [disabled]="!r.readyForApproval" (click)="requestProductionActivation(r.rail)" *mifosxHasPermission="'UPDATE_BANCRO_OPERATIONS'">Request Activation</button>
+      </div>
+      <h4>Pending / Recent Activation Requests</h4>
+      <div class="list-row" *ngFor="let a of activationRequests | slice:0:12"><div><b>{{ a.rail }} · {{ a.status }}</b><br><small>Maker {{ a.requested_by }} · {{ a.requested_at | date:'short' }}</small></div><span *ngIf="a.status === 'PENDING'"><button mat-button color="primary" (click)="decideProductionActivation(a,'APPROVE')">Approve</button><button mat-button color="warn" (click)="decideProductionActivation(a,'REJECT')">Reject</button></span></div>
+    </mat-card>
+  </div>
+
+  <mat-card class="section" id="teller-readiness" *mifosxHasPermission="'READ_BANCRO_OPERATIONS'">
+    <h3>Teller Login & Access Readiness</h3>
+    <p>Each teller signs in through the normal Bancro login with an individual username/password. Bancro then resolves <b>User → Staff → Active Cashier Assignment → Teller/Branch</b>. No shared cashier password is used. Teller-only users are routed directly to Teller Workstation after authentication.</p>
+    <p><a mat-stroked-button color="primary" [routerLink]="['/appusers']">Manage Users</a> <a mat-stroked-button [routerLink]="['/organization/tellers']">Manage Tellers / Cashiers</a></p>
+    <table class="simple-table"><tr><th>User</th><th>Staff</th><th>Office</th><th>Teller permission</th><th>Active cashier</th><th>Readiness</th></tr>
+      <tr *ngFor="let u of tellerAccess">
+        <td>{{ u.username }}<br><small>{{ u.enabled ? 'Enabled' : 'Disabled' }}</small></td>
+        <td>{{ u.staff_name || '—' }}</td><td>{{ u.office_name || '—' }}</td>
+        <td>{{ u.tellerPermission ? 'YES' : 'NO' }}</td>
+        <td><span *ngIf="u.activeCashier">{{ u.activeCashier.teller_name }} / cashier {{ u.activeCashier.cashier_id }}</span><span *ngIf="!u.activeCashier">—</span></td>
+        <td><b>{{ u.ready ? 'READY' : 'ACTION REQUIRED' }}</b><br><small>{{ u.issue || 'Ready for Teller Workstation' }}</small></td>
+      </tr>
+      <tr *ngIf="!tellerAccess.length"><td colspan="6">No user readiness rows returned.</td></tr>
+    </table>
+    <p><small>Recommended roles: <b>Bancro Teller</b> for operators and <b>Bancro Teller Supervisor</b> for checkers. Maker/checker users must remain separate. Passwords, MFA secrets and credentials are never displayed here.</small></p>
+  </mat-card>
+
+  <mat-card class="section" *mifosxHasPermission="'READ_BANCRO_PAYMENT'">
+    <h3>MVP8 NIBSS / NIP Production Certification</h3>
+    <p>The live boundary uses a bank-certified HTTPS gateway. Bancro sends a canonical contract; official NIBSS wire translation and credentials stay in the certified integration boundary.</p>
+    <div class="readiness-grid">
+      <div>Mode <b>{{ nibssStatus?.mode || '—' }}</b></div>
+      <div>Adapter <b>{{ nibssStatus?.enabled ? 'ENABLED' : 'SAFE-OFF' }}</b></div>
+      <div>Gateway health <b>{{ nibssHealth?.status || '—' }}</b></div>
+      <div>Certification <b>{{ nibssCertification?.passed || 0 }} passed / {{ nibssCertification?.pending || 0 }} pending / {{ nibssCertification?.failed || 0 }} failed</b></div>
+    </div>
+    <p><small>{{ nibssStatus?.message }}</small></p>
+    <div class="two-col">
+      <div>
+        <h4>Certification Cases</h4>
+        <div class="list-row" *ngFor="let c of nibssCertification?.cases">
+          <div><b>{{ c.case_code }} · {{ c.operation }}</b><br>{{ c.scenario }}<br><small>Expected {{ c.expected_outcome }} · Current {{ c.status }}<span *ngIf="c.evidence_note"> · {{ c.evidence_note }}</span></small></div>
+          <span><button mat-button color="primary" (click)="recordCertification(c,'PASSED')">Pass</button><button mat-button color="warn" (click)="recordCertification(c,'FAILED')">Fail</button></span>
+        </div>
+        <h4>Official NIBSS Participant Directory</h4>
+        <p><small>{{ nibssInstitutions.length }} institution(s) loaded. Paste only the participant directory supplied through official bank/NIBSS onboarding.</small></p>
+        <mat-form-field appearance="outline" style="width:100%"><mat-label>NIBSS participant JSON</mat-label><textarea matInput rows="4" [(ngModel)]="nibssDirectoryImport" placeholder='[{"institutionCode":"...","institutionName":"..."}]'></textarea></mat-form-field>
+        <button mat-stroked-button color="primary" (click)="importNibssDirectory()" *mifosxHasPermission="'UPDATE_BANCRO_PAYMENT'">Import participant directory</button>
+      </div>
+      <div>
+        <h4>Recent Provider Exchanges</h4>
+        <div class="list-row" *ngFor="let x of nibssExchanges | slice:0:12">
+          <div><b>{{ x.operation }} · {{ x.outcome || '—' }}</b><br>{{ x.transaction_reference || x.request_reference || '—' }}<br><small>HTTP {{ x.http_status || '—' }} · {{ x.duration_ms || 0 }} ms · {{ x.response_code || '—' }}</small></div>
+          <span>{{ x.created_at | date:'short' }}</span>
+        </div>
+        <p *ngIf="!nibssExchanges.length">No live provider exchanges recorded yet.</p>
+      </div>
+    </div>
+  </mat-card>
+
+  <mat-card class="section" *mifosxHasPermission="'READ_BANCRO_PAYMENT'">
+    <h3>MVP9 NPS / ISO 20022 Integration & Certification</h3>
+    <p>NPS is a separate payment rail. Bancro generates a standards-aligned pacs.008 credit-transfer message and keeps status, return and cancellation behind the certified gateway boundary. Production remains safe-off until the bank installs the official NPS implementation profile/XSDs, endpoints, certificates, credentials, participant directory and real certification evidence.</p>
+    <div class="readiness-grid">
+      <div>Mode <b>{{ npsStatus?.mode || '—' }}</b></div>
+      <div>Adapter <b>{{ npsStatus?.enabled ? 'ENABLED' : 'SAFE-OFF' }}</b></div>
+      <div>Gateway health <b>{{ npsHealth?.status || '—' }}</b></div>
+      <div>Participants <b>{{ npsParticipants?.length || 0 }}</b></div>
+      <div>Certification <b>{{ npsCertification?.passed || 0 }} passed / {{ npsCertification?.pending || 0 }} pending / {{ npsCertification?.failed || 0 }} failed</b></div>
+      <div>Official profile <b>{{ npsStatus?.officialProfileInstalled ? 'INSTALLED' : 'BANK/NIBSS PACK REQUIRED' }}</b></div>
+    </div>
+    <p><small>{{ npsStatus?.message }}</small></p>
+    <div class="two-col">
+      <div>
+        <h4>NPS Certification Cases</h4>
+        <div class="list-row" *ngFor="let c of npsCertification?.cases">
+          <div><b>{{ c.caseCode }} · {{ c.operation }}</b><br>{{ c.scenario }}<br><small>Expected {{ c.expectedOutcome }} · Current {{ c.status }}<span *ngIf="c.evidenceNote"> · {{ c.evidenceNote }}</span></small></div>
+          <span><button mat-button color="primary" (click)="recordNpsCertification(c,'PASSED')">Pass</button><button mat-button color="warn" (click)="recordNpsCertification(c,'FAILED')">Fail</button></span>
+        </div>
+        <h4>Official Participant Directory</h4>
+        <p><small>Paste only the participant list supplied by the bank/NIBSS onboarding process. Import is an upsert; Bancro does not invent or scrape production routing.</small></p>
+        <mat-form-field appearance="outline" style="width:100%"><mat-label>NPS participant JSON</mat-label><textarea matInput rows="5" [(ngModel)]="npsDirectoryImport" placeholder='[{"participantCode":"...","participantName":"...","routingId":"..."}]'></textarea></mat-form-field>
+        <button mat-stroked-button color="primary" (click)="importNpsDirectory()" *mifosxHasPermission="'UPDATE_BANCRO_PAYMENT'">Import participant directory</button>
+      </div>
+      <div>
+        <h4>Recent NPS Exchanges / ISO Messages</h4>
+        <div class="list-row" *ngFor="let x of npsExchanges | slice:0:8">
+          <div><b>{{ x.operation }} · {{ x.outcome || '—' }}</b><br>{{ x.transactionReference || '—' }}<br><small>{{ x.messageType || '—' }} · HTTP {{ x.httpStatus || '—' }} · {{ x.durationMs || 0 }} ms · {{ x.responseCode || '—' }}</small></div>
+          <span>{{ x.createdAt | date:'short' }}</span>
+        </div>
+        <div class="list-row" *ngFor="let m of npsMessages | slice:0:6">
+          <div><b>{{ m.messageType }} {{ m.messageVersion }}</b><br>{{ m.messageId }}<br><small>End-to-end {{ m.endToEndId }} · {{ m.status }} · hash {{ m.payloadHash | slice:0:12 }}…</small></div>
+          <span>{{ m.createdAt | date:'short' }}</span>
+        </div>
+        <p *ngIf="!npsExchanges.length && !npsMessages.length">No NPS provider exchanges or message metadata recorded yet.</p>
+      </div>
+    </div>
+  </mat-card>
+
+  <mat-card class="section" *mifosxHasPermission="'READ_BANCRO_FINANCIAL_CONTROLS'">
+    <h3>MVP7 Financial Controls</h3>
+    <p>Institution/branch/teller limits, accounting maker-checker, balanced Fineract fee journals, teller variance approvals and branch business-day closure.</p>
+    <div class="two-col">
+      <div>
+        <h4>Control Profile</h4>
+        <form [formGroup]="controlProfileForm" (ngSubmit)="saveControlProfile()" class="form-grid">
+          <mat-form-field><mat-label>Scope</mat-label><mat-select formControlName="scopeType"><mat-option value="INSTITUTION">Institution</mat-option><mat-option value="OFFICE">Branch / Office</mat-option><mat-option value="TELLER">Teller</mat-option><mat-option value="CASHIER">Cashier</mat-option></mat-select></mat-form-field>
+          <mat-form-field><mat-label>Scope</mat-label><mat-select formControlName="scopeId" [disabled]="controlProfileForm.get('scopeType').value === 'INSTITUTION'"><ng-container *ngIf="controlProfileForm.get('scopeType').value === 'OFFICE'"><mat-option *ngFor="let o of officeOptions" [value]="o.id">{{ o.name }}</mat-option></ng-container><ng-container *ngIf="controlProfileForm.get('scopeType').value === 'TELLER'"><mat-option *ngFor="let t of tellerOptions" [value]="t.id">{{ t.office_name }} · {{ t.name }}</mat-option></ng-container><ng-container *ngIf="controlProfileForm.get('scopeType').value === 'CASHIER'"><mat-option *ngFor="let c of cashierOptions" [value]="c.id">{{ c.office_name }} · {{ c.name }}</mat-option></ng-container></mat-select></mat-form-field>
+          <mat-form-field><mat-label>Currency</mat-label><input matInput formControlName="currencyCode"></mat-form-field>
+          <mat-form-field><mat-label>Max cash deposit</mat-label><input matInput type="number" formControlName="maxSingleCashDeposit"></mat-form-field>
+          <mat-form-field><mat-label>Max cash withdrawal</mat-label><input matInput type="number" formControlName="maxSingleCashWithdrawal"></mat-form-field>
+          <mat-form-field><mat-label>Max transfer</mat-label><input matInput type="number" formControlName="maxSingleTransfer"></mat-form-field>
+          <mat-form-field><mat-label>Daily cash-out</mat-label><input matInput type="number" formControlName="dailyCashOutLimit"></mat-form-field>
+          <mat-form-field><mat-label>Max vault allocation</mat-label><input matInput type="number" formControlName="maxVaultAllocation"></mat-form-field>
+          <mat-form-field><mat-label>Variance tolerance</mat-label><input matInput type="number" formControlName="varianceTolerance"></mat-form-field>
+          <button mat-raised-button color="primary">Save Control Profile</button>
+        </form>
+        <div class="list-row" *ngFor="let c of controlProfiles | slice:0:8"><div><b>{{ c.scope_type }} {{ c.scope_id || '' }}</b><br>{{ c.currency_code }} · withdrawal {{ c.max_single_cash_withdrawal || '—' }} · transfer {{ c.max_single_transfer || '—' }}</div><span>{{ c.enabled ? 'ACTIVE' : 'DISABLED' }}</span></div>
+      </div>
+
+      <div>
+        <h4>Branch Business Day</h4>
+        <form [formGroup]="branchControlForm" class="form-grid">
+          <mat-form-field><mat-label>Branch / Office</mat-label><mat-select formControlName="officeId"><mat-option *ngFor="let o of officeOptions" [value]="o.id">{{ o.name }}</mat-option></mat-select></mat-form-field>
+          <mat-form-field><mat-label>Close note</mat-label><input matInput formControlName="note"></mat-form-field>
+          <button type="button" mat-stroked-button (click)="loadBranchDay()">Load</button>
+          <button type="button" mat-raised-button color="primary" (click)="closeBranch()">Close Branch Day</button>
+          <button type="button" mat-stroked-button color="warn" (click)="reopenBranch()">Reopen</button>
+        </form>
+        <div class="quote-result" *ngIf="branchDay"><b>{{ branchDay.status }}</b> · {{ branchDay.business_date || branchDay.businessDate }}<br>Open cashiers: {{ branchDay.openCashiers || 0 }} · Pending cash control: {{ branchDay.pendingCashControl || 0 }} · Pending variance: {{ branchDay.pendingVarianceOverrides || 0 }} · Unresolved NIP funds: {{ branchDay.unresolvedNipFunds || 0 }} · Unresolved NPS funds: {{ branchDay.unresolvedNpsFunds || 0 }} · Reconciliation exceptions: {{ branchDay.openReconciliationExceptions || 0 }}</div>
+      </div>
+    </div>
+  </mat-card>
+
+  <div class="two-col" *mifosxHasPermission="'READ_BANCRO_FINANCIAL_CONTROLS'">
+    <mat-card class="section">
+      <h3>Accounting Mapping Maker / Checker</h3>
+      <div class="quote-result" *ngFor="let a of accounting | slice:0:8">
+        <b>{{ a.rail }}</b> · mapping {{ a.enabled ? 'ACTIVE' : 'DISABLED' }} · customer fee debit {{ a.customer_fee_debit_enabled ? 'ON' : 'OFF' }}
+        <span *ngIf="a.customer_fee_debit_enabled"> · Savings Charge ID {{ a.customer_fee_charge_id || '—' }}</span>
+      </div>
+      <p><small>The customer-fee switch is activated only by an approved maker/checker mapping below. Set Rail=NIP or NPS, enable customer fee debit, enter the bank-approved Fineract Savings Charge ID, enable the rail mapping, submit as maker, then have a different authorized user approve it.</small></p>
+      <form [formGroup]="accountingChangeForm" (ngSubmit)="requestAccountingChange()" class="form-grid">
+        <mat-form-field><mat-label>Rail</mat-label><input matInput formControlName="rail"></mat-form-field>
+        <mat-form-field><mat-label>Fee clearing GL</mat-label><mat-select formControlName="feeClearingGlAccountId"><mat-option value="">None</mat-option><mat-option *ngFor="let g of glAccountOptions" [value]="g.id">{{ g.gl_code }} · {{ g.name }}</mat-option></mat-select></mat-form-field>
+        <mat-form-field><mat-label>Fee income GL</mat-label><mat-select formControlName="feeIncomeGlAccountId"><mat-option value="">None</mat-option><mat-option *ngFor="let g of glAccountOptions" [value]="g.id">{{ g.gl_code }} · {{ g.name }}</mat-option></mat-select></mat-form-field>
+        <mat-form-field><mat-label>Tax income GL</mat-label><mat-select formControlName="taxIncomeGlAccountId"><mat-option value="">None</mat-option><mat-option *ngFor="let g of glAccountOptions" [value]="g.id">{{ g.gl_code }} · {{ g.name }}</mat-option></mat-select></mat-form-field>
+        <mat-form-field><mat-label>Settlement GL</mat-label><mat-select formControlName="settlementGlAccountId"><mat-option value="">None</mat-option><mat-option *ngFor="let g of glAccountOptions" [value]="g.id">{{ g.gl_code }} · {{ g.name }}</mat-option></mat-select></mat-form-field>
+        <mat-form-field><mat-label>Exception suspense GL</mat-label><mat-select formControlName="exceptionSuspenseGlAccountId"><mat-option value="">None</mat-option><mat-option *ngFor="let g of glAccountOptions" [value]="g.id">{{ g.gl_code }} · {{ g.name }}</mat-option></mat-select></mat-form-field>
+        <mat-checkbox formControlName="customerFeeDebitEnabled">Debit customer fees with Fineract savings charges</mat-checkbox>
+        <mat-form-field><mat-label>Fineract Savings Charge</mat-label><mat-select formControlName="customerFeeChargeId"><mat-option value="">None</mat-option><mat-option *ngFor="let c of chargeOptions" [value]="c.id">{{ c.name }} (#{{ c.id }})</mat-option></mat-select></mat-form-field>
+        <mat-checkbox formControlName="enabled">Enable rail accounting mapping</mat-checkbox>
+        <button mat-raised-button color="primary">Submit Mapping Change</button>
+      </form>
+      <div class="list-row" *ngFor="let c of accountingChanges"><div><b>{{ c.rail }}</b><br>{{ c.maker_username || c.requested_by }} · {{ c.requested_at | date:'short' }}</div><span><button mat-button color="primary" (click)="decideAccountingChange(c,'APPROVE')">Approve</button><button mat-button color="warn" (click)="decideAccountingChange(c,'REJECT')">Reject</button></span></div>
+      <p *ngIf="!accountingChanges.length">No pending accounting mapping changes.</p>
+    </mat-card>
+
+    <mat-card class="section">
+      <h3>Balanced Fee / Tax GL Posting</h3>
+      <form [formGroup]="feeJournalForm" (ngSubmit)="postFeeJournal()" class="form-grid">
+        <mat-form-field class="wide"><mat-label>Idempotency key</mat-label><input matInput formControlName="idempotencyKey"></mat-form-field>
+        <mat-form-field><mat-label>Rail</mat-label><input matInput formControlName="rail"></mat-form-field>
+        <mat-form-field><mat-label>Transaction reference</mat-label><input matInput formControlName="transactionReference"></mat-form-field>
+        <mat-form-field><mat-label>Branch / Office</mat-label><mat-select formControlName="officeId"><mat-option *ngFor="let o of officeOptions" [value]="o.id">{{ o.name }}</mat-option></mat-select></mat-form-field>
+        <mat-form-field><mat-label>Fee amount</mat-label><input matInput type="number" formControlName="feeAmount"></mat-form-field>
+        <mat-form-field><mat-label>Tax amount</mat-label><input matInput type="number" formControlName="taxAmount"></mat-form-field>
+        <button mat-raised-button color="primary">Post Fineract Journal</button>
+      </form>
+      <p><small>Manual fee journals still require an already-funded clearing GL. Automatic customer fee debit is a separate maker/checker-controlled switch above and uses a configured Fineract savings charge, so Bancro never performs a raw balance deduction.</small></p>
+      <div class="list-row" *ngFor="let j of feeJournals | slice:0:8"><div><b>{{ j.transaction_reference }}</b><br>{{ j.rail }} · fee {{ j.fee_amount }} · tax {{ j.tax_amount }} · {{ j.status }}</div><button *ngIf="j.status === 'POSTED'" mat-button color="warn" (click)="reverseFeeJournal(j)">Reverse</button></div>
+    </mat-card>
+  </div>
+
+  <mat-card class="section" *mifosxHasPermission="'READ_BANCRO_FINANCIAL_CONTROLS'">
+    <h3>Teller Variance Supervisor Overrides</h3>
+    <div class="two-col">
+      <form [formGroup]="varianceOverrideForm" (ngSubmit)="requestVarianceOverride()" class="form-grid">
+        <mat-form-field><mat-label>Cashier</mat-label><mat-select formControlName="cashierId"><mat-option *ngFor="let c of cashierOptions" [value]="c.id">{{ c.office_name }} · {{ c.name }} / {{ c.teller_name }}</mat-option></mat-select></mat-form-field>
+        <mat-form-field><mat-label>Declared cash</mat-label><input matInput type="number" formControlName="declaredCash"></mat-form-field>
+        <mat-form-field class="wide"><mat-label>Reason</mat-label><input matInput formControlName="reason"></mat-form-field>
+        <button mat-raised-button color="primary">Request Supervisor Override</button>
+      </form>
+      <div><div class="list-row" *ngFor="let v of varianceOverrides"><div><b>Cashier {{ v.cashier_id }}</b><br>Variance {{ v.variance }} · {{ v.reason }}</div><span><button mat-button color="primary" (click)="decideVarianceOverride(v,'APPROVE')">Approve</button><button mat-button color="warn" (click)="decideVarianceOverride(v,'REJECT')">Reject</button></span></div><p *ngIf="!varianceOverrides.length">No pending variance overrides.</p></div>
+    </div>
+  </mat-card>
+
+
+  <div class="two-col">
+    <mat-card class="section">
+      <h3>Payment Quote</h3>
+      <form [formGroup]="quoteForm" (ngSubmit)="quote()" class="form-grid">
+        <mat-form-field><mat-label>Rail</mat-label><input matInput formControlName="rail"></mat-form-field>
+        <mat-form-field><mat-label>Channel</mat-label><input matInput formControlName="channel"></mat-form-field>
+        <mat-form-field><mat-label>Source Savings Account</mat-label><mat-select formControlName="sourceAccountId"><mat-option value="">Not specified</mat-option><mat-option *ngFor="let a of savingsAccountOptions" [value]="a.id">{{ a.client_name }} · {{ a.account_no }} · {{ a.product_name }}</mat-option></mat-select></mat-form-field>
+        <mat-form-field><mat-label>Amount</mat-label><input matInput type="number" formControlName="amount"></mat-form-field>
+        <button mat-raised-button color="primary">Evaluate</button>
+      </form>
+      <div *ngIf="quoteResult" class="quote-result">
+        <b>{{ quoteResult.allowed ? 'Allowed' : 'Blocked' }}</b> · Fee {{ quoteResult.feeAmount || 0 | number:'1.2-2' }} ·
+        Approval {{ quoteResult.approvalRequired ? 'Required' : 'Not required' }}
+        <div *ngIf="quoteResult.reason">{{ quoteResult.reason }}</div>
+      </div>
+    </mat-card>
+
+    <mat-card class="section">
+      <h3>Create / Update Policy</h3>
+      <form [formGroup]="policyForm" (ngSubmit)="savePolicy()" class="form-grid">
+        <mat-form-field class="wide"><mat-label>Name</mat-label><input matInput formControlName="name"></mat-form-field>
+        <mat-form-field><mat-label>Max Transaction</mat-label><input matInput type="number" formControlName="maximumAmount"></mat-form-field>
+        <mat-form-field><mat-label>Daily Limit</mat-label><input matInput type="number" formControlName="dailyLimit"></mat-form-field>
+        <mat-form-field><mat-label>Approval Above</mat-label><input matInput type="number" formControlName="approvalThreshold"></mat-form-field>
+        <mat-form-field><mat-label>Fee Type</mat-label><mat-select formControlName="feeType"><mat-option value="NONE">None</mat-option><mat-option value="FLAT">Flat</mat-option><mat-option value="PERCENT">Percent</mat-option></mat-select></mat-form-field>
+        <mat-form-field><mat-label>Fee Value</mat-label><input matInput type="number" formControlName="feeValue"></mat-form-field>
+        <button mat-raised-button color="primary">{{ policyEditId ? 'Update Policy' : 'Save Policy' }}</button>
+      </form>
+      <div class="header-row"><h4>Configured Policies</h4><button mat-stroked-button (click)="exportCsv('payment-policies', policies)">Export CSV</button></div>
+      <h4>Configured Payment Policies</h4>
+      <table class="simple-table"><tr><th>Name</th><th>Rail / Channel</th><th>Max</th><th>Approval</th><th>Fee</th><th>Status</th><th>Actions</th></tr><tr *ngFor="let p of policies | slice:0:25"><td>{{ p.name }}</td><td>{{ p.rail }} / {{ p.channel }}</td><td>{{ p.maximum_amount || '—' }}</td><td>{{ p.approval_threshold || '—' }}</td><td>{{ p.fee_type }} {{ p.fee_value || '' }}</td><td>{{ p.enabled ? 'ACTIVE' : 'DISABLED' }}</td><td><button mat-button (click)="editPolicy(p)">Edit</button><button mat-button (click)="clonePolicy(p)">Clone</button></td></tr></table>
+    </mat-card>
+  </div>
+
+  <mat-card class="section">
+    <h3>Maker / Checker Queue</h3>
+    <table class="simple-table"><tr><th>Reference</th><th>Rail</th><th>Amount</th><th>Beneficiary</th><th>Requested</th><th>Actions</th></tr>
+      <tr *ngFor="let a of approvals"><td>{{ a.transaction_reference }}</td><td>{{ a.rail }}</td><td>{{ a.amount | number:'1.2-2' }}</td><td>{{ a.destination_name || a.destination_account }}</td><td>{{ a.requested_at | date:'short' }}</td><td><button mat-button color="primary" (click)="approve(a)">Approve</button><button mat-button color="warn" (click)="reject(a)">Reject</button></td></tr>
+      <tr *ngIf="!approvals.length"><td colspan="6">No pending approvals.</td></tr>
+    </table>
+  </mat-card>
+
+  <div class="two-col">
+    <mat-card class="section"><div class="header-row"><h3 id="risk-operations">Operational Alerts</h3><button mat-stroked-button (click)="exportCsv('operational-alerts', alerts)">Export CSV</button></div><div class="list-row" *ngFor="let a of alerts"><div><b>{{ a.severity }} · {{ a.alert_type }} · {{ a.status }}</b><br>{{ a.message }}<br><small>{{ a.created_at | date:'short' }}</small></div><span><button mat-button (click)="updateAlert(a,'ACKNOWLEDGED')">Acknowledge</button><button mat-button (click)="updateAlert(a,'INVESTIGATING')">Investigate</button><button mat-button color="primary" (click)="updateAlert(a,'RESOLVED')">Resolve</button></span></div><p *ngIf="!alerts.length">No active alerts.</p></mat-card>
+    <mat-card class="section"><h3>Dispute Case Management</h3><form [formGroup]="disputeForm" (ngSubmit)="createDispute()" class="form-grid"><mat-form-field><mat-label>Transaction reference</mat-label><input matInput formControlName="transactionReference"></mat-form-field><mat-form-field><mat-label>Reason</mat-label><input matInput formControlName="reason"></mat-form-field><mat-form-field class="wide"><mat-label>Description</mat-label><textarea matInput formControlName="description"></textarea></mat-form-field><button mat-raised-button color="primary">Create Case</button></form><div class="header-row"><h4>Cases</h4><button mat-stroked-button (click)="exportCsv('disputes', disputes)">Export CSV</button></div><div class="list-row" *ngFor="let d of disputes | slice:0:25"><div><b>{{ d.case_reference }} · {{ d.status }}</b><br>{{ d.transaction_reference || 'No transaction reference' }} · {{ d.reason }}<br><small>SLA {{ d.sla_due_at | date:'short' }}</small></div><span><button mat-button (click)="updateDisputeStatus(d,'INVESTIGATING')">Investigate</button><button mat-button (click)="updateDisputeStatus(d,'PENDING_PROVIDER')">Provider</button><button mat-button color="primary" (click)="updateDisputeStatus(d,'RESOLVED')">Resolve</button><button mat-button color="warn" (click)="updateDisputeStatus(d,'REJECTED')">Reject</button></span></div></mat-card>
+  </div>
+
+  <mat-card class="section" *mifosxHasPermission="'READ_BANCRO_POS'">
+    <h3>MVP10 POS / PTSA / ISO 8583 Administration</h3>
+    <p>Operational POS configuration is managed here. Live credentials, private keys, HSM keys, PIN/MAC keys and client certificates remain in the deployment secret/HSM boundary and are intentionally not editable in the browser.</p>
+    <div class="readiness-grid">
+      <div>Mode <b>{{ posStatus?.mode || '—' }}</b></div><div>Provider <b>{{ posStatus?.enabled ? 'ENABLED' : 'SAFE-OFF' }}</b></div>
+      <div>Gateway <b>{{ posStatus?.gatewayConfigured ? 'CONFIGURED' : 'NOT CONFIGURED' }}</b></div><div>HSM <b>{{ posStatus?.hsmConfigured ? 'CONFIGURED' : 'NOT CONFIGURED' }}</b></div>
+      <div>Health <b>{{ posHealth?.status || '—' }}</b></div><div>Certified terminals <b>{{ posStatus?.certifiedTerminals || 0 }}</b></div>
+      <div>Production ready <b>{{ posStatus?.productionReady ? 'YES' : 'NO' }}</b></div><div>Profile <b>{{ posStatus?.iso8583Profile || '—' }}</b></div>
+    </div>
+    <p><small>{{ posStatus?.note }}</small></p>
+    <div class="two-col">
+      <div>
+        <h4>POS/PTSA Certification Cases</h4>
+        <div class="list-row" *ngFor="let c of posCertification?.cases">
+          <div><b>{{ c.case_code }}</b><br>{{ c.description }}<br><small>{{ c.status }}<span *ngIf="c.evidence_note"> · {{ c.evidence_note }}</span></small></div>
+          <span><button mat-button color="primary" (click)="recordPosCertification(c,'PASSED')">Pass</button><button mat-button color="warn" (click)="recordPosCertification(c,'FAILED')">Fail</button></span>
+        </div>
+      </div>
+      <div>
+        <h4>Recent Gateway Exchanges</h4>
+        <div class="list-row" *ngFor="let x of posExchanges | slice:0:12"><div><b>{{ x.operation }} · {{ x.mti || '—' }} · {{ x.outcome || '—' }}</b><br>{{ x.terminal_id || '—' }} · RRN {{ x.rrn || '—' }}<br><small>{{ x.route || '—' }} · response {{ x.response_code || '—' }} · {{ x.duration_ms || 0 }} ms</small></div><span>{{ x.created_at | date:'short' }}</span></div>
+        <p *ngIf="!posExchanges.length">No POS gateway exchanges recorded yet.</p>
+      </div>
+    </div>
+  </mat-card>
+
+  <div class="two-col">
+    <mat-card class="section" *mifosxHasPermission="'READ_BANCRO_POS'">
+      <h3>Merchant / Terminal / PTSA Configuration</h3>
+      <form [formGroup]="merchantForm" (ngSubmit)="createMerchant()" class="form-grid">
+        <mat-form-field><mat-label>Merchant code</mat-label><input matInput formControlName="merchantCode" [readonly]="!!merchantEditId"></mat-form-field>
+        <mat-form-field><mat-label>Merchant name</mat-label><input matInput formControlName="name"></mat-form-field>
+        <mat-form-field><mat-label>Settlement account ID</mat-label><input matInput type="number" formControlName="settlementAccountId"></mat-form-field>
+        <mat-form-field><mat-label>MDR %</mat-label><input matInput type="number" formControlName="mdrPercent"></mat-form-field>
+        <mat-form-field><mat-label>Status</mat-label><mat-select formControlName="status"><mat-option value="ACTIVE">Active</mat-option><mat-option value="INACTIVE">Inactive</mat-option></mat-select></mat-form-field>
+        <button mat-stroked-button color="primary">{{ merchantEditId ? 'Update Merchant' : 'Create Merchant' }}</button>
+        <button *ngIf="merchantEditId" type="button" mat-button (click)="cancelMerchantEdit()">Cancel edit</button>
+      </form>
+      <div class="list-row" *ngFor="let m of merchants | slice:0:10"><div><b>{{ m.merchant_code }} · {{ m.name }}</b><br>Settlement account {{ m.settlement_account_id || '—' }} · MDR {{ m.mdr_percent || 0 }}% · {{ m.status }}</div><button mat-button (click)="editMerchant(m)" *mifosxHasPermission="'UPDATE_BANCRO_OPERATIONS'">Edit</button></div>
+      <form [formGroup]="terminalForm" (ngSubmit)="createTerminal()" class="form-grid compact-top">
+        <mat-form-field><mat-label>Terminal ID (TID)</mat-label><input matInput formControlName="terminalId" [readonly]="!!terminalEditId"></mat-form-field>
+        <mat-form-field><mat-label>Merchant</mat-label><mat-select formControlName="merchantId"><mat-option *ngFor="let m of merchantOptions" [value]="m.id">{{ m.label || m.name || m.merchant_code }}</mat-option></mat-select></mat-form-field>
+        <mat-form-field><mat-label>Serial number</mat-label><input matInput formControlName="serialNumber"></mat-form-field>
+        <mat-form-field><mat-label>PTSP code</mat-label><input matInput formControlName="ptspCode"></mat-form-field>
+        <mat-form-field><mat-label>Routing mode</mat-label><mat-select formControlName="routingMode"><mat-option value="DUAL">Dual</mat-option><mat-option value="PRIMARY_ONLY">Primary only</mat-option></mat-select></mat-form-field>
+        <mat-form-field><mat-label>Primary PTSA</mat-label><input matInput formControlName="primaryRoute"></mat-form-field>
+        <mat-form-field><mat-label>Secondary PTSA</mat-label><input matInput formControlName="secondaryRoute"></mat-form-field>
+        <mat-form-field><mat-label>Active route</mat-label><input matInput formControlName="activeRoute"></mat-form-field>
+        <mat-form-field><mat-label>Terminal profile</mat-label><input matInput formControlName="terminalProfile"></mat-form-field>
+        <mat-form-field><mat-label>MCC</mat-label><input matInput formControlName="merchantCategoryCode"></mat-form-field>
+        <mat-form-field><mat-label>Latitude</mat-label><input matInput type="number" formControlName="latitude"></mat-form-field>
+        <mat-form-field><mat-label>Longitude</mat-label><input matInput type="number" formControlName="longitude"></mat-form-field>
+        <mat-form-field><mat-label>Geofence radius (m)</mat-label><input matInput type="number" formControlName="geofenceRadiusM"></mat-form-field>
+        <mat-form-field class="wide"><mat-label>Registered address</mat-label><input matInput formControlName="registeredAddress"></mat-form-field>
+        <mat-form-field><mat-label>Certification</mat-label><mat-select formControlName="certificationStatus"><mat-option value="PENDING">Pending</mat-option><mat-option value="CERTIFIED">Certified</mat-option><mat-option value="SUSPENDED">Suspended</mat-option></mat-select></mat-form-field>
+        <mat-form-field><mat-label>Status</mat-label><mat-select formControlName="status"><mat-option value="ACTIVE">Active</mat-option><mat-option value="INACTIVE">Inactive</mat-option></mat-select></mat-form-field>
+        <button mat-raised-button color="primary">{{ terminalEditId ? 'Update Terminal' : 'Create Terminal' }}</button>
+        <button *ngIf="terminalEditId" type="button" mat-stroked-button (click)="cancelTerminalEdit()">Cancel edit</button>
+      </form>
+      <div class="list-row" *ngFor="let t of terminals | slice:0:12"><div><b>{{ t.terminal_id }}</b> · {{ t.certification_status || 'PENDING' }}<br>{{ t.ptsa_primary || t.primary_route }} → {{ t.ptsa_secondary || t.secondary_route }} · active {{ t.active_route || t.primary_route }}<br><small>{{ t.registered_address || 'No registered address' }} · geo {{ t.geo_latitude || '—' }}, {{ t.geo_longitude || '—' }}</small></div><button mat-button (click)="editTerminal(t)" *mifosxHasPermission="'UPDATE_BANCRO_POS'">Edit</button></div>
+    </mat-card>
+
+    <mat-card class="section" *mifosxHasPermission="'READ_BANCRO_POS'">
+      <h3>POS UAT / Transaction Control</h3>
+      <form [formGroup]="posForm" (ngSubmit)="processPos()" class="form-grid">
+        <mat-form-field><mat-label>Terminal ID</mat-label><input matInput formControlName="terminalId"></mat-form-field>
+        <mat-form-field><mat-label>Amount</mat-label><input matInput type="number" formControlName="amount"></mat-form-field>
+        <mat-form-field><mat-label>Type</mat-label><mat-select formControlName="transactionType"><mat-option value="PURCHASE">Purchase</mat-option><mat-option value="REFUND">Refund</mat-option></mat-select></mat-form-field>
+        <mat-form-field><mat-label>POS Entry Mode</mat-label><input matInput formControlName="posEntryMode" placeholder="From certified terminal"></mat-form-field>
+        <mat-form-field><mat-label>Condition code</mat-label><input matInput formControlName="conditionCode"></mat-form-field>
+        <mat-form-field><mat-label>Latitude</mat-label><input matInput type="number" formControlName="latitude"></mat-form-field>
+        <mat-form-field><mat-label>Longitude</mat-label><input matInput type="number" formControlName="longitude"></mat-form-field>
+        <mat-form-field><mat-label>Simulator outcome</mat-label><mat-select formControlName="simulationOutcome"><mat-option value="APPROVED">Approved</mat-option><mat-option value="DECLINED">Declined</mat-option><mat-option value="UNKNOWN">Unknown</mat-option></mat-select></mat-form-field>
+        <mat-form-field class="wide"><mat-label>Idempotency key (optional)</mat-label><input matInput formControlName="idempotencyKey"></mat-form-field>
+        <button mat-raised-button color="primary" *mifosxHasPermission="'CREATE_BANCRO_POS'">Process POS Request</button>
+      </form>
+      <form [formGroup]="posHeartbeatForm" (ngSubmit)="posHeartbeat()" class="form-grid compact-top">
+        <mat-form-field><mat-label>Heartbeat terminal</mat-label><input matInput formControlName="terminalId"></mat-form-field>
+        <mat-form-field><mat-label>Latitude</mat-label><input matInput type="number" formControlName="latitude"></mat-form-field>
+        <mat-form-field><mat-label>Longitude</mat-label><input matInput type="number" formControlName="longitude"></mat-form-field>
+        <button mat-stroked-button *mifosxHasPermission="'CREATE_BANCRO_POS'">Send 0800 Heartbeat</button>
+      </form>
+      <div class="list-row" *ngFor="let t of posTransactions | slice:0:12"><div><b>{{ t.transaction_type || 'LEGACY' }} · {{ t.rrn }} · {{ t.status }}</b><br>{{ t.terminal_id }} · {{ t.amount | number:'1.2-2' }} {{ t.currency_code }} · MTI {{ t.mti || '—' }}</div><span><button mat-button (click)="posAdvice(t)" *mifosxHasPermission="'UPDATE_BANCRO_POS'">Advice</button><button mat-button color="warn" (click)="posReverse(t)" *mifosxHasPermission="'UPDATE_BANCRO_POS'">Reverse</button></span></div>
+      <p><small>Simulator is the default. LIVE/CERTIFIED_GATEWAY remains safe-off until the certified PTSA/processor gateway, TLS/mTLS and HSM/key boundary are configured and certification evidence is complete. An uncertain live financial send is never blindly replayed across the secondary route.</small></p>
+    </mat-card>
+  </div>
+
+  <mat-card class="section" *mifosxHasPermission="'READ_BANCRO_POS'">
+    <h3>POS Settlement / Reconciliation Preparation</h3>
+    <form [formGroup]="posSettlementForm" class="form-grid">
+      <mat-form-field><mat-label>Business date</mat-label><input matInput type="date" formControlName="businessDate"></mat-form-field>
+      <mat-form-field><mat-label>Merchant (optional)</mat-label><mat-select formControlName="merchantId"><mat-option value="">All merchants</mat-option><mat-option *ngFor="let m of merchantOptions" [value]="m.id">{{ m.label || m.name || m.merchant_code }}</mat-option></mat-select></mat-form-field>
+      <button type="button" mat-stroked-button (click)="previewPosSettlement()">Preview</button>
+      <button type="button" mat-raised-button color="primary" (click)="createPosSettlement()" *mifosxHasPermission="'CREATE_BANCRO_POS'">Create Reconciliation Batch</button>
+    </form>
+    <div class="quote-result" *ngIf="posSettlementPreviewResult"><b>{{ posSettlementPreviewResult.businessDate }}</b> · {{ posSettlementPreviewResult.transactionCount || 0 }} transaction(s) · gross {{ posSettlementPreviewResult.grossAmount | number:'1.2-2' }} · MDR {{ posSettlementPreviewResult.mdrAmount | number:'1.2-2' }} · net {{ posSettlementPreviewResult.netAmount | number:'1.2-2' }}<br><small>{{ posSettlementPreviewResult.note }}</small></div>
+    <div class="list-row" *ngFor="let b of posSettlementBatches | slice:0:10"><div><b>{{ b.batch_reference }}</b><br>{{ b.business_date }} · {{ b.transaction_count }} transaction(s) · net {{ b.net_amount | number:'1.2-2' }}</div><span>{{ b.status }}</span></div>
+  </mat-card>
+
+  <div class="two-col">
+    <mat-card class="section">
+      <h3>Fraud / Risk Rules</h3>
+      <form [formGroup]="fraudForm" (ngSubmit)="saveFraudRule()" class="form-grid">
+        <mat-form-field class="wide"><mat-label>Rule name</mat-label><input matInput formControlName="name"></mat-form-field>
+        <mat-form-field><mat-label>Rule type</mat-label><mat-select formControlName="ruleType"><mat-option value="AMOUNT_THRESHOLD">Single amount threshold</mat-option><mat-option value="DAILY_AMOUNT">Daily cumulative amount</mat-option><mat-option value="VELOCITY">Transaction velocity</mat-option></mat-select></mat-form-field>
+        <mat-form-field><mat-label>Rail</mat-label><input matInput formControlName="rail" placeholder="NIP / INTERNAL / ALL"></mat-form-field>
+        <mat-form-field><mat-label>Channel</mat-label><input matInput formControlName="channel" placeholder="TELLER / API / ALL"></mat-form-field>
+        <mat-form-field><mat-label>Payment type</mat-label><input matInput formControlName="paymentType" placeholder="TRANSFER / CASH_WITHDRAWAL / ALL"></mat-form-field>
+        <mat-form-field *ngIf="fraudForm.get('ruleType').value === 'AMOUNT_THRESHOLD'"><mat-label>Amount threshold</mat-label><input matInput type="number" formControlName="thresholdValue"></mat-form-field>
+        <mat-form-field *ngIf="fraudForm.get('ruleType').value === 'DAILY_AMOUNT'"><mat-label>Daily amount threshold</mat-label><input matInput type="number" formControlName="dailyAmountThreshold"></mat-form-field>
+        <mat-form-field *ngIf="fraudForm.get('ruleType').value === 'VELOCITY'"><mat-label>Window minutes</mat-label><input matInput type="number" formControlName="windowMinutes"></mat-form-field>
+        <mat-form-field *ngIf="fraudForm.get('ruleType').value === 'VELOCITY'"><mat-label>Maximum occurrences</mat-label><input matInput type="number" formControlName="occurrenceThreshold"></mat-form-field>
+        <mat-form-field><mat-label>Action</mat-label><mat-select formControlName="action"><mat-option value="REVIEW">Review / approval</mat-option><mat-option value="BLOCK">Block</mat-option><mat-option value="ALLOW">Allow</mat-option></mat-select></mat-form-field>
+        <button mat-raised-button color="primary">{{ fraudEditId ? 'Update Rule' : 'Save Rule' }}</button>
+      </form>
+      <div class="header-row"><h4>Configured Rules</h4><button mat-stroked-button (click)="exportCsv('fraud-rules', fraudRules)">Export CSV</button></div>
+      <div class="list-row" *ngFor="let r of fraudRules | slice:0:25"><div><b>{{ r.name }} · {{ r.action }}</b><br>{{ r.rule_type }} · {{ r.rail }} / {{ r.channel }} · {{ r.enabled ? 'ACTIVE' : 'DISABLED' }}</div><button mat-button (click)="editFraudRule(r)">Edit</button></div>
+      <div class="list-row" *ngFor="let r of fraudRules"><div><b>{{ r.name }}</b><br>{{ r.rail }} / {{ r.channel || 'ALL' }} · {{ r.payment_type || 'ALL' }} · {{ r.rule_type }}<span *ngIf="r.threshold_value"> · {{ r.threshold_value | number:'1.2-2' }}</span><span *ngIf="r.daily_amount_threshold"> · daily {{ r.daily_amount_threshold | number:'1.2-2' }}</span><span *ngIf="r.window_minutes"> · {{ r.occurrence_threshold }} in {{ r.window_minutes }} min</span></div><span>{{ r.action }}</span></div>
+    </mat-card>
+  </div>
+
+  <mat-card class="section" *mifosxHasPermission="'READ_BANCRO_CARDS'">
+    <h3>MVP11 Card Processor / Scheme / HSM Administration</h3>
+    <p>Configure issuer card products and certified processor/HSM boundaries here. Full PAN, CVV/CVC, PIN/PIN blocks, clear keys and private keys are never accepted or stored by Bancro.</p>
+    <div class="status-grid">
+      <div>Live processor <b>{{ cardProgramStatus?.liveEnabled ? 'ENABLED' : 'SAFE OFF' }}</b></div>
+      <div>HSM live boundary <b>{{ cardProgramStatus?.hsmLiveEnabled ? 'ENABLED' : 'SAFE OFF' }}</b></div>
+      <div>Processor auth <b>{{ cardProgramStatus?.authConfigured ? 'Configured' : 'Not configured' }}</b></div>
+      <div>Processor webhook <b>{{ cardProgramStatus?.processorWebhookSecretConfigured ? 'Configured' : 'Not configured' }}</b></div>
+      <div>Active products <b>{{ cardProgramStatus?.activeProducts || 0 }}</b></div>
+      <div>Pending lifecycle <b>{{ cardProgramStatus?.pendingLifecycleRequests || 0 }}</b></div>
+    </div>
+    <p><small>PCI baseline: {{ cardProgramStatus?.pciDssBaseline || 'PCI_DSS_4_0_1' }} · cryptography remains inside the certified processor / PCI-approved HSM boundary.</small></p>
+  </mat-card>
+
+  <div class="two-col" *mifosxHasPermission="'READ_BANCRO_CARDS'">
+    <mat-card class="section">
+      <h3>Card Processor Profile</h3>
+      <form [formGroup]="cardProcessorProfileForm" (ngSubmit)="saveCardProcessorProfile()" class="form-grid">
+        <mat-form-field><mat-label>Processor code</mat-label><input matInput formControlName="processorCode"></mat-form-field>
+        <mat-form-field><mat-label>Display name</mat-label><input matInput formControlName="displayName"></mat-form-field>
+        <mat-form-field><mat-label>Mode</mat-label><mat-select formControlName="mode"><mat-option value="SIMULATOR">Simulator</mat-option><mat-option value="CERTIFIED_GATEWAY">Certified gateway</mat-option><mat-option value="LIVE">Live</mat-option></mat-select></mat-form-field>
+        <mat-form-field class="wide"><mat-label>HTTPS base URL</mat-label><input matInput formControlName="baseUrl" placeholder="https://processor.example"></mat-form-field>
+        <mat-form-field><mat-label>Issue path</mat-label><input matInput formControlName="issuePath"></mat-form-field>
+        <mat-form-field><mat-label>Lifecycle path</mat-label><input matInput formControlName="lifecyclePath"></mat-form-field>
+        <mat-form-field><mat-label>Status path</mat-label><input matInput formControlName="statusPath"></mat-form-field>
+        <mat-form-field><mat-label>Health path</mat-label><input matInput formControlName="healthPath"></mat-form-field>
+        <mat-form-field><mat-label>Auth secret reference</mat-label><input matInput formControlName="authSecretReference" placeholder="Secret-manager key name only"></mat-form-field>
+        <mat-form-field><mat-label>Client-ID reference</mat-label><input matInput formControlName="clientIdReference" placeholder="Secret-manager key name only"></mat-form-field>
+        <mat-checkbox formControlName="enabled">Enabled</mat-checkbox>
+        <button mat-raised-button color="primary" *mifosxHasPermission="'UPDATE_BANCRO_CARDS'">Save Processor Profile</button>
+      </form>
+      <div class="list-row" *ngFor="let p of cardProcessorProfiles"><div><b>{{ p.processor_code }}</b> · {{ p.mode }}<br>{{ p.display_name }} · {{ p.enabled ? 'enabled' : 'disabled' }}</div><span>{{ p.base_url || 'No live URL' }}</span></div>
+      <p><small>Credentials are not stored here. The UI stores only endpoint/configuration metadata and secret references.</small></p>
+    </mat-card>
+
+    <mat-card class="section">
+      <h3>HSM Profile / Key Aliases</h3>
+      <form [formGroup]="hsmProfileForm" (ngSubmit)="saveHsmProfile()" class="form-grid">
+        <mat-form-field><mat-label>Profile code</mat-label><input matInput formControlName="profileCode"></mat-form-field>
+        <mat-form-field><mat-label>Provider</mat-label><input matInput formControlName="providerName"></mat-form-field>
+        <mat-form-field><mat-label>Model</mat-label><input matInput formControlName="modelName"></mat-form-field>
+        <mat-form-field><mat-label>Integration mode</mat-label><mat-select formControlName="integrationMode"><mat-option value="PROCESSOR_MANAGED">Processor managed</mat-option><mat-option value="DIRECT_HSM">Direct HSM</mat-option><mat-option value="CLOUD_HSM">Cloud HSM</mat-option></mat-select></mat-form-field>
+        <mat-form-field class="wide"><mat-label>PCI approval reference</mat-label><input matInput formControlName="pciApprovalReference"></mat-form-field>
+        <mat-form-field><mat-label>PIN key alias</mat-label><input matInput formControlName="pinKeyAlias"></mat-form-field>
+        <mat-form-field><mat-label>MAC key alias</mat-label><input matInput formControlName="macKeyAlias"></mat-form-field>
+        <mat-form-field><mat-label>CVK alias</mat-label><input matInput formControlName="cardVerificationKeyAlias"></mat-form-field>
+        <mat-form-field><mat-label>Status</mat-label><mat-select formControlName="status"><mat-option value="PENDING">Pending</mat-option><mat-option value="APPROVED">Approved</mat-option><mat-option value="SUSPENDED">Suspended</mat-option><mat-option value="RETIRED">Retired</mat-option></mat-select></mat-form-field>
+        <mat-checkbox formControlName="enabled">Enabled</mat-checkbox>
+        <button mat-raised-button color="primary" *mifosxHasPermission="'UPDATE_BANCRO_CARDS'">Save HSM Profile</button>
+      </form>
+      <div class="list-row" *ngFor="let h of hsmProfiles"><div><b>{{ h.profile_code }}</b> · {{ h.status }}<br>{{ h.provider_name }} {{ h.model_name || '' }} · {{ h.integration_mode }}</div><span>{{ h.pci_approval_reference || 'Approval pending' }}</span></div>
+    </mat-card>
+  </div>
+
+  <div class="two-col" *mifosxHasPermission="'READ_BANCRO_CARDS'">
+    <mat-card class="section">
+      <h3>Card Products</h3>
+      <form [formGroup]="cardProductForm" (ngSubmit)="saveCardProduct()" class="form-grid">
+        <mat-form-field><mat-label>Product code</mat-label><input matInput formControlName="productCode"></mat-form-field>
+        <mat-form-field><mat-label>Name</mat-label><input matInput formControlName="name"></mat-form-field>
+        <mat-form-field><mat-label>Scheme</mat-label><input matInput formControlName="scheme" placeholder="VERVE / VISA / MASTERCARD"></mat-form-field>
+        <mat-form-field><mat-label>Card type</mat-label><mat-select formControlName="cardType"><mat-option value="DEBIT">Debit</mat-option><mat-option value="PREPAID">Prepaid</mat-option><mat-option value="VIRTUAL">Virtual</mat-option></mat-select></mat-form-field>
+        <mat-form-field><mat-label>Processor</mat-label><mat-select formControlName="processorCode"><mat-option *ngFor="let p of cardProcessorProfiles" [value]="p.processor_code">{{ p.processor_code }}</mat-option></mat-select></mat-form-field>
+        <mat-form-field><mat-label>HSM profile</mat-label><mat-select formControlName="hsmProfileCode"><mat-option value="">Processor managed / none</mat-option><mat-option *ngFor="let h of hsmProfiles" [value]="h.profile_code">{{ h.profile_code }}</mat-option></mat-select></mat-form-field>
+        <mat-form-field><mat-label>Currency</mat-label><input matInput formControlName="currencyCode"></mat-form-field>
+        <mat-form-field><mat-label>Daily POS limit</mat-label><input matInput type="number" formControlName="defaultDailyPosLimit"></mat-form-field>
+        <mat-form-field><mat-label>Daily Web limit</mat-label><input matInput type="number" formControlName="defaultDailyWebLimit"></mat-form-field>
+        <mat-form-field><mat-label>Daily ATM limit</mat-label><input matInput type="number" formControlName="defaultDailyAtmLimit"></mat-form-field>
+        <mat-form-field><mat-label>Status</mat-label><mat-select formControlName="status"><mat-option value="DRAFT">Draft</mat-option><mat-option value="ACTIVE">Active</mat-option><mat-option value="SUSPENDED">Suspended</mat-option><mat-option value="RETIRED">Retired</mat-option></mat-select></mat-form-field>
+        <mat-checkbox formControlName="physicalEnabled">Physical</mat-checkbox><mat-checkbox formControlName="virtualEnabled">Virtual</mat-checkbox>
+        <mat-checkbox formControlName="contactlessEnabled">Contactless</mat-checkbox><mat-checkbox formControlName="onlineEnabled">Online</mat-checkbox>
+        <mat-checkbox formControlName="internationalEnabled">International</mat-checkbox>
+        <button mat-raised-button color="primary" *mifosxHasPermission="'UPDATE_BANCRO_CARDS'">Save Card Product</button>
+      </form>
+      <div class="list-row" *ngFor="let p of cardProducts"><div><b>{{ p.product_code }} · {{ p.name }}</b><br>{{ p.scheme }} {{ p.card_type }} · {{ p.processor_code }} · {{ p.status }}</div><span>{{ p.currency_code }}</span></div>
+    </mat-card>
+
+    <mat-card class="section">
+      <h3>Card Lifecycle Maker / Checker</h3>
+      <form [formGroup]="cardLifecycleForm" (ngSubmit)="requestCardLifecycle()" class="form-grid">
+        <mat-form-field><mat-label>Request</mat-label><mat-select formControlName="requestType"><mat-option value="ISSUE">Issue</mat-option><mat-option value="ACTIVATE">Activate</mat-option><mat-option value="BLOCK">Block</mat-option><mat-option value="UNBLOCK">Unblock</mat-option><mat-option value="HOTLIST">Hotlist</mat-option><mat-option value="REPLACE">Replace</mat-option><mat-option value="CLOSE">Close</mat-option><mat-option value="PIN_REISSUE">Secure PIN reissue</mat-option></mat-select></mat-form-field>
+        <mat-form-field *ngIf="cardLifecycleForm.get('requestType').value === 'ISSUE'"><mat-label>Product</mat-label><mat-select formControlName="productCode"><mat-option *ngFor="let p of cardProducts" [value]="p.product_code">{{ p.product_code }} · {{ p.name }}</mat-option></mat-select></mat-form-field>
+        <mat-form-field *ngIf="cardLifecycleForm.get('requestType').value === 'ISSUE'"><mat-label>Customer</mat-label><mat-select formControlName="customerId"><mat-option *ngFor="let c of clientOptions" [value]="c.id">{{ c.label || c.display_name || c.account_no }}</mat-option></mat-select></mat-form-field>
+        <mat-form-field *ngIf="cardLifecycleForm.get('requestType').value === 'ISSUE'"><mat-label>Savings account</mat-label><mat-select formControlName="accountId"><mat-option *ngFor="let a of savingsAccountOptions" [value]="a.id">{{ a.label || a.account_no || a.client_name }}</mat-option></mat-select></mat-form-field>
+        <mat-form-field *ngIf="cardLifecycleForm.get('requestType').value !== 'ISSUE'" class="wide"><mat-label>Card</mat-label><mat-select formControlName="cardId"><mat-option *ngFor="let c of cards" [value]="c.id">{{ c.scheme }} {{ c.masked_pan || c.last_four }} · {{ c.status }}</mat-option></mat-select></mat-form-field>
+        <mat-form-field class="wide"><mat-label>Reason</mat-label><textarea matInput formControlName="reason"></textarea></mat-form-field>
+        <button mat-raised-button color="primary" *mifosxHasPermission="'CREATE_BANCRO_CARDS'">Submit for Checker</button>
+      </form>
+      <div class="list-row" *ngFor="let r of cardLifecycleRequests"><div><b>{{ r.request_type }} · {{ r.status }}</b><br>{{ r.product_code || '' }} {{ r.masked_pan || r.last_four || r.card_id || '' }} · maker {{ r.requested_by }}</div><span><button mat-button color="primary" (click)="decideCardLifecycle(r,'APPROVE')" *mifosxHasPermission="'UPDATE_BANCRO_CARDS'">Approve</button><button mat-button color="warn" (click)="decideCardLifecycle(r,'REJECT')" *mifosxHasPermission="'UPDATE_BANCRO_CARDS'">Reject</button></span></div>
+      <p><small>Maker and checker must be different users. Hotlisting is not undone by UNBLOCK; replacement is required.</small></p>
+    </mat-card>
+  </div>
+
+  <div class="two-col" *mifosxHasPermission="'READ_BANCRO_CARDS'">
+    <mat-card class="section">
+      <h3>Card / Processor / HSM Certification</h3>
+      <div class="status-grid"><div>Passed <b>{{ cardCertification?.passed || 0 }}</b></div><div>Pending <b>{{ cardCertification?.pending || 0 }}</b></div><div>Failed <b>{{ cardCertification?.failed || 0 }}</b></div></div>
+      <div class="list-row" *ngFor="let c of cardCertification?.cases"><div><b>{{ c.case_code }} · {{ c.status }}</b><br>{{ c.description }}<br><small>{{ c.evidence_note || 'No evidence recorded' }}</small></div><span><button mat-button color="primary" (click)="recordCardCertification(c,'PASSED')" *mifosxHasPermission="'UPDATE_BANCRO_CARDS'">Pass</button><button mat-button color="warn" (click)="recordCardCertification(c,'FAILED')" *mifosxHasPermission="'UPDATE_BANCRO_CARDS'">Fail</button></span></div>
+    </mat-card>
+
+    <mat-card class="section">
+      <h3>HSM Key Ceremony Evidence</h3>
+      <form [formGroup]="keyCeremonyForm" (ngSubmit)="recordKeyCeremony()" class="form-grid">
+        <mat-form-field><mat-label>Ceremony reference</mat-label><input matInput formControlName="ceremonyReference"></mat-form-field>
+        <mat-form-field><mat-label>HSM profile</mat-label><mat-select formControlName="hsmProfileCode"><mat-option value="">Processor managed</mat-option><mat-option *ngFor="let h of hsmProfiles" [value]="h.profile_code">{{ h.profile_code }}</mat-option></mat-select></mat-form-field>
+        <mat-form-field><mat-label>Key purpose</mat-label><mat-select formControlName="keyPurpose"><mat-option value="PIN">PIN</mat-option><mat-option value="MAC">MAC</mat-option><mat-option value="CVK">Card verification</mat-option><mat-option value="DATA">Data encryption</mat-option></mat-select></mat-form-field>
+        <mat-form-field><mat-label>Key alias</mat-label><input matInput formControlName="keyAlias"></mat-form-field>
+        <mat-form-field><mat-label>Key version</mat-label><input matInput formControlName="keyVersion"></mat-form-field>
+        <mat-form-field><mat-label>KCV</mat-label><input matInput formControlName="kcv" placeholder="Key check value only"></mat-form-field>
+        <mat-form-field class="wide"><mat-label>Participants / dual-control note</mat-label><textarea matInput formControlName="participantsNote"></textarea></mat-form-field>
+        <mat-form-field class="wide"><mat-label>Evidence note</mat-label><textarea matInput formControlName="evidenceNote"></textarea></mat-form-field>
+        <button mat-raised-button color="primary" *mifosxHasPermission="'UPDATE_BANCRO_CARDS'">Record Ceremony Metadata</button>
+      </form>
+      <div class="list-row" *ngFor="let k of keyCeremonies | slice:0:10"><div><b>{{ k.ceremony_reference }} · {{ k.key_purpose }}</b><br>{{ k.key_alias }} {{ k.key_version || '' }} · {{ k.status }}</div><span>KCV {{ k.kcv || '—' }}</span></div>
+      <p><small>Never paste clear keys, PINs or PIN blocks here. The API rejects sensitive key/card fields.</small></p>
+    </mat-card>
+  </div>
+
+  <mat-card class="section" *mifosxHasPermission="'READ_BANCRO_CARDS'">
+    <h3>Card Processor / Scheme Reconciliation</h3>
+    <form [formGroup]="cardReconciliationForm" class="form-grid">
+      <mat-form-field><mat-label>Business date</mat-label><input matInput type="date" formControlName="businessDate"></mat-form-field>
+      <mat-form-field><mat-label>Processor</mat-label><mat-select formControlName="processorCode"><mat-option value="">All</mat-option><mat-option *ngFor="let p of cardProcessorProfiles" [value]="p.processor_code">{{ p.processor_code }}</mat-option></mat-select></mat-form-field>
+      <mat-form-field><mat-label>Scheme</mat-label><input matInput formControlName="scheme" placeholder="VERVE / VISA / MASTERCARD"></mat-form-field>
+      <button type="button" mat-stroked-button (click)="previewCardReconciliation()">Preview</button>
+      <button type="button" mat-raised-button color="primary" (click)="createCardReconciliationBatch()" *mifosxHasPermission="'CREATE_BANCRO_CARDS'">Prepare Batch</button>
+    </form>
+    <div *ngIf="cardReconciliationPreviewResult" class="status-grid">
+      <div>Transactions <b>{{ cardReconciliationPreviewResult.transaction_count || 0 }}</b></div>
+      <div>Gross <b>{{ cardReconciliationPreviewResult.gross_amount || 0 | number:'1.2-2' }}</b></div>
+      <div>Refunds <b>{{ cardReconciliationPreviewResult.refund_amount || 0 | number:'1.2-2' }}</b></div>
+      <div>Reversals <b>{{ cardReconciliationPreviewResult.reversal_amount || 0 | number:'1.2-2' }}</b></div>
+      <div>Net <b>{{ cardReconciliationPreviewResult.netAmount || 0 | number:'1.2-2' }}</b></div>
+    </div>
+    <h4>Recent processor transactions</h4>
+    <div class="list-row" *ngFor="let t of cardSchemeTransactions | slice:0:10"><div><b>{{ t.transaction_type }} · {{ t.status }}</b><br>{{ t.scheme || '—' }} / {{ t.processor_code || '—' }} · {{ t.amount | number:'1.2-2' }} {{ t.currency_code }}</div><span>{{ t.processor_transaction_id }}</span></div>
+    <h4>Prepared reconciliation batches</h4>
+    <div class="list-row" *ngFor="let b of cardReconciliationBatches | slice:0:8"><div><b>{{ b.batch_reference }} · {{ b.status }}</b><br>{{ b.business_date }} · {{ b.processor_code || 'ALL' }} / {{ b.scheme || 'ALL' }}</div><span>{{ b.net_amount | number:'1.2-2' }} {{ b.currency_code }}</span></div>
+    <p><small>This is processor/scheme reconciliation evidence only. It does not create a parallel ledger or post accounting entries; the existing Fineract ledger remains authoritative.</small></p>
+  </mat-card>
+
+  <mat-card class="section" *mifosxHasPermission="'READ_BANCRO_CARDS'">
+    <h3>Card Processor Exchange Audit</h3>
+    <div class="list-row" *ngFor="let x of cardProcessorExchanges | slice:0:12"><div><b>{{ x.operation }} · {{ x.outcome }}</b><br>{{ x.processor_code }} · request {{ x.request_id || '—' }} · card {{ x.card_id || '—' }}</div><span>{{ x.provider_reference || 'No provider reference' }}</span></div>
+    <p><small>Only operational metadata and SHA-256 request/response hashes are retained. Raw processor responses and sensitive card data are not stored.</small></p>
+  </mat-card>
+
+  <div class="two-col">
+    <mat-card class="section">
+      <h3>Webhook Delivery History & Replay</h3>
+      <form [formGroup]="webhookForm" (ngSubmit)="createWebhook()" class="form-grid">
+        <mat-form-field><mat-label>Name</mat-label><input matInput formControlName="name"></mat-form-field>
+        <mat-form-field class="wide"><mat-label>HTTPS callback URL</mat-label><input matInput formControlName="callbackUrl"></mat-form-field>
+        <mat-form-field class="wide"><mat-label>Event types</mat-label><input matInput formControlName="eventTypes"></mat-form-field>
+        <button mat-raised-button color="primary">Create Subscription</button>
+      </form>
+      <p><small>Delivery is HMAC-SHA256 signed. Only secret references are stored in Bancro; secret values remain in the deployment secret store.</small></p>
+      <h4>Subscriptions</h4><div class="list-row" *ngFor="let w of webhooks"><div><b>{{ w.name }} · {{ w.enabled ? 'ENABLED' : 'DISABLED' }}</b><br>{{ w.callback_url }}<br><small>{{ w.event_types }}</small></div><span><button mat-button (click)="editWebhook(w)">Edit</button><button mat-button (click)="toggleWebhook(w)">{{ w.enabled ? 'Disable' : 'Enable' }}</button></span></div>
+      <h4>Delivery History</h4><div class="list-row" *ngFor="let d of webhookDeliveries | slice:0:20"><div><b>{{ d.subscription_name }} · {{ d.status }}</b><br>{{ d.event_type }} · attempts {{ d.attempt_count }}<br><small>{{ d.last_error || ('HTTP ' + (d.last_http_status || '—')) }}</small></div><button mat-button *ngIf="d.status !== 'DELIVERED'" (click)="retryWebhookDelivery(d)">Retry</button></div>
+      <h4>Outbox</h4><div class="list-row" *ngFor="let e of outbox | slice:0:20"><div><b>{{ e.event_type }} · {{ e.status }}</b><br>{{ e.aggregate_type }} / {{ e.aggregate_id }}<br><small>{{ e.last_error || 'No error' }}</small></div><button mat-button *ngIf="e.status !== 'PUBLISHED'" (click)="replayOutbox(e)">Replay</button></div>
+    </mat-card>
+
+    <mat-card class="section">
+      <h3>Legacy Card Simulator (UAT only)</h3>
+      <form [formGroup]="cardForm" (ngSubmit)="createCard()" class="form-grid">
+        <mat-form-field><mat-label>Customer</mat-label><mat-select formControlName="customerId"><mat-option value="">None</mat-option><mat-option *ngFor="let c of clientOptions" [value]="c.id">{{ c.display_name }} · {{ c.account_no }}</mat-option></mat-select></mat-form-field>
+        <mat-form-field><mat-label>Savings Account</mat-label><mat-select formControlName="accountId"><mat-option value="">None</mat-option><mat-option *ngFor="let a of savingsAccountOptions" [value]="a.id">{{ a.client_name }} · {{ a.account_no }}</mat-option></mat-select></mat-form-field>
+        <mat-form-field><mat-label>Processor</mat-label><input matInput formControlName="processorCode"></mat-form-field>
+        <mat-form-field><mat-label>Scheme</mat-label><input matInput formControlName="scheme"></mat-form-field>
+        <mat-form-field><mat-label>Masked PAN</mat-label><input matInput formControlName="maskedPan" placeholder="**** **** **** 1234"></mat-form-field>
+        <mat-form-field><mat-label>Last four</mat-label><input matInput formControlName="lastFour" maxlength="4"></mat-form-field>
+        <button mat-raised-button color="primary">Create Card Record</button>
+      </form>
+      <div class="list-row" *ngFor="let c of cards"><div><b>{{ c.scheme }} {{ c.masked_pan || c.last_four }}</b><br>{{ c.status }} · {{ c.processor_code }}</div><span><button mat-button (click)="cardAction(c,'ACTIVATE')">Activate</button><button mat-button (click)="cardAction(c,'BLOCK')">Block</button></span></div>
+      <p><small>Bancro never accepts CVV/PIN. Live cryptographic operations require the bank's certified processor/HSM boundary.</small></p>
+    </mat-card>
+  </div>
+
+  <mat-card class="section"><h3>Platform Inventory / Integration Boundary</h3><p>{{ merchants.length }} merchant(s) · {{ terminals.length }} POS terminal(s) · {{ summary?.activeCards || 0 }} active card(s) · {{ webhooks.length }} webhook subscription(s) · {{ posTransactions.length }} POS UAT transaction(s).</p><p>Live card issuance/lifecycle is controlled by MVP11 maker-checker and the certified processor/HSM boundary. Legacy direct card controls remain simulator-only. Bancro stores only tokenized/masked card metadata.</p></mat-card>
+</div>

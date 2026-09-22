@@ -1,0 +1,23 @@
+.activity-page { padding:20px; }
+.header-row { display:flex; justify-content:space-between; align-items:flex-start; gap:16px; }
+.header-row p { margin-top:4px; color:#666; max-width:900px; }
+.kpis { display:grid; grid-template-columns:repeat(4,minmax(160px,1fr)); gap:12px; margin:16px 0; }
+.kpis mat-card { padding:16px; display:flex; flex-direction:column; gap:6px; }
+.kpis strong { font-size:26px; }
+.filters { padding:16px; margin-bottom:16px; }
+.filter-grid { display:grid; grid-template-columns:repeat(4,minmax(160px,1fr)); gap:10px; align-items:center; }
+.filter-actions { display:flex; gap:8px; }
+.activity-layout { display:grid; grid-template-columns:minmax(0,2fr) minmax(300px,1fr); gap:16px; align-items:start; }
+.activity-list,.detail { padding:16px; }
+.activity-row { display:grid; grid-template-columns:10px 1fr auto; gap:12px; align-items:center; padding:12px 4px; border-bottom:1px solid #e8e8e8; cursor:pointer; }
+.activity-row:hover,.activity-row.selected { background:#f7f8f7; }
+.status-dot { width:9px; height:9px; border-radius:50%; background:#777; }
+.status-dot[data-status="SUCCESS"],.status-dot[data-status="EXECUTED"] { background:#2e7d32; }
+.status-dot[data-status="FAILED"],.status-dot[data-status="BLOCKED"],.status-dot[data-status="REJECTED"] { background:#c62828; }
+.status-dot[data-status="PENDING_APPROVAL"],.status-dot[data-status="PENDING"] { background:#ef6c00; }
+.meta { color:#686868; font-size:12px; margin-top:3px; }
+.status { font-size:12px; font-weight:700; }
+dl { display:grid; grid-template-columns:130px 1fr; gap:8px 12px; } dt { color:#666; } dd { margin:0; word-break:break-word; }
+pre { white-space:pre-wrap; word-break:break-word; background:#f5f5f5; padding:12px; border-radius:6px; max-height:420px; overflow:auto; }
+.error { padding:10px; background:#fdeaea; margin:10px 0; }
+@media(max-width:900px){.kpis,.filter-grid,.activity-layout{grid-template-columns:1fr}.header-row{flex-direction:column}}

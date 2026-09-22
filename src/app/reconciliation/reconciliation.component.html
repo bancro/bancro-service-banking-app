@@ -1,0 +1,89 @@
+<div class="container">
+  <div class="header-row">
+    <div>
+      <h2>Settlement &amp; Reconciliation</h2>
+      <p>Match Bancro payments to provider settlement records, verify linked core debits and GL balance, and manage reconciliation exceptions.</p>
+    </div>
+  </div>
+
+  <div *ngIf="message" class="notice success">{{ message }}</div>
+  <div *ngIf="error" class="notice error">{{ error }}</div>
+
+  <mat-card class="mb-4">
+    <mat-card-content>
+      <div class="filters">
+        <mat-form-field appearance="outline"><mat-label>From</mat-label><input matInput type="date" [(ngModel)]="fromDate"></mat-form-field>
+        <mat-form-field appearance="outline"><mat-label>To</mat-label><input matInput type="date" [(ngModel)]="toDate"></mat-form-field>
+        <mat-form-field appearance="outline"><mat-label>Rail</mat-label><mat-select [(value)]="rail"><mat-option value="NIP">NIP</mat-option><mat-option value="NPS">NPS</mat-option><mat-option value="POS">POS</mat-option><mat-option value="CARD">Card</mat-option><mat-option value="">All</mat-option></mat-select></mat-form-field>
+        <mat-form-field appearance="outline"><mat-label>UAT scenario</mat-label><mat-select [(value)]="simulatorScenario"><mat-option value="NORMAL">Normal match</mat-option><mat-option value="AMOUNT_MISMATCH">Amount mismatch</mat-option><mat-option value="UNMATCHED">Unmatched provider line</mat-option><mat-option value="DUPLICATE">Duplicate settlement line</mat-option></mat-select></mat-form-field>
+        <button mat-stroked-button (click)="refresh()">Refresh</button>
+        <button mat-raised-button color="primary" (click)="generateSimulatorBatch()" [disabled]="rail !== 'NIP' && rail !== 'NPS'" *mifosxHasPermission="'CREATE_BANCRO_RECONCILIATION'">Generate {{ rail || 'NIP/NPS' }} simulator batch</button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <div class="kpis" *ngIf="summary">
+    <mat-card><mat-card-content><div class="label">Successful payments</div><div class="value">{{summary.payments?.successCount || 0}}</div><small>{{summary.payments?.successAmount || 0 | number:'1.2-2'}} NGN</small></mat-card-content></mat-card>
+    <mat-card><mat-card-content><div class="label">Unsettled success</div><div class="value">{{summary.payments?.unsettledCount || 0}}</div><small>{{summary.payments?.unsettledAmount || 0 | number:'1.2-2'}} NGN</small></mat-card-content></mat-card>
+    <mat-card><mat-card-content><div class="label">Matched settlement lines</div><div class="value">{{summary.settlement?.matchedCount || 0}}</div><small>of {{summary.settlement?.itemCount || 0}} lines</small></mat-card-content></mat-card>
+    <mat-card><mat-card-content><div class="label">Open exceptions</div><div class="value">{{summary.openExceptions || 0}}</div><small>Require investigation</small></mat-card-content></mat-card>
+  </div>
+
+  <mat-card class="mb-4">
+    <mat-card-title>Settlement batches</mat-card-title>
+    <mat-card-content>
+      <div class="table-wrap">
+        <table mat-table [dataSource]="batches">
+          <ng-container matColumnDef="reference"><th mat-header-cell *matHeaderCellDef>Batch</th><td mat-cell *matCellDef="let b"><button mat-button (click)="selectBatch(b)">{{b.batchReference}}</button></td></ng-container>
+          <ng-container matColumnDef="date"><th mat-header-cell *matHeaderCellDef>Date</th><td mat-cell *matCellDef="let b">{{b.settlementDate | date}}</td></ng-container>
+          <ng-container matColumnDef="rail"><th mat-header-cell *matHeaderCellDef>Rail</th><td mat-cell *matCellDef="let b">{{b.rail}}</td></ng-container>
+          <ng-container matColumnDef="source"><th mat-header-cell *matHeaderCellDef>Source</th><td mat-cell *matCellDef="let b">{{b.source}}</td></ng-container>
+          <ng-container matColumnDef="grossDebit"><th mat-header-cell *matHeaderCellDef>Gross debit</th><td mat-cell *matCellDef="let b">{{b.grossDebit | number:'1.2-2'}} {{b.currencyCode}}</td></ng-container>
+          <ng-container matColumnDef="matched"><th mat-header-cell *matHeaderCellDef>Matched</th><td mat-cell *matCellDef="let b">{{b.matchedCount}} / {{b.itemCount}}</td></ng-container>
+          <ng-container matColumnDef="exceptions"><th mat-header-cell *matHeaderCellDef>Exceptions</th><td mat-cell *matCellDef="let b">{{b.exceptionCount}}</td></ng-container>
+          <ng-container matColumnDef="status"><th mat-header-cell *matHeaderCellDef>Status</th><td mat-cell *matCellDef="let b"><strong>{{b.status}}</strong></td></ng-container>
+          <ng-container matColumnDef="actions"><th mat-header-cell *matHeaderCellDef>Actions</th><td mat-cell *matCellDef="let b"><button mat-button (click)="selectBatch(b)">View</button><button mat-button color="primary" (click)="reconcile(b)" *mifosxHasPermission="'UPDATE_BANCRO_RECONCILIATION'">Reconcile</button></td></ng-container>
+          <tr mat-header-row *matHeaderRowDef="batchColumns"></tr><tr mat-row *matRowDef="let row; columns: batchColumns"></tr>
+        </table>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="mb-4" *ngIf="selectedBatch">
+    <mat-card-title>{{selectedBatch.batchReference}} · reconciliation detail</mat-card-title>
+    <mat-card-content>
+      <p><strong>{{selectedBatch.status}}</strong> · {{selectedBatch.matchedCount}} matched · {{selectedBatch.exceptionCount}} exception(s) · net {{selectedBatch.netAmount | number:'1.2-2'}} {{selectedBatch.currencyCode}}</p>
+      <div class="table-wrap">
+        <table mat-table [dataSource]="selectedBatch.items || []">
+          <ng-container matColumnDef="line"><th mat-header-cell *matHeaderCellDef>#</th><td mat-cell *matCellDef="let i">{{i.lineNo}}</td></ng-container>
+          <ng-container matColumnDef="provider"><th mat-header-cell *matHeaderCellDef>Provider ref</th><td mat-cell *matCellDef="let i">{{i.providerReference || i.providerSessionId || '-'}}</td></ng-container>
+          <ng-container matColumnDef="bancro"><th mat-header-cell *matHeaderCellDef>Bancro ref</th><td mat-cell *matCellDef="let i">{{i.transactionReference || '-'}}<br><small>{{i.matchMethod || ''}}</small></td></ng-container>
+          <ng-container matColumnDef="amount"><th mat-header-cell *matHeaderCellDef>Amount</th><td mat-cell *matCellDef="let i">{{i.amount | number:'1.2-2'}} {{i.currencyCode}}</td></ng-container>
+          <ng-container matColumnDef="status"><th mat-header-cell *matHeaderCellDef>Reconciliation</th><td mat-cell *matCellDef="let i"><strong>{{i.reconciliationStatus}}</strong><br><small>{{i.exceptionMessage}}</small></td></ng-container>
+          <ng-container matColumnDef="gl"><th mat-header-cell *matHeaderCellDef>GL</th><td mat-cell *matCellDef="let i">{{i.glStatus || '-'}}<br><small *ngIf="i.glDebit !== null">Dr {{i.glDebit | number:'1.2-2'}} / Cr {{i.glCredit | number:'1.2-2'}}</small></td></ng-container>
+          <ng-container matColumnDef="resolution"><th mat-header-cell *matHeaderCellDef>Resolution</th><td mat-cell *matCellDef="let i">{{i.resolutionStatus}}<br><small>{{i.resolutionNote}}</small></td></ng-container>
+          <tr mat-header-row *matHeaderRowDef="itemColumns"></tr><tr mat-row *matRowDef="let row; columns: itemColumns"></tr>
+        </table>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card>
+    <mat-card-title>Open exceptions</mat-card-title>
+    <mat-card-content>
+      <p>Resolving an exception records an operational acknowledgement only. Customer balances, payment outcomes and GL entries are never modified from this screen.</p>
+      <div class="table-wrap">
+        <table mat-table [dataSource]="exceptions">
+          <ng-container matColumnDef="batch"><th mat-header-cell *matHeaderCellDef>Batch</th><td mat-cell *matCellDef="let i">{{i.batchReference}}</td></ng-container>
+          <ng-container matColumnDef="provider"><th mat-header-cell *matHeaderCellDef>Provider ref</th><td mat-cell *matCellDef="let i">{{i.providerReference || '-'}}</td></ng-container>
+          <ng-container matColumnDef="reference"><th mat-header-cell *matHeaderCellDef>Bancro ref</th><td mat-cell *matCellDef="let i">{{i.transactionReference || '-'}}</td></ng-container>
+          <ng-container matColumnDef="amount"><th mat-header-cell *matHeaderCellDef>Amount</th><td mat-cell *matCellDef="let i">{{i.amount | number:'1.2-2'}} {{i.currencyCode}}</td></ng-container>
+          <ng-container matColumnDef="exception"><th mat-header-cell *matHeaderCellDef>Exception</th><td mat-cell *matCellDef="let i"><strong>{{i.reconciliationStatus}}</strong><br><small>{{i.exceptionMessage}}</small></td></ng-container>
+          <ng-container matColumnDef="resolution"><th mat-header-cell *matHeaderCellDef>Resolution</th><td mat-cell *matCellDef="let i">{{i.resolutionStatus}}</td></ng-container>
+          <ng-container matColumnDef="actions"><th mat-header-cell *matHeaderCellDef>Actions</th><td mat-cell *matCellDef="let i"><button mat-button (click)="resolveException(i)" *mifosxHasPermission="'UPDATE_BANCRO_RECONCILIATION'">Acknowledge</button></td></ng-container>
+          <tr mat-header-row *matHeaderRowDef="exceptionColumns"></tr><tr mat-row *matRowDef="let row; columns: exceptionColumns"></tr>
+        </table>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

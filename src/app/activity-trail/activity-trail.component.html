@@ -1,0 +1,71 @@
+<div class="activity-page">
+  <div class="header-row">
+    <div>
+      <h2>Current Activity Trail</h2>
+      <p>Operational history across Bancro teller, payments, controls, reconciliation, disputes, POS/cards and integrations. The existing core command audit remains available separately.</p>
+    </div>
+    <button mat-stroked-button color="primary" (click)="refresh()">Refresh</button>
+  </div>
+
+  <div *ngIf="error" class="error">{{ error }}</div>
+
+  <div class="kpis">
+    <mat-card><span>Activity today</span><strong>{{ summary?.today || 0 }}</strong></mat-card>
+    <mat-card><span>Failed / blocked today</span><strong>{{ summary?.failedToday || 0 }}</strong></mat-card>
+    <mat-card><span>Teller today</span><strong>{{ summary?.tellerToday || 0 }}</strong></mat-card>
+    <mat-card><span>Payments today</span><strong>{{ summary?.paymentsToday || 0 }}</strong></mat-card>
+  </div>
+
+  <mat-card class="filters">
+    <form [formGroup]="filterForm" (ngSubmit)="refresh()" class="filter-grid">
+      <mat-form-field appearance="outline"><mat-label>Category</mat-label><mat-select formControlName="category"><mat-option value="">All</mat-option><mat-option value="TELLER">Teller</mat-option><mat-option value="PAYMENTS">Payments</mat-option><mat-option value="CONTROLS">Controls</mat-option><mat-option value="OPERATIONS">Operations</mat-option><mat-option value="RECONCILIATION">Reconciliation</mat-option><mat-option value="DISPUTES">Disputes</mat-option><mat-option value="POS">POS</mat-option><mat-option value="CARDS">Cards</mat-option><mat-option value="RISK">Risk</mat-option><mat-option value="ACCOUNTING">Accounting</mat-option><mat-option value="INTEGRATIONS">Integrations</mat-option></mat-select></mat-form-field>
+      <mat-form-field appearance="outline"><mat-label>Action</mat-label><input matInput formControlName="action" placeholder="e.g. COMMAND_APPROVED"></mat-form-field>
+      <mat-form-field appearance="outline"><mat-label>Status</mat-label><input matInput formControlName="status" placeholder="e.g. SUCCESS, OPEN, REJECTED"></mat-form-field>
+      <mat-form-field appearance="outline"><mat-label>Transaction reference</mat-label><input matInput formControlName="transactionReference"></mat-form-field>
+      <mat-form-field appearance="outline"><mat-label>Entity type</mat-label><input matInput formControlName="entityType" placeholder="e.g. TELLER_COMMAND"></mat-form-field>
+      <mat-form-field appearance="outline"><mat-label>Entity ID</mat-label><input matInput formControlName="entityId"></mat-form-field>
+      <mat-form-field appearance="outline"><mat-label>User</mat-label><input matInput formControlName="username" placeholder="username or SYSTEM"></mat-form-field>
+      <mat-form-field appearance="outline"><mat-label>Rows</mat-label><mat-select formControlName="limit"><mat-option [value]="50">50</mat-option><mat-option [value]="150">150</mat-option><mat-option [value]="300">300</mat-option><mat-option [value]="500">500</mat-option></mat-select></mat-form-field>
+      <mat-checkbox formControlName="mine">My activity only</mat-checkbox>
+      <div class="filter-actions"><button mat-raised-button color="primary">Apply</button><button mat-button type="button" (click)="reset()">Reset</button></div>
+    </form>
+  </mat-card>
+
+  <div class="activity-layout">
+    <mat-card class="activity-list">
+      <mat-card-title>Latest activity</mat-card-title>
+      <mat-card-content>
+        <div class="activity-row" *ngFor="let a of activities" (click)="open(a)" [class.selected]="selected?.id === a.id">
+          <div class="status-dot" [attr.data-status]="a.status"></div>
+          <div class="activity-main">
+            <div><strong>{{ a.summary }}</strong></div>
+            <div class="meta">{{ a.category }} · {{ a.action }} · {{ a.username || 'SYSTEM' }} · {{ a.created_at | date:'medium' }}</div>
+            <div class="meta" *ngIf="a.transaction_reference">Transaction: {{ a.transaction_reference }}</div>
+          </div>
+          <span class="status">{{ a.status }}</span>
+        </div>
+        <p *ngIf="!activities.length && !loading">No activity matches the selected filters.</p>
+        <p *ngIf="loading">Loading activity…</p>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="detail" *ngIf="selected">
+      <mat-card-title>Activity detail</mat-card-title>
+      <mat-card-content>
+        <dl>
+          <dt>Activity reference</dt><dd>{{ selected.activity_reference }}</dd>
+          <dt>Summary</dt><dd>{{ selected.summary }}</dd>
+          <dt>Category</dt><dd>{{ selected.category }}</dd>
+          <dt>Action</dt><dd>{{ selected.action }}</dd>
+          <dt>Status</dt><dd>{{ selected.status }}</dd>
+          <dt>User</dt><dd>{{ selected.username || 'SYSTEM' }}<span *ngIf="selected.user_id"> (#{{ selected.user_id }})</span></dd>
+          <dt>Entity</dt><dd>{{ selected.entity_type || '—' }} <span *ngIf="selected.entity_id">· {{ selected.entity_id }}</span></dd>
+          <dt>Transaction</dt><dd>{{ selected.transaction_reference || '—' }}</dd>
+          <dt>Office</dt><dd>{{ selected.office_id || '—' }}</dd>
+          <dt>Time</dt><dd>{{ selected.created_at | date:'medium' }}</dd>
+        </dl>
+        <pre *ngIf="details(selected)">{{ details(selected) | json }}</pre>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

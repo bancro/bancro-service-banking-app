@@ -34,6 +34,11 @@ import { NotificationsModule } from "./notifications/notifications.module";
 import { CollectionsModule } from "./collections/collections.module";
 import { ProfileModule } from "./profile/profile.module";
 import { TasksModule } from "./tasks/tasks.module";
+import { PaymentsModule } from "./payments/payments.module";
+import { TellerWorkstationModule } from "./teller-workstation/teller-workstation.module";
+import { ReconciliationModule } from "./reconciliation/reconciliation.module";
+import { OperationsModule } from "./operations/operations.module";
+import { ActivityTrailModule } from "./activity-trail/activity-trail.module";
 import { ConfigurationWizardModule } from "./configuration-wizard/configuration-wizard.module";
 import { PortalModule } from "@angular/cdk/portal";
 
@@ -43,7 +48,6 @@ import { DatePipe, LocationStrategy } from "@angular/common";
 import { TranslateLoader, TranslateModule } from "@ngx-translate/core";
 import { TranslateHttpLoader } from "@ngx-translate/http-loader";
 import { DataImportModule } from "./data-import/data-import.module";
-// import { NgApexchartsModule } from 'ng-apexcharts';
 
 /**
  * App Module
@@ -98,9 +102,13 @@ export function HttpLoaderFactory(http: HttpClient) {
     SearchModule,
     CollectionsModule,
     TasksModule,
+    PaymentsModule,
+    TellerWorkstationModule,
+    ReconciliationModule,
+    OperationsModule,
+    ActivityTrailModule,
     ConfigurationWizardModule,
     AppRoutingModule
-    // NgApexchartsModule,
     // TranslateModule.forRoot({
     //   loader: {
     //     provide: TranslateLoader,

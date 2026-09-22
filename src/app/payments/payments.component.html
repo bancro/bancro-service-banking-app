@@ -1,0 +1,86 @@
+<div class="container">
+  <div class="mb-4">
+    <h2>Bancro Payments</h2>
+    <p>Payment operations across Bancro rails. NIP and NPS/ISO 20022 can run in simulator or certified-gateway mode. Live external submission is blocked unless the payment has a committed Bancro/Fineract core debit; use the Teller Workstation for the normal end-to-end debit + external-transfer flow.</p>
+  </div>
+  <div *ngIf="message" class="notice success">{{ message }}</div>
+  <div *ngIf="error" class="notice error">{{ error }}</div>
+  <div *ngIf="nibssStatus" class="notice success">NIBSS/NIP mode: <strong>{{ nibssStatus.mode }}</strong> · {{ nibssStatus.message }}</div>
+  <div *ngIf="npsStatus" class="notice success">NPS / ISO 20022 mode: <strong>{{ npsStatus.mode }}</strong> · {{ npsStatus.message }}</div>
+
+  <mat-card class="mb-4">
+    <mat-card-title>Create test payment instruction</mat-card-title>
+    <mat-card-content>
+      <form [formGroup]="form" class="payment-form">
+        <mat-form-field appearance="outline"><mat-label>Source account ID</mat-label><input matInput formControlName="sourceAccountId" type="number"></mat-form-field>
+
+        <mat-form-field appearance="outline" *ngIf="isNip() || isNps()">
+          <mat-label>{{ isNps() ? 'NPS participant' : 'Destination bank' }}</mat-label>
+          <mat-select formControlName="destinationBankCode">
+            <mat-option *ngFor="let institution of destinationInstitutions()" [value]="institution.institutionCode">{{ institution.institutionName }} · {{ institution.institutionCode }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field appearance="outline" *ngIf="!isNip() && !isNps()"><mat-label>Destination bank code</mat-label><input matInput formControlName="destinationBankCode"></mat-form-field>
+
+        <div class="wide" *ngIf="isNip()" style="display:grid;grid-template-columns:1fr auto;gap:10px;align-items:start;">
+          <mat-form-field appearance="outline"><mat-label>Destination account</mat-label><input matInput formControlName="destinationAccount"></mat-form-field>
+          <button mat-stroked-button type="button" (click)="nameEnquiry()" [disabled]="enquiring">{{ enquiring ? 'Checking…' : 'Name enquiry' }}</button>
+        </div>
+        <mat-form-field appearance="outline" *ngIf="!isNip()"><mat-label>Destination account</mat-label><input matInput formControlName="destinationAccount"></mat-form-field>
+
+        <mat-form-field appearance="outline"><mat-label>Destination name</mat-label><input matInput formControlName="destinationName" [readonly]="isNip()"></mat-form-field>
+        <mat-form-field appearance="outline"><mat-label>Amount</mat-label><input matInput formControlName="amount" type="number"></mat-form-field>
+        <mat-form-field appearance="outline"><mat-label>Currency</mat-label><input matInput formControlName="currencyCode"></mat-form-field>
+        <mat-form-field appearance="outline"><mat-label>Rail</mat-label><mat-select formControlName="rail"><mat-option value="SIMULATOR">Simulator</mat-option><mat-option value="NIP">NIP</mat-option><mat-option value="NPS">NPS / ISO 20022</mat-option><mat-option value="POS">POS (adapter pending)</mat-option><mat-option value="CARD">Card (adapter pending)</mat-option></mat-select></mat-form-field>
+        <mat-form-field appearance="outline"><mat-label>Channel</mat-label><mat-select formControlName="channel"><mat-option value="API">API</mat-option><mat-option value="BRANCH">Branch</mat-option><mat-option value="WEB">Web</mat-option><mat-option value="MOBILE">Mobile</mat-option></mat-select></mat-form-field>
+        <mat-form-field appearance="outline" *ngIf="(isNip() && nibssStatus?.mode === 'SIMULATOR') || (isNps() && npsStatus?.mode === 'SIMULATOR')"><mat-label>Simulator submit outcome</mat-label><mat-select formControlName="simulationOutcome"><mat-option value="SUCCESS">Success</mat-option><mat-option value="UNKNOWN">Unknown / timeout</mat-option><mat-option value="FAILED">Failed</mat-option></mat-select></mat-form-field>
+        <mat-form-field appearance="outline" class="wide"><mat-label>Narration</mat-label><input matInput formControlName="narration"></mat-form-field>
+        <mat-form-field appearance="outline" class="wide"><mat-label>Idempotency key</mat-label><input matInput formControlName="idempotencyKey"><mat-hint>Repeat the same key to safely retry the request.</mat-hint></mat-form-field>
+      </form>
+      <div *ngIf="nameEnquiryResult" class="notice success">Beneficiary: <strong>{{ nameEnquiryResult.accountName }}</strong> · {{ nameEnquiryResult.bankName }} · enquiry {{ nameEnquiryResult.enquiryReference }}</div>
+      <button mat-raised-button color="primary" (click)="create()" *mifosxHasPermission="'CREATE_BANCRO_PAYMENT'">Create instruction</button>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card>
+    <mat-card-title>Payment operations</mat-card-title>
+    <mat-card-content>
+      <div class="filters">
+        <mat-form-field appearance="outline"><mat-label>Status</mat-label><mat-select [(value)]="statusFilter" (selectionChange)="load()"><mat-option value="">All</mat-option><mat-option value="CREATED">Created</mat-option><mat-option value="PENDING_APPROVAL">Pending approval</mat-option><mat-option value="FUNDS_COMMITTED">Funds committed</mat-option><mat-option value="SUCCESS">Success</mat-option><mat-option value="FAILED">Failed</mat-option><mat-option value="UNKNOWN">Unknown</mat-option><mat-option value="REVERSED">Reversed</mat-option></mat-select></mat-form-field>
+        <mat-form-field appearance="outline"><mat-label>Rail</mat-label><mat-select [(value)]="railFilter" (selectionChange)="load()"><mat-option value="">All</mat-option><mat-option value="SIMULATOR">Simulator</mat-option><mat-option value="NIP">NIP</mat-option><mat-option value="NPS">NPS</mat-option><mat-option value="POS">POS</mat-option><mat-option value="CARD">Card</mat-option><mat-option value="INTERNAL">Internal / Teller</mat-option></mat-select></mat-form-field>
+        <button mat-button (click)="load()"><fa-icon icon="sync"></fa-icon> Refresh</button>
+      </div>
+      <div class="table-wrap">
+        <table mat-table [dataSource]="payments">
+          <ng-container matColumnDef="reference"><th mat-header-cell *matHeaderCellDef>Reference</th><td mat-cell *matCellDef="let p">{{p.transactionReference}}</td></ng-container>
+          <ng-container matColumnDef="rail"><th mat-header-cell *matHeaderCellDef>Rail</th><td mat-cell *matCellDef="let p">{{p.rail}}</td></ng-container>
+          <ng-container matColumnDef="destination"><th mat-header-cell *matHeaderCellDef>Destination</th><td mat-cell *matCellDef="let p">{{p.destinationBankCode}} {{p.destinationAccount}}<br><small>{{p.destinationName}}</small></td></ng-container>
+          <ng-container matColumnDef="amount"><th mat-header-cell *matHeaderCellDef>Amount</th><td mat-cell *matCellDef="let p">{{p.amount | number:'1.2-2'}} {{p.currencyCode}}<br><small *ngIf="p.feeAmount">Fee: {{p.feeAmount | number:'1.2-2'}} · Total: {{p.totalDebitAmount | number:'1.2-2'}}</small></td></ng-container>
+          <ng-container matColumnDef="status"><th mat-header-cell *matHeaderCellDef>Status</th><td mat-cell *matCellDef="let p"><strong>{{p.status}}</strong><br><small *ngIf="p.approvalStatus && p.approvalStatus !== 'NOT_REQUIRED'">Approval: {{p.approvalStatus}}</small><br><small *ngIf="p.riskStatus && p.riskStatus !== 'CLEAR'">Risk: {{p.riskStatus}}</small></td></ng-container>
+          <ng-container matColumnDef="settlement"><th mat-header-cell *matHeaderCellDef>Settlement</th><td mat-cell *matCellDef="let p"><strong>{{p.settlementStatus || 'UNSETTLED'}}</strong><br><small>{{p.settlementDate | date}}</small></td></ng-container>
+          <ng-container matColumnDef="provider"><th mat-header-cell *matHeaderCellDef>Provider ref</th><td mat-cell *matCellDef="let p">{{p.providerReference || '-'}}</td></ng-container>
+          <ng-container matColumnDef="created"><th mat-header-cell *matHeaderCellDef>Created</th><td mat-cell *matCellDef="let p">{{p.createdAt | date:'medium'}}</td></ng-container>
+          <ng-container matColumnDef="actions"><th mat-header-cell *matHeaderCellDef>Test actions</th><td mat-cell *matCellDef="let p"><ng-container *mifosxHasPermission="'UPDATE_BANCRO_PAYMENT'">
+            <div *ngIf="p.rail === 'SIMULATOR'" class="actions"><button mat-button (click)="simulate(p,'SUCCESS')" [disabled]="p.status === 'SUCCESS' || p.status === 'REVERSED'">Approve</button><button mat-button (click)="simulate(p,'FAILED')" [disabled]="p.status === 'SUCCESS' || p.status === 'REVERSED'">Fail</button><button mat-button (click)="simulate(p,'UNKNOWN')" [disabled]="p.status === 'SUCCESS' || p.status === 'REVERSED'">Unknown</button><button mat-button color="warn" (click)="reverse(p)" [disabled]="p.status !== 'SUCCESS'">Reverse</button></div>
+            <div *ngIf="(p.rail === 'NIP' || p.rail === 'NPS') && !p.coreDebitTransactionId" class="actions">
+              <button mat-button *ngIf="p.status === 'CREATED' || p.status === 'FUNDS_COMMITTED'" (click)="submit(p)">Submit</button>
+              <button mat-button *ngIf="p.status === 'UNKNOWN'" (click)="requery(p)">Requery</button>
+              <button mat-button color="warn" *ngIf="p.status === 'SUCCESS'" (click)="requestReversal(p)">{{ p.rail === 'NPS' ? 'Request return' : 'Request reversal' }}</button>
+              <button mat-button color="warn" *ngIf="p.rail === 'NPS' && (p.status === 'SUCCESS' || p.status === 'UNKNOWN')" (click)="requestCancellation(p)">Request cancellation</button>
+              <button mat-button *ngIf="p.rail === 'NPS'" (click)="previewIso(p)">Preview ISO 20022</button>
+            </div>
+            <span *ngIf="(p.rail === 'NIP' || p.rail === 'NPS') && p.coreDebitTransactionId"><small>Managed by originating channel</small></span>
+          </ng-container></td></ng-container>
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr><tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+        </table>
+      </div>
+      <div *ngIf="isoPreview" class="notice">
+        <div><strong>ISO 20022 preview · {{ isoPreview.messageType }} {{ isoPreview.messageVersion }}</strong> · Message {{ isoPreview.messageId }} · End-to-end {{ isoPreview.endToEndId }}</div>
+        <small>{{ isoPreview.warning }}</small>
+        <pre style="white-space:pre-wrap;max-height:320px;overflow:auto;">{{ isoPreview.xml }}</pre>
+        <button mat-button type="button" (click)="isoPreview = null">Close preview</button>
+      </div>
+
+    </mat-card-content>
+  </mat-card>
+</div>

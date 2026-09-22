@@ -10,6 +10,7 @@ import { Alert } from '../core/alert/alert.model';
 
 /** Custom Services */
 import { AlertService } from '../core/alert/alert.service';
+import { AuthenticationService } from '../core/authentication/authentication.service';
 
 /** Environment Imports */
 import { environment } from '../../environments/environment';
@@ -36,9 +37,11 @@ export class LoginComponent implements OnInit, OnDestroy {
   /**
    * @param {AlertService} alertService Alert Service.
    * @param {Router} router Router for navigation.
+   * @param {AuthenticationService} authenticationService Authentication Service.
    */
   constructor(private alertService: AlertService,
-              private router: Router) { }
+              private router: Router,
+              private authenticationService: AuthenticationService) { }
 
   /**
    * Subscribes to alert event of alert service.
@@ -55,7 +58,12 @@ export class LoginComponent implements OnInit, OnDestroy {
       } else if (alertType === 'Authentication Success') {
         this.resetPassword = false;
         this.twoFactorAuthenticationRequired = false;
-        this.router.navigate(['/'], { replaceUrl: true });
+        const credentials = this.authenticationService.getCredentials();
+        const permissions = credentials?.permissions || [];
+        const tellerCapable = permissions.includes('READ_BANCRO_TELLER_WORKSTATION');
+        const administrator = permissions.includes('ALL_FUNCTIONS') || permissions.includes('ALL_FUNCTIONS_READ')
+          || permissions.includes('READ_BANCRO_OPERATIONS') || permissions.includes('READ_USER');
+        this.router.navigate([tellerCapable && !administrator ? '/teller-workstation' : '/'], { replaceUrl: true });
       }
     });
   }
