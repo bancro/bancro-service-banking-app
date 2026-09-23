@@ -1,4 +1,4 @@
-.operations-page { padding: 20px; }
+.operations-page { padding: 0; }
 .header-row { display:flex; justify-content:space-between; align-items:flex-start; gap:16px; }
 .kpis { display:grid; grid-template-columns:repeat(4,minmax(150px,1fr)); gap:12px; margin:16px 0; }
 .kpis mat-card { padding:16px; display:flex; flex-direction:column; gap:6px; }
@@ -8,13 +8,13 @@
 .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; align-items:start; }
 .wide { grid-column:1/-1; }
 .readiness-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
-.readiness-grid div { padding:12px; border:1px solid #ddd; border-radius:6px; display:flex; flex-direction:column; gap:4px; }
+.readiness-grid div { padding:12px; border:1px solid #ddd; border-radius:0.1rem; display:flex; flex-direction:column; gap:4px; }
 .simple-table { width:100%; border-collapse:collapse; }
 .simple-table th,.simple-table td { text-align:left; padding:10px; border-bottom:1px solid #ddd; }
 .list-row { display:flex; justify-content:space-between; gap:12px; padding:10px 0; border-bottom:1px solid #ddd; }
 .error { padding:10px; background:#fdeaea; margin:10px 0; }
 .message { padding:10px; background:#eef8ee; margin:10px 0; }
-.quote-result { margin-top:12px; padding:12px; border:1px solid #ddd; border-radius:6px; }
+.quote-result { margin-top:12px; padding:12px; border:1px solid #ddd; border-radius:0.1rem; }
 @media(max-width:900px){.kpis,.two-col,.readiness-grid,.form-grid{grid-template-columns:1fr}.wide{grid-column:auto}.header-row{flex-direction:column}}
 .compact-top { margin-top: 18px; padding-top: 14px; border-top: 1px solid #eee; }
 
@@ -31,7 +31,7 @@
 .operations-heading h2 { margin: 0 0 5px; }
 .operations-heading p { margin: 0; color: #777; max-width: 780px; }
 
-.admin-area-nav { padding: 16px 18px 18px; }
+.admin-area-nav { padding: 1.75rem; }
 .area-nav-heading {
   display: flex;
   justify-content: space-between;
@@ -55,7 +55,7 @@
   min-height: 64px;
   padding: 10px 12px;
   border: 1px solid #e4e6e7;
-  border-radius: 10px;
+  border-radius: 0.1rem;
   background: #fff;
   color: #4b4b4b;
   text-decoration: none;
@@ -89,7 +89,7 @@
 .admin-area-card.active small { color: rgba(255,255,255,.72); }
 
 @media(max-width:700px) {
-  .operations-page { padding: 16px; }
+  .operations-page { padding: 0; }
   .area-nav-heading { flex-direction: column; }
   .admin-area-grid { grid-template-columns: 1fr; }
 }

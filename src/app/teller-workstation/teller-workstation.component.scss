@@ -1,5 +1,5 @@
 .container {
-  padding: 28px 32px 40px;
+  padding: 0;
 }
 
 .page-heading {
@@ -25,7 +25,7 @@
 .notice {
   padding: 12px 16px;
   margin-bottom: 14px;
-  border-radius: 10px;
+  border-radius: 0.1rem;
 }
 .success { background: #edf8f1; color: #285f42; }
 .error { background: #fff0f1; color: #7e2630; }
@@ -37,7 +37,7 @@
   padding: 10px 14px;
   margin-bottom: 18px;
   border: 1px solid #dce9e0;
-  border-radius: 12px;
+  border-radius: 0.1rem;
   background: #f6fbf8;
   color: #39433c;
 }
@@ -71,7 +71,7 @@
 .setup-steps span {
   padding: 12px;
   border: 1px solid #e5e8e6;
-  border-radius: 10px;
+  border-radius: 0.1rem;
   background: #fafbfa;
 }
 .setup-note { margin-bottom: 0; }
@@ -158,7 +158,7 @@
 .quick-action {
   appearance: none;
   border: 1px solid #e2e5e7;
-  border-radius: 11px !important;
+  border-radius: 0.1rem !important;
   background: #fff;
   color: #515151;
   min-height: 70px;
@@ -216,7 +216,7 @@
   gap: 3px;
   padding: 12px 14px;
   border: 1px solid #e3e7e5;
-  border-radius: 10px;
+  border-radius: 0.1rem;
   margin-bottom: 8px;
   background: #fafbfa;
 }
@@ -251,7 +251,7 @@
 }
 .receipt-line span { color: #747774; }
 .narration { color: #555; margin: 16px 0; }
-.receipt-audit { font-weight: 700; border: 1px solid #ddd; padding: 8px; text-align: center; border-radius: 8px; }
+.receipt-audit { font-weight: 700; border: 1px solid #ddd; padding: 8px; text-align: center; border-radius: 0.1rem; }
 
 .transactions-card { margin: 0 0 20px; }
 .table-wrap { overflow: auto; }
@@ -285,7 +285,7 @@ table { width: 100%; }
 .eod-grid div {
   padding: 10px 12px;
   border: 1px solid #e8e8e8;
-  border-radius: 9px;
+  border-radius: 0.1rem;
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -325,7 +325,7 @@ table { width: 100%; }
 }
 
 @media (max-width: 900px) {
-  .container { padding: 20px 16px 32px; }
+  .container { padding: 0; }
   .work-grid { grid-template-columns: 1fr; }
   .receipt { position: static; }
   .teller-form { grid-template-columns: 1fr; }

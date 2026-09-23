@@ -1,8 +1,9 @@
 /*
- * Bancro authenticated-shell adaptation of the user-supplied Dore admin template.
+ * Bancro Dore authenticated UI conformance layer.
  *
- * Important: every rule is scoped to #mifosx-shell-container so the existing
- * Bancro login/reset-password experience remains visually unchanged.
+ * Source design reference: the user-supplied Dore light/bluenavy template.
+ * The scope is activated by ShellComponent only after authentication, which
+ * deliberately preserves the current Bancro login/reset-password design.
  */
 @font-face {
   font-family: 'Bancro Dore Nunito';
@@ -11,7 +12,6 @@
   font-display: swap;
   src: url('/assets/dore/font/nunito/nunito-300.woff2') format('woff2');
 }
-
 @font-face {
   font-family: 'Bancro Dore Nunito';
   font-style: normal;
@@ -19,7 +19,6 @@
   font-display: swap;
   src: url('/assets/dore/font/nunito/nunito-regular.woff2') format('woff2');
 }
-
 @font-face {
   font-family: 'Bancro Dore Nunito';
   font-style: normal;
@@ -27,7 +26,6 @@
   font-display: swap;
   src: url('/assets/dore/font/nunito/nunito-600.woff2') format('woff2');
 }
-
 @font-face {
   font-family: 'Bancro Dore Nunito';
   font-style: normal;
@@ -36,215 +34,463 @@
   src: url('/assets/dore/font/nunito/nunito-700.woff2') format('woff2');
 }
 
-#mifosx-shell-container {
-  --bancro-dore-primary: #00365a;
-  --bancro-dore-primary-strong: #002743;
-  --bancro-dore-accent: #9fe870;
-  --bancro-dore-accent-ink: #163300;
-  --bancro-dore-bg: #f8f8f8;
-  --bancro-dore-surface: #ffffff;
-  --bancro-dore-border: #e7e7e7;
-  --bancro-dore-text: #3a3a3a;
-  --bancro-dore-muted: #8f8f8f;
-  --bancro-dore-danger: #c43d4b;
-  --bancro-dore-warning: #d59b22;
-  --bancro-dore-success: #2f855a;
-  --bancro-dore-radius: 12px;
-  --bancro-dore-shadow: 0 3px 30px rgba(0, 0, 0, 0.08);
+body.bancro-dore-authenticated,
+#mifosx-shell-container,
+.cdk-overlay-container.bancro-dore-authenticated {
+  --dore-primary: #00365a;
+  --dore-primary-hover: #001e31;
+  --dore-secondary: #184f90;
+  --dore-bg: #f8f8f8;
+  --dore-surface: #ffffff;
+  --dore-text: #3a3a3a;
+  --dore-muted: #8f8f8f;
+  --dore-border: #d7d7d7;
+  --dore-border-soft: #f3f3f3;
+  --dore-danger: #c43d4b;
+  --dore-success: #2f855a;
+  --dore-warning: #b69329;
+  --dore-radius: 0.1rem;
+  --dore-pill: 50px;
+  --dore-card-shadow: 0 1px 15px rgba(0, 0, 0, .04), 0 1px 6px rgba(0, 0, 0, .04);
+  --dore-menu-shadow: 0 3px 30px rgba(0, 0, 0, .1), 0 3px 20px rgba(0, 0, 0, .1);
 
-  background: var(--bancro-dore-bg);
-  color: var(--bancro-dore-text);
   font-family: 'Bancro Dore Nunito', 'Nunito', Arial, sans-serif;
-  letter-spacing: 0.1px;
+  color: var(--dore-text);
+}
 
-  .mat-drawer-content,
-  .mat-sidenav-content {
-    background: var(--bancro-dore-bg);
-  }
+body.bancro-dore-authenticated {
+  margin: 0;
+  overflow-x: hidden !important;
+  background: var(--dore-bg);
+}
 
+body.bancro-dore-authenticated,
+#mifosx-shell-container {
+  /* ---------- Typography / page rhythm ---------- */
   h1, h2, h3, h4, h5, h6,
   .mat-card-title,
   .mat-card-subtitle,
   .mat-button,
   .mat-raised-button,
-  .mat-stroked-button,
   .mat-flat-button,
+  .mat-stroked-button,
   .mat-form-field,
   .mat-table,
-  .mat-list-item {
+  .mat-list-item,
+  .mat-tab-label,
+  .mat-paginator,
+  .mat-menu-item,
+  input,
+  textarea,
+  select,
+  button {
     font-family: 'Bancro Dore Nunito', 'Nunito', Arial, sans-serif;
   }
 
-  h1, h2, h3, h4, h5, h6 {
-    color: #303030;
-    font-weight: 600;
-  }
-
-  h2 { font-size: 1.6rem; }
-  h3 { font-size: 1.2rem; }
-
+  h1, h2, h3, h4, h5, h6 { color: var(--dore-text); font-weight: 600; }
+  h1 { font-size: 1.75rem; line-height: 2.05rem; }
+  h2 { font-size: 1.4rem; line-height: 1.75rem; }
+  h3 { font-size: 1.15rem; line-height: 1.5rem; }
   p { line-height: 1.55; }
+  a { color: var(--dore-primary); }
+  a:hover { color: var(--dore-primary-hover); }
+  small, .text-muted, .mat-card-subtitle { color: var(--dore-muted) !important; }
 
   .container,
+  .container-fluid,
   .operations-page,
-  .activity-page {
+  .activity-page,
+  .payments-page,
+  .reconciliation-page {
     box-sizing: border-box;
     width: 100%;
     max-width: none;
-    padding-left: 32px;
-    padding-right: 32px;
   }
 
-  .mat-card {
-    border: 0;
-    border-radius: var(--bancro-dore-radius);
-    box-shadow: var(--bancro-dore-shadow) !important;
-    background: var(--bancro-dore-surface);
+  /* The shell already provides the Dore page gutters; stop legacy containers
+     from introducing narrow centered desktop columns. */
+  mifosx-content > .container,
+  mifosx-content > .container-fluid,
+  mifosx-content > * > .container,
+  mifosx-content > * > .container-fluid {
+    max-width: none !important;
   }
 
-  .mat-card-title {
-    color: #303030;
-    font-size: 1.05rem;
+  .separator,
+  .main-heading { border-bottom: 1px solid var(--dore-border); }
+
+  /* ---------- Dore cards / panels ---------- */
+  .mat-card,
+  .card,
+  .mat-expansion-panel,
+  .mat-stepper-horizontal,
+  .mat-stepper-vertical,
+  .mat-tab-group,
+  .mat-table,
+  .data-table,
+  .table-container,
+  .content-card,
+  .form-card,
+  .mat-elevation-z1,
+  .mat-elevation-z2,
+  .mat-elevation-z3,
+  .mat-elevation-z4,
+  .mat-elevation-z6,
+  .mat-elevation-z8 {
+    border: 0 !important;
+    border-radius: var(--dore-radius) !important;
+    background: var(--dore-surface);
+    box-shadow: var(--dore-card-shadow) !important;
+  }
+
+  .mat-card { padding: 1.75rem; }
+  .mat-card-title { margin-bottom: 1rem; font-size: 1rem; font-weight: 600; }
+  .mat-card-header { margin-bottom: .75rem; }
+  .mat-card-actions { margin-bottom: 0; }
+
+  /* Nested cards should not become a stack of heavy shadows. */
+  .mat-card .mat-card,
+  .mat-expansion-panel .mat-card,
+  .mat-tab-body .mat-card.mat-elevation-z0 {
+    box-shadow: none !important;
+    border: 1px solid var(--dore-border-soft) !important;
+  }
+
+  /* ---------- Buttons ---------- */
+  .mat-button-base,
+  .mat-button,
+  .mat-raised-button,
+  .mat-flat-button,
+  .mat-stroked-button,
+  .mat-icon-button {
     font-weight: 600;
-  }
-
-  .mat-card-subtitle,
-  small,
-  .text-muted {
-    color: var(--bancro-dore-muted);
-  }
-
-  .mat-raised-button.mat-primary,
-  .mat-flat-button.mat-primary {
-    background: var(--bancro-dore-primary);
-    color: #fff;
-  }
-
-  .mat-stroked-button.mat-primary,
-  .mat-button.mat-primary {
-    color: var(--bancro-dore-primary);
+    letter-spacing: .03rem;
   }
 
   .mat-raised-button,
   .mat-flat-button,
   .mat-stroked-button,
-  .mat-button {
+  .mat-button:not(.mat-icon-button) {
     min-height: 38px;
-    border-radius: 20px !important;
-    font-weight: 600;
-    letter-spacing: 0.15px;
+    border-radius: var(--dore-pill) !important;
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
   }
 
+  .mat-raised-button.mat-primary,
+  .mat-flat-button.mat-primary {
+    background-color: var(--dore-primary) !important;
+    color: #fff !important;
+  }
+  .mat-raised-button.mat-primary:hover,
+  .mat-flat-button.mat-primary:hover {
+    background-color: var(--dore-primary-hover) !important;
+  }
+  .mat-stroked-button.mat-primary,
+  .mat-button.mat-primary { color: var(--dore-primary) !important; }
+  .mat-stroked-button.mat-primary { border-color: var(--dore-primary) !important; }
+
+  .mat-raised-button.mat-warn,
+  .mat-flat-button.mat-warn { color: #fff; }
+
+  /* ---------- Forms ---------- */
+  input:not([type='checkbox']):not([type='radio']),
+  textarea,
+  select {
+    color: var(--dore-text);
+    font-size: .8rem;
+  }
+
+  .mat-form-field { font-size: .8rem; }
+  .mat-form-field-appearance-outline .mat-form-field-outline,
+  .mat-form-field-appearance-outline .mat-form-field-outline-thick { color: var(--dore-border); }
+  .mat-form-field-appearance-outline.mat-focused .mat-form-field-outline-thick { color: rgba(0, 54, 90, .6); }
   .mat-form-field-appearance-outline .mat-form-field-outline-start {
-    border-radius: 9px 0 0 9px;
+    border-radius: var(--dore-radius) 0 0 var(--dore-radius) !important;
   }
-
   .mat-form-field-appearance-outline .mat-form-field-outline-end {
-    border-radius: 0 9px 9px 0;
+    border-radius: 0 var(--dore-radius) var(--dore-radius) 0 !important;
   }
-
-  .mat-form-field-appearance-outline.mat-focused .mat-form-field-outline-thick {
-    color: var(--bancro-dore-primary);
-  }
-
-  .mat-checkbox-checked.mat-accent .mat-checkbox-background,
-  .mat-checkbox-indeterminate.mat-accent .mat-checkbox-background {
-    background-color: var(--bancro-dore-primary);
-  }
-
-  .mat-table,
-  table.simple-table {
-    width: 100%;
+  .mat-form-field-appearance-fill .mat-form-field-flex {
+    border-radius: var(--dore-radius) var(--dore-radius) 0 0 !important;
     background: #fff;
-    border-collapse: separate;
-    border-spacing: 0;
+  }
+  .mat-form-field-label { color: #6d6d6d; }
+  .mat-form-field.mat-focused .mat-form-field-label { color: var(--dore-primary); }
+  .mat-form-field-ripple { background-color: var(--dore-primary) !important; }
+  .mat-checkbox-checked.mat-accent .mat-checkbox-background,
+  .mat-checkbox-indeterminate.mat-accent .mat-checkbox-background,
+  .mat-radio-button.mat-accent.mat-radio-checked .mat-radio-outer-circle,
+  .mat-slide-toggle.mat-checked .mat-slide-toggle-bar { border-color: var(--dore-primary); }
+  .mat-checkbox-checked.mat-accent .mat-checkbox-background,
+  .mat-checkbox-indeterminate.mat-accent .mat-checkbox-background,
+  .mat-radio-button.mat-accent .mat-radio-inner-circle,
+  .mat-slide-toggle.mat-checked .mat-slide-toggle-thumb { background-color: var(--dore-primary); }
+
+  /* ---------- Tables / grids ---------- */
+  .mat-table,
+  table:not(.mat-calendar-table):not(.versions) {
+    width: 100%;
+    color: var(--dore-text);
+    background: #fff;
+    border-collapse: collapse;
   }
 
   .mat-header-row,
-  table.simple-table th {
-    background: #f4f5f5;
+  table:not(.mat-calendar-table):not(.versions) thead tr {
+    background: var(--dore-border-soft);
   }
-
   .mat-header-cell,
-  table.simple-table th {
-    color: #5c5c5c;
-    font-size: 0.74rem;
+  table:not(.mat-calendar-table):not(.versions) th {
+    color: #5d5d5d;
+    font-size: .72rem;
     font-weight: 700;
-    letter-spacing: 0.35px;
+    letter-spacing: .035rem;
     text-transform: uppercase;
   }
-
   .mat-cell,
   .mat-header-cell,
-  table.simple-table td,
-  table.simple-table th {
-    border-bottom-color: #ececec;
+  table:not(.mat-calendar-table):not(.versions) td,
+  table:not(.mat-calendar-table):not(.versions) th {
+    border-bottom: 1px solid var(--dore-border-soft) !important;
   }
+  .mat-row:hover,
+  table:not(.mat-calendar-table):not(.versions) tbody tr:hover { background: #fbfbfb; }
+  table:not(.mat-calendar-table):not(.versions) th,
+  table:not(.mat-calendar-table):not(.versions) td { padding: 12px 14px; }
+  .mat-sort-header-arrow { color: var(--dore-primary); }
 
-  table.simple-table td,
-  table.simple-table th {
-    padding: 12px 14px;
-    text-align: left;
+  /* ---------- Tabs ---------- */
+  .mat-tab-header { border-bottom: 1px solid var(--dore-border); }
+  .mat-tab-label {
+    min-width: 0;
+    padding: .75rem 0;
+    margin-right: 1.5rem;
+    color: var(--dore-muted);
+    font-weight: 600;
+    letter-spacing: .03rem;
+    opacity: 1;
   }
+  .mat-tab-label.mat-tab-label-active { color: var(--dore-primary); }
+  .mat-ink-bar { height: 2px !important; background-color: var(--dore-primary) !important; }
 
-  table.simple-table tr:last-child td {
-    border-bottom: 0;
-  }
+  /* ---------- Expansion panels ---------- */
+  .mat-expansion-panel { margin-bottom: 12px; }
+  .mat-expansion-panel-header { min-height: 52px; font-weight: 600; }
+  .mat-expansion-panel-header.mat-expanded { border-bottom: 1px solid var(--dore-border-soft); }
+  .mat-expansion-indicator::after { color: var(--dore-primary); }
 
+  /* ---------- Stepper ---------- */
+  .mat-step-header .mat-step-icon-selected,
+  .mat-step-header .mat-step-icon-state-done,
+  .mat-step-header .mat-step-icon-state-edit { background-color: var(--dore-primary); color: #fff; }
+  .mat-step-header .mat-step-label.mat-step-label-active { color: var(--dore-primary); font-weight: 600; }
+
+  /* ---------- Pagination ---------- */
+  .mat-paginator { color: var(--dore-text); background: transparent; }
+  .mat-paginator-container { min-height: 58px; border-top: 1px solid var(--dore-border-soft); }
+  .mat-paginator-page-size-select { width: 72px; }
+
+  /* ---------- Lists / chips / tree ---------- */
+  .mat-list-base .mat-list-item { color: var(--dore-text); }
+  .mat-list-base .mat-list-item:hover { background: #f8f8f8; }
+  .mat-chip.mat-standard-chip { border-radius: 15px; }
+  .mat-chip.mat-standard-chip.mat-chip-selected.mat-primary { background: var(--dore-primary); color: #fff; }
+  .mat-tree { background: transparent; }
+
+  /* ---------- Notifications / status blocks ---------- */
   .notice,
-  .error,
-  .message {
-    border: 0;
-    border-radius: 10px;
-    box-shadow: none;
-  }
-
-  .error,
-  .notice.error {
-    background: #fff0f1;
-    color: #7e2630;
-  }
-
   .message,
-  .notice.success {
-    background: #edf8f1;
-    color: #245a3d;
+  .error,
+  .alert,
+  .status-message {
+    border: 0 !important;
+    border-radius: var(--dore-radius) !important;
+    box-shadow: none !important;
   }
+  .error,
+  .notice.error,
+  .alert-danger { background: #fff0f1 !important; color: #7e2630 !important; }
+  .message,
+  .notice.success,
+  .alert-success { background: #edf8f1 !important; color: #245a3d !important; }
+  .alert-warning { background: #fff8e6 !important; color: #6f5718 !important; }
+  .alert-info { background: #edf5fa !important; color: #204d68 !important; }
 
-  .mat-progress-bar {
-    height: 2px;
-  }
+  /* ---------- Common legacy helper classes ---------- */
+  .mat-divider { border-top-color: var(--dore-border-soft); }
+  hr { border: 0; border-top: 1px solid var(--dore-border); }
+  .mat-progress-bar { height: 2px; }
+  .mat-progress-bar-fill::after { background-color: var(--dore-primary); }
+  .mat-progress-bar-buffer { background: transparent; }
+  .status-approved, .status-active { color: var(--dore-success); }
+  .status-rejected, .status-closed { color: var(--dore-danger); }
 
-  .mat-progress-bar-fill::after {
-    background-color: var(--bancro-dore-primary);
-  }
-
-  .mat-progress-bar-buffer {
-    background: transparent;
-  }
-
-  ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    background: #d5d5d5;
-    border-radius: 8px;
-  }
-
-  ::-webkit-scrollbar-track {
-    background: transparent;
-  }
+  /* ---------- Scrollbars ---------- */
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-thumb { background: #d5d5d5; border-radius: 8px; }
+  ::-webkit-scrollbar-track { background: transparent; }
 }
 
-@media (max-width: 800px) {
+
+/* ---------- Universal authenticated view frame ----------
+   Angular inserts each activated top-level component directly after this
+   router-outlet. This gives all 650+ authenticated views the same Dore page
+   gutter without editing every feature template individually. */
+#mifosx-shell-container mifosx-content router-outlet + * {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 24px 60px 32px;
+}
+
+#mifosx-shell-container mifosx-content router-outlet + * > .container,
+#mifosx-shell-container mifosx-content router-outlet + * > .container-fluid {
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+#mifosx-shell-container mifosx-content router-outlet + * > .operations-page,
+#mifosx-shell-container mifosx-content router-outlet + * > .activity-page,
+#mifosx-shell-container mifosx-content router-outlet + * > .payments-page,
+#mifosx-shell-container mifosx-content router-outlet + * > .reconciliation-page {
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Mifos' index/menu views use list-grid. Recast those tiles as Dore cards so
+   Products, Accounting, Organization, System and similar menu pages share the
+   template rather than retaining the older Tailwind tile treatment. */
+body.bancro-dore-authenticated .list-grid {
+  gap: 1.5rem !important;
+}
+body.bancro-dore-authenticated .list-grid > div,
+body.bancro-dore-authenticated .list-grid > mat-list-item,
+body.bancro-dore-authenticated .list-grid > a,
+body.bancro-dore-authenticated .list-grid > button {
+  border: 0 !important;
+  border-radius: var(--dore-radius) !important;
+  background: #fff !important;
+  box-shadow: var(--dore-card-shadow) !important;
+}
+body.bancro-dore-authenticated .list-grid .mat-list-item {
+  min-height: 92px;
+  height: 100%;
+  border: 0 !important;
+  border-radius: var(--dore-radius) !important;
+  background: #fff !important;
+  color: var(--dore-text) !important;
+}
+body.bancro-dore-authenticated .list-grid .mat-list-item:hover {
+  background: #fbfbfb !important;
+  color: var(--dore-primary) !important;
+}
+body.bancro-dore-authenticated .list-grid h4,
+body.bancro-dore-authenticated .list-grid [matline] {
+  color: var(--dore-text) !important;
+}
+body.bancro-dore-authenticated .list-grid p {
+  color: var(--dore-muted) !important;
+}
+body.bancro-dore-authenticated .list-grid fa-icon {
+  color: var(--dore-primary) !important;
+}
+
+/* Common data/detail surfaces used throughout the legacy feature modules. */
+body.bancro-dore-authenticated .tab-container,
+body.bancro-dore-authenticated .view-details,
+body.bancro-dore-authenticated .form-container,
+body.bancro-dore-authenticated .receipt-container,
+body.bancro-dore-authenticated .accordion_class__tab {
+  border-color: var(--dore-border-soft) !important;
+  border-radius: var(--dore-radius) !important;
+  background: #fff;
+}
+
+/* Neutralize Tailwind's newer large-radius treatment on the authenticated app
+   where it conflicts with the supplied Dore 0.1rem visual language. */
+body.bancro-dore-authenticated .rounded-lg,
+body.bancro-dore-authenticated .rounded-md {
+  border-radius: var(--dore-radius) !important;
+}
+body.bancro-dore-authenticated .border {
+  border-color: var(--dore-border) !important;
+}
+
+/* ---------- CDK/Material overlays live outside #mifosx-shell-container ---------- */
+.cdk-overlay-container.bancro-dore-authenticated {
+  .mat-dialog-container,
+  .mat-menu-panel,
+  .mat-select-panel,
+  .mat-autocomplete-panel,
+  .mat-datepicker-content,
+  .mat-tooltip,
+  .mat-snack-bar-container {
+    font-family: 'Bancro Dore Nunito', 'Nunito', Arial, sans-serif;
+  }
+
+  .mat-dialog-container {
+    padding: 1.75rem;
+    border: 0;
+    border-radius: var(--dore-radius);
+    background: #fff;
+    color: var(--dore-text);
+    box-shadow: var(--dore-menu-shadow);
+  }
+  .mat-dialog-title { color: var(--dore-text); font-weight: 600; }
+  .mat-dialog-actions { border-top: 1px solid var(--dore-border-soft); padding-top: 1rem; }
+
+  .mat-menu-panel,
+  .mat-select-panel,
+  .mat-autocomplete-panel,
+  .mat-datepicker-content {
+    border: 1px solid rgba(58, 58, 58, .08);
+    border-radius: var(--dore-radius) !important;
+    background: #fff;
+    color: var(--dore-text);
+    box-shadow: var(--dore-menu-shadow) !important;
+  }
+  .mat-menu-item,
+  .mat-option { color: var(--dore-text); font-size: .8rem; }
+  .mat-menu-item:hover,
+  .mat-option:hover,
+  .mat-option.mat-active { background: var(--dore-bg); }
+  .mat-option.mat-selected:not(.mat-option-multiple) { color: var(--dore-primary); background: #edf2f6; }
+
+  .mat-tooltip {
+    border-radius: var(--dore-radius);
+    background: #3a3a3a;
+    color: #fff;
+    font-size: 11px;
+  }
+  .mat-snack-bar-container {
+    border-radius: var(--dore-radius);
+    background: #3a3a3a;
+    color: #fff;
+  }
+  .mat-calendar-body-selected { background-color: var(--dore-primary); color: #fff; }
+  .mat-calendar-body-today:not(.mat-calendar-body-selected) { border-color: var(--dore-primary); }
+}
+
+/* Responsive Dore gutters. */
+@media (max-width: 1439px) {
+  #mifosx-shell-container mifosx-content router-outlet + * { padding-left: 50px; padding-right: 50px; }
+}
+@media (max-width: 1199px) {
+  #mifosx-shell-container mifosx-content router-outlet + * { padding-left: 40px; padding-right: 40px; }
+}
+@media (max-width: 767px) {
+  #mifosx-shell-container mifosx-content router-outlet + * { padding: 18px 15px 24px; }
+
+  body.bancro-dore-authenticated,
   #mifosx-shell-container {
-    .container,
-    .operations-page,
-    .activity-page {
-      padding-left: 16px;
-      padding-right: 16px;
-    }
+    .mat-card { padding: 1.5rem; }
+    .mat-tab-label { margin-right: 1rem; }
+    table:not(.mat-calendar-table):not(.versions) th,
+    table:not(.mat-calendar-table):not(.versions) td { padding: 10px 9px; }
   }
 }

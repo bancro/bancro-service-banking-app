@@ -1,37 +1,26 @@
-<!-- Application Shell -->
-<mat-sidenav-container id="mifosx-shell-container" autosize>
+<!-- Dore-authenticated application shell. Login/pre-authentication routes remain outside this shell. -->
+<div id="mifosx-shell-container" class="dore-authenticated-shell">
+  <mifosx-toolbar [sidenav]="sidenav" (collapse)="toggleCollapse($event)"></mifosx-toolbar>
+  <mat-progress-bar class="dore-route-progress" [mode]="progressBarMode"></mat-progress-bar>
 
-  <!-- Sidenav -->
-  <mat-sidenav
-    #sidenav
-    class="sidebar-panel"
-    [ngClass]="{
-      'sidebar-full': !sidenavCollapsed,
-      'sidebar-compact': sidenavCollapsed
-    }"
-    [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
-    [mode]="(isHandset$ | async) ? 'over' : 'side'"
-    [opened]="!(isHandset$ | async)">
+  <mat-sidenav-container class="dore-shell-body" autosize>
+    <mat-sidenav
+      #sidenav
+      class="sidebar-panel"
+      [ngClass]="{
+        'sidebar-full': !sidenavCollapsed,
+        'sidebar-compact': sidenavCollapsed
+      }"
+      [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
+      [mode]="(isHandset$ | async) ? 'over' : 'side'"
+      [opened]="!(isHandset$ | async)">
+      <mifosx-sidenav [sidenavCollapsed]="sidenavCollapsed"></mifosx-sidenav>
+    </mat-sidenav>
 
-    <mifosx-sidenav [sidenavCollapsed]="sidenavCollapsed"></mifosx-sidenav>
-
-  </mat-sidenav>
-
-  <!-- Content -->
-  <mat-sidenav-content>
-
-    <!-- Toolbar -->
-    <mifosx-toolbar [sidenav]="sidenav" (collapse)="toggleCollapse($event)"></mifosx-toolbar>
-    <!-- Progress Bar -->
-    <mat-progress-bar [mode]="progressBarMode"></mat-progress-bar>
-
-    <!-- Breadcrumb -->
-    <mifosx-breadcrumb></mifosx-breadcrumb>
-    <!-- Content -->
-    <mifosx-content></mifosx-content>
-    <!-- Footer -->
-    <mifosx-footer></mifosx-footer>
-
-  </mat-sidenav-content>
-
-</mat-sidenav-container>
+    <mat-sidenav-content class="dore-page-canvas">
+      <mifosx-breadcrumb></mifosx-breadcrumb>
+      <mifosx-content></mifosx-content>
+      <mifosx-footer></mifosx-footer>
+    </mat-sidenav-content>
+  </mat-sidenav-container>
+</div>

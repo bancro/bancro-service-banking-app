@@ -1,101 +1,103 @@
-<div class="dore-sidenav" [class.is-collapsed]="sidenavCollapsed">
-  <div class="dore-brand" [routerLink]="['/home']" aria-label="Bancro home">
-    <img *ngIf="!sidenavCollapsed" src="assets/images/bancro.png" alt="Bancro" class="brand-full" />
-    <img *ngIf="sidenavCollapsed" src="assets/images/icon.png" alt="Bancro" class="brand-mark" />
-  </div>
+<div class="dore-menu" [class.is-collapsed]="sidenavCollapsed">
+  <div class="dore-main-menu">
+    <div class="main-menu-scroll">
+      <button type="button" class="main-menu-item" [class.active]="selectedSection === 'workspace'" (click)="selectSection('workspace')" matTooltip="Workspace" matTooltipPosition="right">
+        <fa-icon icon="home"></fa-icon><span>Workspace</span>
+      </button>
 
-  <div class="dore-nav-scroll">
-    <mat-nav-list class="dore-nav-list">
-      <div class="nav-group-label" *ngIf="!sidenavCollapsed">Workspace</div>
+      <button type="button" class="main-menu-item" [class.active]="selectedSection === 'customers'" (click)="selectSection('customers')" matTooltip="Customer Banking" matTooltipPosition="right"
+              *ngIf="hasAnyPermission(['READ_CLIENT','READ_GROUP','READ_CENTER','READ_GLACCOUNT','READ_PRODUCTMIX'])">
+        <fa-icon icon="user"></fa-icon><span>Customers</span>
+      </button>
 
-      <a mat-list-item [routerLink]="['/home']" routerLinkActive="is-active" [matTooltip]="sidenavCollapsed ? 'Home' : ''" matTooltipPosition="right">
-        <fa-icon icon="home" class="nav-icon"></fa-icon>
-        <span class="nav-label" *ngIf="!sidenavCollapsed">Home</span>
-      </a>
-      <a mat-list-item [routerLink]="['/dashboard']" routerLinkActive="is-active" [matTooltip]="sidenavCollapsed ? 'Dashboard' : ''" matTooltipPosition="right">
-        <fa-icon icon="tachometer-alt" class="nav-icon"></fa-icon>
-        <span class="nav-label" *ngIf="!sidenavCollapsed">Dashboard</span>
-      </a>
+      <button type="button" class="main-menu-item" [class.active]="selectedSection === 'channels'" (click)="selectSection('channels')" matTooltip="Branch & Channels" matTooltipPosition="right"
+              *ngIf="hasAnyPermission(['READ_BANCRO_TELLER_WORKSTATION','READ_TELLER','READ_BANCRO_OPERATIONS','READ_BANCRO_PAYMENT','READ_BANCRO_CARDS','READ_BANCRO_POS','READ_BANCRO_RECONCILIATION'])">
+        <fa-icon icon="money-bill-alt"></fa-icon><span>Channels</span>
+      </button>
 
-      <div class="nav-group-label" *ngIf="!sidenavCollapsed">Customer Banking</div>
-      <a mat-list-item [routerLink]="['/clients']" routerLinkActive="is-active" *mifosxHasPermission="'READ_CLIENT'">
-        <fa-icon icon="user" class="nav-icon"></fa-icon><span class="nav-label" *ngIf="!sidenavCollapsed">Customers</span>
-      </a>
-      <a mat-list-item [routerLink]="['/groups']" routerLinkActive="is-active" *mifosxHasPermission="'READ_GROUP'">
-        <fa-icon icon="users" class="nav-icon"></fa-icon><span class="nav-label" *ngIf="!sidenavCollapsed">Groups</span>
-      </a>
-      <a mat-list-item [routerLink]="['/centers']" routerLinkActive="is-active" *mifosxHasPermission="'READ_CENTER'">
-        <fa-icon icon="building" class="nav-icon"></fa-icon><span class="nav-label" *ngIf="!sidenavCollapsed">Centers</span>
-      </a>
-      <a mat-list-item [routerLink]="['/accounting']" routerLinkActive="is-active" *mifosxHasPermission="'READ_GLACCOUNT'">
-        <fa-icon icon="university" class="nav-icon"></fa-icon><span class="nav-label" *ngIf="!sidenavCollapsed">Accounting</span>
-      </a>
-      <a mat-list-item [routerLink]="['/products']" routerLinkActive="is-active" *mifosxHasPermission="'READ_PRODUCTMIX'">
-        <fa-icon icon="briefcase" class="nav-icon"></fa-icon><span class="nav-label" *ngIf="!sidenavCollapsed">Products</span>
-      </a>
+      <button type="button" class="main-menu-item" [class.active]="selectedSection === 'controls'" (click)="selectSection('controls')" matTooltip="Controls & Operations" matTooltipPosition="right"
+              *ngIf="hasAnyPermission(['READ_BANCRO_OPERATIONS','READ_BANCRO_ACTIVITY_TRAIL'])">
+        <fa-icon icon="tasks"></fa-icon><span>Controls</span>
+      </button>
 
-      <div class="nav-group-label" *ngIf="!sidenavCollapsed">Branch & Payments</div>
-      <a mat-list-item [routerLink]="['/teller-workstation']" routerLinkActive="is-active" *mifosxHasPermission="'READ_BANCRO_TELLER_WORKSTATION'">
-        <fa-icon icon="money-bill-alt" class="nav-icon"></fa-icon><span class="nav-label" *ngIf="!sidenavCollapsed">Teller Workstation</span>
-      </a>
-      <a mat-list-item [routerLink]="['/organization/tellers']" routerLinkActive="is-active" *mifosxHasPermission="'READ_TELLER'">
-        <fa-icon icon="id-badge" class="nav-icon"></fa-icon><span class="nav-label" *ngIf="!sidenavCollapsed">Teller Management</span>
-      </a>
-      <a mat-list-item [routerLink]="['/operations/teller']" routerLinkActive="is-active" *mifosxHasPermission="'READ_BANCRO_OPERATIONS'">
-        <fa-icon icon="tasks" class="nav-icon"></fa-icon><span class="nav-label" *ngIf="!sidenavCollapsed">Teller Access & Readiness</span>
-      </a>
-      <a mat-list-item [routerLink]="['/payments']" routerLinkActive="is-active" *mifosxHasPermission="'READ_BANCRO_PAYMENT'">
-        <fa-icon icon="money-check" class="nav-icon"></fa-icon><span class="nav-label" *ngIf="!sidenavCollapsed">Payments</span>
-      </a>
-      <a mat-list-item [routerLink]="['/operations/transfers']" routerLinkActive="is-active" *mifosxHasPermission="'READ_BANCRO_PAYMENT'">
-        <fa-icon icon="random" class="nav-icon"></fa-icon><span class="nav-label" *ngIf="!sidenavCollapsed">Transfers & NIBSS</span>
-      </a>
-      <a mat-list-item [routerLink]="['/operations/cards']" routerLinkActive="is-active" *mifosxHasPermission="'READ_BANCRO_CARDS'">
-        <fa-icon icon="id-badge" class="nav-icon"></fa-icon><span class="nav-label" *ngIf="!sidenavCollapsed">Cards</span>
-      </a>
-      <a mat-list-item [routerLink]="['/operations/pos']" routerLinkActive="is-active" *mifosxHasPermission="'READ_BANCRO_POS'">
-        <fa-icon icon="money-check" class="nav-icon"></fa-icon><span class="nav-label" *ngIf="!sidenavCollapsed">POS & Merchants</span>
-      </a>
-      <a mat-list-item [routerLink]="['/reconciliation']" routerLinkActive="is-active" *mifosxHasPermission="'READ_BANCRO_RECONCILIATION'">
-        <fa-icon icon="sync" class="nav-icon"></fa-icon><span class="nav-label" *ngIf="!sidenavCollapsed">Settlement & Reconciliation</span>
-      </a>
-
-      <div class="nav-group-label" *ngIf="!sidenavCollapsed">Control & Administration</div>
-      <a mat-list-item [routerLink]="['/operations']" routerLinkActive="is-active" [routerLinkActiveOptions]="{ exact: true }" *mifosxHasPermission="'READ_BANCRO_OPERATIONS'">
-        <fa-icon icon="tachometer-alt" class="nav-icon"></fa-icon><span class="nav-label" *ngIf="!sidenavCollapsed">Bancro Administration</span>
-      </a>
-      <a mat-list-item [routerLink]="['/operations/approvals']" routerLinkActive="is-active" *mifosxHasPermission="'READ_BANCRO_OPERATIONS'">
-        <fa-icon icon="tasks" class="nav-icon"></fa-icon><span class="nav-label" *ngIf="!sidenavCollapsed">Approvals & Controls</span>
-      </a>
-      <a mat-list-item [routerLink]="['/activity-trail']" routerLinkActive="is-active" *mifosxHasPermission="'READ_BANCRO_ACTIVITY_TRAIL'">
-        <fa-icon icon="list-ul" class="nav-icon"></fa-icon><span class="nav-label" *ngIf="!sidenavCollapsed">Current Activity Trail</span>
-      </a>
-      <a mat-list-item [routerLink]="['/operations/integrations']" routerLinkActive="is-active" *mifosxHasPermission="'READ_BANCRO_OPERATIONS'">
-        <fa-icon icon="cogs" class="nav-icon"></fa-icon><span class="nav-label" *ngIf="!sidenavCollapsed">Integrations</span>
-      </a>
-      <a mat-list-item [routerLink]="['/appusers']" routerLinkActive="is-active" *mifosxHasPermission="'READ_USER'">
-        <fa-icon icon="user-shield" class="nav-icon"></fa-icon><span class="nav-label" *ngIf="!sidenavCollapsed">Users & Roles</span>
-      </a>
-      <a mat-list-item [routerLink]="['/organization']" routerLinkActive="is-active" *mifosxHasPermission="'READ_OFFICE'">
-        <fa-icon icon="building" class="nav-icon"></fa-icon><span class="nav-label" *ngIf="!sidenavCollapsed">Organization</span>
-      </a>
-      <a mat-list-item [routerLink]="['/system']" routerLinkActive="is-active" *mifosxHasPermission="'READ_CONFIGURATION'">
-        <fa-icon icon="cog" class="nav-icon"></fa-icon><span class="nav-label" *ngIf="!sidenavCollapsed">System Administration</span>
-      </a>
-      <a mat-list-item [routerLink]="['/reports']" routerLinkActive="is-active" *mifosxHasPermission="'READ_REPORT'">
-        <fa-icon icon="chart-bar" class="nav-icon"></fa-icon><span class="nav-label" *ngIf="!sidenavCollapsed">Reports</span>
-      </a>
-    </mat-nav-list>
-  </div>
-
-  <div class="dore-user-card" [class.compact]="sidenavCollapsed">
-    <div class="user-avatar">{{ username ? (username | slice:0:1) : 'B' }}</div>
-    <div class="user-copy" *ngIf="!sidenavCollapsed">
-      <strong>{{ username }}</strong>
-      <span>{{ officeName || 'Bancro' }}</span>
+      <button type="button" class="main-menu-item" [class.active]="selectedSection === 'administration'" (click)="selectSection('administration')" matTooltip="Administration" matTooltipPosition="right"
+              *ngIf="hasAnyPermission(['READ_USER','READ_OFFICE','READ_CONFIGURATION','READ_REPORT'])">
+        <fa-icon icon="cogs"></fa-icon><span>Admin</span>
+      </button>
     </div>
-    <button mat-icon-button (click)="logout()" [matTooltip]="'Sign out'" aria-label="Sign out">
-      <fa-icon icon="sign-out-alt"></fa-icon>
-    </button>
+
+    <div class="main-menu-footer">
+      <button mat-icon-button (click)="logout()" matTooltip="Sign out" matTooltipPosition="right" aria-label="Sign out">
+        <fa-icon icon="sign-out-alt"></fa-icon>
+      </button>
+    </div>
+  </div>
+
+  <div class="dore-sub-menu" *ngIf="!sidenavCollapsed">
+    <div class="sub-menu-header">
+      <span>BANCRO</span>
+      <strong>{{ selectedSectionTitle }}</strong>
+    </div>
+
+    <div class="sub-menu-scroll" [ngSwitch]="selectedSection">
+      <mat-nav-list *ngSwitchCase="'workspace'" class="dore-sub-list">
+        <a mat-list-item [routerLink]="['/home']" routerLinkActive="active-link"><fa-icon icon="home"></fa-icon><span>Home</span></a>
+        <a mat-list-item [routerLink]="['/dashboard']" routerLinkActive="active-link"><fa-icon icon="tachometer-alt"></fa-icon><span>Dashboard</span></a>
+        <a mat-list-item [routerLink]="['/navigation']" routerLinkActive="active-link"><fa-icon icon="location-arrow"></fa-icon><span>Navigation</span></a>
+        <a mat-list-item [routerLink]="['/checker-inbox-and-tasks/checker-inbox']" routerLinkActive="active-link"><fa-icon icon="tasks"></fa-icon><span>Checker Inbox & Tasks</span></a>
+        <a mat-list-item [routerLink]="['/notifications']" routerLinkActive="active-link"><fa-icon icon="bell"></fa-icon><span>Notifications</span></a>
+        <button mat-list-item type="button" (click)="showKeyboardShortcuts()"><fa-icon icon="keyboard"></fa-icon><span>Keyboard Shortcuts</span></button>
+        <button mat-list-item type="button" (click)="help()"><fa-icon icon="question-circle"></fa-icon><span>Help</span></button>
+      </mat-nav-list>
+
+      <mat-nav-list *ngSwitchCase="'customers'" class="dore-sub-list">
+        <a mat-list-item [routerLink]="['/clients']" routerLinkActive="active-link" *mifosxHasPermission="'READ_CLIENT'"><fa-icon icon="user"></fa-icon><span>Customers</span></a>
+        <a mat-list-item [routerLink]="['/groups']" routerLinkActive="active-link" *mifosxHasPermission="'READ_GROUP'"><fa-icon icon="users"></fa-icon><span>Groups</span></a>
+        <a mat-list-item [routerLink]="['/centers']" routerLinkActive="active-link" *mifosxHasPermission="'READ_CENTER'"><fa-icon icon="building"></fa-icon><span>Centers</span></a>
+        <a mat-list-item [routerLink]="['/products']" routerLinkActive="active-link" *mifosxHasPermission="'READ_PRODUCTMIX'"><fa-icon icon="briefcase"></fa-icon><span>Products</span></a>
+        <a mat-list-item [routerLink]="['/accounting']" routerLinkActive="active-link" *mifosxHasPermission="'READ_GLACCOUNT'"><fa-icon icon="university"></fa-icon><span>Accounting</span></a>
+        <a mat-list-item [routerLink]="['/accounting/journal-entries/frequent-postings']" routerLinkActive="active-link" *mifosxHasPermission="'READ_GLACCOUNT'"><fa-icon icon="sync"></fa-icon><span>Frequent Postings</span></a>
+        <a mat-list-item [routerLink]="['/accounting/journal-entries/create']" routerLinkActive="active-link" *mifosxHasPermission="'READ_GLACCOUNT'"><fa-icon icon="plus"></fa-icon><span>Create Journal Entry</span></a>
+        <a mat-list-item [routerLink]="['/accounting/chart-of-accounts']" routerLinkActive="active-link" *mifosxHasPermission="'READ_GLACCOUNT'"><fa-icon icon="sitemap"></fa-icon><span>Chart of Accounts</span></a>
+        <a mat-list-item [routerLink]="['/collections/individual-collection-sheet']" routerLinkActive="active-link"><fa-icon icon="tasks"></fa-icon><span>Collection Sheet</span></a>
+      </mat-nav-list>
+
+      <mat-nav-list *ngSwitchCase="'channels'" class="dore-sub-list">
+        <a mat-list-item [routerLink]="['/teller-workstation']" routerLinkActive="active-link" *mifosxHasPermission="'READ_BANCRO_TELLER_WORKSTATION'"><fa-icon icon="money-bill-alt"></fa-icon><span>Teller Workstation</span></a>
+        <a mat-list-item [routerLink]="['/organization/tellers']" routerLinkActive="active-link" *mifosxHasPermission="'READ_TELLER'"><fa-icon icon="id-badge"></fa-icon><span>Teller Management</span></a>
+        <a mat-list-item [routerLink]="['/operations/teller']" routerLinkActive="active-link" *mifosxHasPermission="'READ_BANCRO_OPERATIONS'"><fa-icon icon="tasks"></fa-icon><span>Teller Access & Readiness</span></a>
+        <a mat-list-item [routerLink]="['/payments']" routerLinkActive="active-link" *mifosxHasPermission="'READ_BANCRO_PAYMENT'"><fa-icon icon="money-check"></fa-icon><span>Payments</span></a>
+        <a mat-list-item [routerLink]="['/operations/transfers']" routerLinkActive="active-link" *mifosxHasPermission="'READ_BANCRO_PAYMENT'"><fa-icon icon="random"></fa-icon><span>Transfers & NIBSS</span></a>
+        <a mat-list-item [routerLink]="['/operations/cards']" routerLinkActive="active-link" *mifosxHasPermission="'READ_BANCRO_CARDS'"><fa-icon icon="id-badge"></fa-icon><span>Cards</span></a>
+        <a mat-list-item [routerLink]="['/operations/pos']" routerLinkActive="active-link" *mifosxHasPermission="'READ_BANCRO_POS'"><fa-icon icon="money-check"></fa-icon><span>POS & Merchants</span></a>
+        <a mat-list-item [routerLink]="['/reconciliation']" routerLinkActive="active-link" *mifosxHasPermission="'READ_BANCRO_RECONCILIATION'"><fa-icon icon="sync"></fa-icon><span>Settlement & Reconciliation</span></a>
+      </mat-nav-list>
+
+      <mat-nav-list *ngSwitchCase="'controls'" class="dore-sub-list">
+        <a mat-list-item [routerLink]="['/operations']" [routerLinkActiveOptions]="{ exact: true }" routerLinkActive="active-link" *mifosxHasPermission="'READ_BANCRO_OPERATIONS'"><fa-icon icon="tachometer-alt"></fa-icon><span>Bancro Administration</span></a>
+        <a mat-list-item [routerLink]="['/operations/approvals']" routerLinkActive="active-link" *mifosxHasPermission="'READ_BANCRO_OPERATIONS'"><fa-icon icon="tasks"></fa-icon><span>Approvals & Controls</span></a>
+        <a mat-list-item [routerLink]="['/activity-trail']" routerLinkActive="active-link" *mifosxHasPermission="'READ_BANCRO_ACTIVITY_TRAIL'"><fa-icon icon="list-ul"></fa-icon><span>Current Activity Trail</span></a>
+        <a mat-list-item [routerLink]="['/operations/integrations']" routerLinkActive="active-link" *mifosxHasPermission="'READ_BANCRO_OPERATIONS'"><fa-icon icon="cogs"></fa-icon><span>Integrations</span></a>
+      </mat-nav-list>
+
+      <mat-nav-list *ngSwitchCase="'administration'" class="dore-sub-list">
+        <a mat-list-item [routerLink]="['/appusers']" routerLinkActive="active-link" *mifosxHasPermission="'READ_USER'"><fa-icon icon="user-shield"></fa-icon><span>Users & Roles</span></a>
+        <a mat-list-item [routerLink]="['/organization']" routerLinkActive="active-link" *mifosxHasPermission="'READ_OFFICE'"><fa-icon icon="building"></fa-icon><span>Organization</span></a>
+        <a mat-list-item [routerLink]="['/system']" routerLinkActive="active-link" *mifosxHasPermission="'READ_CONFIGURATION'"><fa-icon icon="cog"></fa-icon><span>System Administration</span></a>
+        <a mat-list-item [routerLink]="['/reports']" routerLinkActive="active-link" *mifosxHasPermission="'READ_REPORT'"><fa-icon icon="chart-bar"></fa-icon><span>Reports</span></a>
+        <a mat-list-item [routerLink]="['/templates']" routerLinkActive="active-link"><fa-icon icon="file"></fa-icon><span>Templates</span></a>
+        <a mat-list-item [routerLink]="['/data-import']" routerLinkActive="active-link"><fa-icon icon="upload"></fa-icon><span>Data Import</span></a>
+        <a mat-list-item [routerLink]="['/self-service']" routerLinkActive="active-link"><fa-icon icon="users"></fa-icon><span>Self Service</span></a>
+      </mat-nav-list>
+    </div>
+
+    <div class="sub-menu-user">
+      <div class="user-avatar">{{ username ? (username | slice:0:1) : 'B' }}</div>
+      <div class="user-copy">
+        <strong>{{ username || 'Bancro User' }}</strong>
+        <span>{{ officeName || 'Bancro' }}</span>
+      </div>
+      <button mat-icon-button (click)="logout()" matTooltip="Sign out" aria-label="Sign out"><fa-icon icon="sign-out-alt"></fa-icon></button>
+    </div>
   </div>
 </div>

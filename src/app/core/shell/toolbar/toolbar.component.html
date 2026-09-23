@@ -1,11 +1,12 @@
 <mat-toolbar id="mifosx-toolbar" class="dore-toolbar">
-  <div class="toolbar-left">
+  <div class="navbar-left">
     <button mat-icon-button class="menu-button" *ngIf="(isHandset$ | async)" (click)="toggleSidenav()" aria-label="Open navigation">
       <fa-icon icon="bars"></fa-icon>
     </button>
 
-    <button mat-icon-button class="menu-button" *ngIf="!(isHandset$ | async)" (click)="toggleSidenavCollapse()" [matTooltip]="sidenavCollapsed ? 'Expand navigation' : 'Collapse navigation'" aria-label="Toggle navigation width">
-      <fa-icon [icon]="sidenavCollapsed ? 'chevron-right' : 'chevron-left'"></fa-icon>
+    <button mat-icon-button class="menu-button" *ngIf="!(isHandset$ | async)" (click)="toggleSidenavCollapse()"
+            [matTooltip]="sidenavCollapsed ? 'Show submenu' : 'Hide submenu'" aria-label="Toggle Dore submenu">
+      <span class="dore-menu-glyph" [class.collapsed]="sidenavCollapsed"><i></i><i></i><i></i></span>
     </button>
 
     <div class="toolbar-search">
@@ -13,18 +14,22 @@
     </div>
   </div>
 
-  <span class="toolbar-spacer"></span>
+  <a class="navbar-logo" [routerLink]="['/home']" aria-label="Bancro home">
+    <img src="assets/images/bancro.png" alt="Bancro" />
+  </a>
 
-  <div class="toolbar-actions">
-    <mifosx-language-selector class="language" fxHide.lt-md></mifosx-language-selector>
-    <mifosx-notifications-tray fxHide.lt-md></mifosx-notifications-tray>
+  <div class="navbar-right">
+    <div class="header-icons">
+      <mifosx-language-selector class="language" fxHide.lt-md></mifosx-language-selector>
+      <mifosx-notifications-tray fxHide.lt-md></mifosx-notifications-tray>
+    </div>
 
     <button class="profile-trigger" [matMenuTriggerFor]="applicationMenu" aria-label="Open user menu">
-      <span class="profile-avatar">{{ username ? (username | slice:0:1) : 'B' }}</span>
       <span class="profile-copy" fxHide.lt-md>
         <strong>{{ username || 'Bancro User' }}</strong>
         <small>{{ officeName || 'Bancro' }}</small>
       </span>
+      <span class="profile-avatar">{{ username ? (username | slice:0:1) : 'B' }}</span>
       <fa-icon icon="chevron-down" class="profile-chevron" fxHide.lt-md></fa-icon>
     </button>
   </div>
@@ -35,16 +40,8 @@
     <span class="menu-avatar">{{ username ? (username | slice:0:1) : 'B' }}</span>
     <div><strong>{{ username || 'Bancro User' }}</strong><small>{{ officeName || 'Bancro' }}</small></div>
   </div>
-  <button mat-menu-item [routerLink]="['/profile']">
-    <mat-icon><fa-icon icon="user" size="sm"></fa-icon></mat-icon><span>Profile</span>
-  </button>
-  <button mat-menu-item [routerLink]="['/settings']">
-    <mat-icon><fa-icon icon="cog" size="sm"></fa-icon></mat-icon><span>Settings</span>
-  </button>
-  <button mat-menu-item (click)="help()">
-    <mat-icon><fa-icon icon="question-circle" size="sm"></fa-icon></mat-icon><span>Help</span>
-  </button>
-  <button mat-menu-item (click)="logout()" id="logout" class="sign-out-item">
-    <mat-icon><fa-icon icon="sign-out-alt" size="sm"></fa-icon></mat-icon><span>Sign Out</span>
-  </button>
+  <button mat-menu-item [routerLink]="['/profile']"><mat-icon><fa-icon icon="user" size="sm"></fa-icon></mat-icon><span>Profile</span></button>
+  <button mat-menu-item [routerLink]="['/settings']"><mat-icon><fa-icon icon="cog" size="sm"></fa-icon></mat-icon><span>Settings</span></button>
+  <button mat-menu-item (click)="help()"><mat-icon><fa-icon icon="question-circle" size="sm"></fa-icon></mat-icon><span>Help</span></button>
+  <button mat-menu-item (click)="logout()" id="logout" class="sign-out-item"><mat-icon><fa-icon icon="sign-out-alt" size="sm"></fa-icon></mat-icon><span>Sign Out</span></button>
 </mat-menu>

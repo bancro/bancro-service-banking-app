@@ -1,30 +1,14 @@
-<!-- <nav class="breadcrumb-wrapper">
-  <ul class="breadcrumb">
-    <span #breadcrumb class="breadcrumb-title">{{ breadcrumbs[breadcrumbs.length-1].label | translate }}</span>
-    <span *ngIf="breadcrumbs.length-1 !== 0" class="separator">
-      <li *ngFor="let breadcrumb of breadcrumbs; let last = last" class="breadcrumb-label">
-        <span *ngIf="!last" class="breadcrumb-link">
-          <a *ngIf="breadcrumb.url" [routerLink]="breadcrumb.url">{{ breadcrumb.label | translate }}</a>
-          <span *ngIf="!breadcrumb.url">{{ breadcrumb.label | translate }}</span>
-        </span>
+<nav class="breadcrumb-wrapper" aria-label="Breadcrumb">
+  <div class="breadcrumb">
+    <div class="breadcrumb-title">{{ breadcrumbs?.[breadcrumbs.length-1]?.label | translate }}</div>
+    <ol class="breadcrumb-trail" *ngIf="breadcrumbs?.length > 1">
+      <li *ngFor="let breadcrumb of breadcrumbs; let last = last" class="breadcrumb-label" [class.is-last]="last">
+        <a *ngIf="!last && breadcrumb.url" class="breadcrumb-link" [routerLink]="breadcrumb.url">{{ breadcrumb.label | translate }}</a>
+        <span *ngIf="!last && !breadcrumb.url" class="breadcrumb-link">{{ breadcrumb.label | translate }}</span>
         <span *ngIf="last">{{ breadcrumb.label | translate }}</span>
       </li>
-    </span>
-  </ul>
-</nav> -->
-<nav class="breadcrumb-wrapper">
-  <ul class="breadcrumb">
-    <div class="breadcrumb-title text-[#0E0F0C]">{{ breadcrumbs?.[breadcrumbs.length-1]?.label | translate }}</div>
-    <span *ngIf="breadcrumbs?.length-1 !== 0" class="">
-      <li *ngFor="let breadcrumb of breadcrumbs; let last = last" class="breadcrumb-label">
-        <span *ngIf="!last" class="breadcrumb-link">
-          <a *ngIf="breadcrumb.url" [routerLink]="breadcrumb.url">{{ breadcrumb?.label | translate }}</a>
-          <span *ngIf="!breadcrumb.url">{{ breadcrumb.label | translate }}</span>
-        </span>
-        <span *ngIf="last">{{ breadcrumb?.label | translate }}</span>
-      </li>
-    </span>
-  </ul>
+    </ol>
+  </div>
 </nav>
 
 
