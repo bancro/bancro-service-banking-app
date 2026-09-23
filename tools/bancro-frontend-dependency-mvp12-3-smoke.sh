@@ -1,8 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
-node <<'NODE'
-const p=require('../package.json');
-const l=require('../package-lock.json');
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+ROOT="$ROOT" node <<'NODE'
+const path = require('path');
+const root = process.env.ROOT;
+const p = require(path.join(root, 'package.json'));
+const l = require(path.join(root, 'package-lock.json'));
 function fail(m){console.error(m); process.exit(1)}
 if(p.dependencies?.['ng-apexcharts']) fail('ng-apexcharts must be removed from package.json');
 if(l.packages?.['node_modules/ng-apexcharts']) fail('ng-apexcharts must be removed from package-lock package graph');
