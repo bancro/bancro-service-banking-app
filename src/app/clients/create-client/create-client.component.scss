@@ -1,0 +1,15 @@
+:host {
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+
+.container {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+}
+
+:host ::ng-deep .mat-stepper-horizontal {
+  width: 100%;
+}

@@ -197,3 +197,80 @@ mifosx-shell {
     }
   }
 }
+
+/*
+ * Legacy Angular Material form/layout compatibility inside the authenticated shell.
+ * The Dore skin must never squeeze, crop or hide Fineract form controls.
+ */
+mifosx-shell {
+  .bancro-route-content > * {
+    min-width: 0;
+  }
+
+  .container {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  form,
+  [fxlayout],
+  [fxlayoutgap] {
+    min-width: 0;
+  }
+
+  .mat-form-field {
+    min-width: 0;
+    box-sizing: border-box;
+  }
+
+  .mat-form-field-wrapper,
+  .mat-form-field-flex,
+  .mat-form-field-infix,
+  .mat-select,
+  .mat-select-trigger {
+    min-width: 0;
+    box-sizing: border-box;
+  }
+
+  .mat-form-field-wrapper,
+  .mat-form-field-flex,
+  .mat-select,
+  .mat-select-trigger {
+    width: 100%;
+  }
+
+  /* Material defaults the infix to a fixed 180px; allow flex-layout forms to use their column width. */
+  .mat-form-field-infix {
+    width: auto;
+    max-width: 100%;
+  }
+
+  input.mat-input-element,
+  textarea.mat-input-element {
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .mat-horizontal-stepper-header-container {
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+
+  .mat-horizontal-content-container {
+    overflow: visible;
+    padding: 24px 28px 32px;
+  }
+
+  .mat-horizontal-stepper-content[aria-expanded='true'] {
+    overflow: visible;
+  }
+
+  @media (max-width: 767px) {
+    .mat-horizontal-content-container {
+      padding: 18px 14px 24px;
+    }
+  }
+}

@@ -17,16 +17,19 @@
     "start": "npm run env -s && ng serve --aot --proxy-config proxy.conf.js",
     "serve:dev": "npm run env -s && ng serve",
     "serve:sw": "npm run build -s && npx http-server ./dist -p 4200",
-    "lint": "ng lint && stylelint \"src/**/*.scss\" --syntax scss && htmlhint \"src\" --config .htmlhintrc",
+    "lint": "npm run lint:ts && npm run lint:styles && npm run lint:html",
     "test": "npm run env -s && ng test",
-    "test:ci": "npm run env -s && npm run lint -s && ng test --code-coverage --watch=false",
+    "test:ci": "npm run env -s && ng test --code-coverage --watch=false",
     "e2e": "ng e2e",
     "translations:extract": "ngx-translate-extract --input ./src --output ./src/translations/template.json --format=json --clean -sort --marker extract",
     "docs": "hads ./docs -o",
     "env": "node version.js",
     "postinstall": "node version.js && ngcc",
     "cypress:open": "cypress open",
-    "cypress:run": "cypress run"
+    "cypress:run": "cypress run",
+    "lint:ts": "tslint -p src/tsconfig.app.json -c tslint.json && tslint -p src/tsconfig.spec.json -c tslint.json && tslint -p cypress/tsconfig.json -c tslint.json && tslint -p e2e/cypress/tsconfig.json -c tslint.json",
+    "lint:styles": "stylelint \"src/**/*.scss\" --syntax scss",
+    "lint:html": "htmlhint \"src/**/*.html\" --config .htmlhintrc"
   },
   "dependencies": {
     "@angular-devkit/schematics": "^14.2.12",

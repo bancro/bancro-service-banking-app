@@ -1,10 +1,6 @@
 <div class="operations-page">
-  <div class="header-row operations-heading">
-    <div>
-      <span class="eyebrow">Bancro Administration</span>
-      <h2>{{ areaTitle }}</h2>
-      <p>{{ areaDescription }}</p>
-    </div>
+  <div class="header-row">
+    <div><h2>Bancro Administration & Operations</h2><p>Administrator configuration for payment rails, financial controls, teller access, POS/PTSA, certification, risk, reconciliation and production readiness.</p></div>
     <button mat-stroked-button color="primary" (click)="refresh()">Refresh</button>
   </div>
 
@@ -20,36 +16,13 @@
   </div>
 
   <mat-card class="section admin-area-nav">
-    <div class="area-nav-heading">
-      <div><h3>Administration Areas</h3><p>Choose an operational area. Technical integration settings stay separate from day-to-day channel administration.</p></div>
-      <a mat-button [routerLink]="['/operations']" *ngIf="activeArea !== 'overview'">All areas</a>
-    </div>
-    <div class="admin-area-grid">
-      <a class="admin-area-card" [class.active]="activeArea === 'overview'" [routerLink]="['/operations']">
-        <fa-icon icon="tachometer-alt"></fa-icon><span><strong>Overview</strong><small>Readiness and inventory</small></span>
-      </a>
-      <a class="admin-area-card" [class.active]="activeArea === 'teller'" [routerLink]="['/operations/teller']" *mifosxHasPermission="'READ_BANCRO_OPERATIONS'">
-        <fa-icon icon="money-bill-alt"></fa-icon><span><strong>Teller</strong><small>Access and controls</small></span>
-      </a>
-      <a class="admin-area-card" [class.active]="activeArea === 'transfers'" [routerLink]="['/operations/transfers']" *mifosxHasPermission="'READ_BANCRO_PAYMENT'">
-        <fa-icon icon="random"></fa-icon><span><strong>Transfers & NIBSS</strong><small>NIP and NPS</small></span>
-      </a>
-      <a class="admin-area-card" [class.active]="activeArea === 'cards'" [routerLink]="['/operations/cards']" *mifosxHasPermission="'READ_BANCRO_CARDS'">
-        <fa-icon icon="id-badge"></fa-icon><span><strong>Cards</strong><small>Products, processor and HSM</small></span>
-      </a>
-      <a class="admin-area-card" [class.active]="activeArea === 'pos'" [routerLink]="['/operations/pos']" *mifosxHasPermission="'READ_BANCRO_POS'">
-        <fa-icon icon="money-check"></fa-icon><span><strong>POS & Merchants</strong><small>Merchants, terminals and PTSA</small></span>
-      </a>
-      <a class="admin-area-card" [class.active]="activeArea === 'approvals'" [routerLink]="['/operations/approvals']" *mifosxHasPermission="'READ_BANCRO_OPERATIONS'">
-        <fa-icon icon="tasks"></fa-icon><span><strong>Approvals & Controls</strong><small>Maker-checker and limits</small></span>
-      </a>
-      <a class="admin-area-card" [class.active]="activeArea === 'integrations'" [routerLink]="['/operations/integrations']" *mifosxHasPermission="'READ_BANCRO_OPERATIONS'">
-        <fa-icon icon="cogs"></fa-icon><span><strong>Integrations</strong><small>Connection and activation</small></span>
-      </a>
+    <h3>Administration Areas</h3>
+    <div class="admin-nav-links">
+      <a href="#integration-config">Integration & activation</a> · <a href="#teller-readiness">Teller readiness</a> · <a href="#financial-controls">Financial controls</a> · <a href="#risk-operations">Risk & operations</a> · <a href="#pos-admin">POS</a> · <a href="#cards-admin">Cards/HSM</a> · <a href="#webhooks-admin">Webhooks</a>
     </div>
   </mat-card>
 
-  <mat-card class="section" [hidden]="!showArea('overview','integrations')">
+  <mat-card class="section">
     <h3>Production Readiness</h3>
     <div class="readiness-grid">
       <div>NIBSS live adapter <b>{{ readiness?.nibssLiveReady ? 'READY' : (readiness?.nibssLiveConfigured ? 'Configured but incomplete' : 'Safe-off') }}</b></div>
@@ -61,7 +34,7 @@
     </div>
   </mat-card>
 
-  <div class="two-col" id="integration-config" [hidden]="!showArea('integrations')" *mifosxHasPermission="'READ_BANCRO_OPERATIONS'">
+  <div class="two-col" id="integration-config" *mifosxHasPermission="'READ_BANCRO_OPERATIONS'">
     <mat-card class="section">
       <h3>Integration Configuration</h3>
       <p>Manage non-secret NIP, NPS, POS, Cards, HSM and webhook connection settings here. Credentials, private keys and key material remain in the deployment secret store/HSM.</p>
@@ -100,7 +73,7 @@
     </mat-card>
   </div>
 
-  <mat-card class="section" id="teller-readiness" [hidden]="!showArea('teller')" *mifosxHasPermission="'READ_BANCRO_OPERATIONS'">
+  <mat-card class="section" id="teller-readiness" *mifosxHasPermission="'READ_BANCRO_OPERATIONS'">
     <h3>Teller Login & Access Readiness</h3>
     <p>Each teller signs in through the normal Bancro login with an individual username/password. Bancro then resolves <b>User → Staff → Active Cashier Assignment → Teller/Branch</b>. No shared cashier password is used. Teller-only users are routed directly to Teller Workstation after authentication.</p>
     <p><a mat-stroked-button color="primary" [routerLink]="['/appusers']">Manage Users</a> <a mat-stroked-button [routerLink]="['/organization/tellers']">Manage Tellers / Cashiers</a></p>
@@ -117,9 +90,8 @@
     <p><small>Recommended roles: <b>Bancro Teller</b> for operators and <b>Bancro Teller Supervisor</b> for checkers. Maker/checker users must remain separate. Passwords, MFA secrets and credentials are never displayed here.</small></p>
   </mat-card>
 
-  <mat-card class="section" [hidden]="!showArea('transfers')" *mifosxHasPermission="'READ_BANCRO_PAYMENT'">
-    <!-- Compatibility milestone label: MVP8 NIBSS / NIP Production Certification -->
-    <h3>NIBSS / NIP Integration & Certification</h3>
+  <mat-card class="section" *mifosxHasPermission="'READ_BANCRO_PAYMENT'">
+    <h3>MVP8 NIBSS / NIP Production Certification</h3>
     <p>The live boundary uses a bank-certified HTTPS gateway. Bancro sends a canonical contract; official NIBSS wire translation and credentials stay in the certified integration boundary.</p>
     <div class="readiness-grid">
       <div>Mode <b>{{ nibssStatus?.mode || '—' }}</b></div>
@@ -151,9 +123,8 @@
     </div>
   </mat-card>
 
-  <mat-card class="section" [hidden]="!showArea('transfers')" *mifosxHasPermission="'READ_BANCRO_PAYMENT'">
-    <!-- Compatibility milestone label: MVP9 NPS / ISO 20022 Integration & Certification -->
-    <h3>NPS / ISO 20022 Integration & Certification</h3>
+  <mat-card class="section" *mifosxHasPermission="'READ_BANCRO_PAYMENT'">
+    <h3>MVP9 NPS / ISO 20022 Integration & Certification</h3>
     <p>NPS is a separate payment rail. Bancro generates a standards-aligned pacs.008 credit-transfer message and keeps status, return and cancellation behind the certified gateway boundary. Production remains safe-off until the bank installs the official NPS implementation profile/XSDs, endpoints, certificates, credentials, participant directory and real certification evidence.</p>
     <div class="readiness-grid">
       <div>Mode <b>{{ npsStatus?.mode || '—' }}</b></div>
@@ -191,9 +162,8 @@
     </div>
   </mat-card>
 
-  <mat-card class="section" id="financial-controls" [hidden]="!showArea('teller','approvals')" *mifosxHasPermission="'READ_BANCRO_FINANCIAL_CONTROLS'">
-    <!-- Compatibility milestone label: MVP7 Financial Controls -->
-    <h3>Financial Controls</h3>
+  <mat-card class="section" *mifosxHasPermission="'READ_BANCRO_FINANCIAL_CONTROLS'">
+    <h3>MVP7 Financial Controls</h3>
     <p>Institution/branch/teller limits, accounting maker-checker, balanced Fineract fee journals, teller variance approvals and branch business-day closure.</p>
     <div class="two-col">
       <div>
@@ -227,7 +197,7 @@
     </div>
   </mat-card>
 
-  <div class="two-col" [hidden]="!showArea('approvals')" *mifosxHasPermission="'READ_BANCRO_FINANCIAL_CONTROLS'">
+  <div class="two-col" *mifosxHasPermission="'READ_BANCRO_FINANCIAL_CONTROLS'">
     <mat-card class="section">
       <h3>Accounting Mapping Maker / Checker</h3>
       <div class="quote-result" *ngFor="let a of accounting | slice:0:8">
@@ -267,7 +237,7 @@
     </mat-card>
   </div>
 
-  <mat-card class="section" [hidden]="!showArea('teller','approvals')" *mifosxHasPermission="'READ_BANCRO_FINANCIAL_CONTROLS'">
+  <mat-card class="section" *mifosxHasPermission="'READ_BANCRO_FINANCIAL_CONTROLS'">
     <h3>Teller Variance Supervisor Overrides</h3>
     <div class="two-col">
       <form [formGroup]="varianceOverrideForm" (ngSubmit)="requestVarianceOverride()" class="form-grid">
@@ -281,7 +251,7 @@
   </mat-card>
 
 
-  <div class="two-col" [hidden]="!showArea('approvals')">
+  <div class="two-col">
     <mat-card class="section">
       <h3>Payment Quote</h3>
       <form [formGroup]="quoteForm" (ngSubmit)="quote()" class="form-grid">
@@ -315,7 +285,7 @@
     </mat-card>
   </div>
 
-  <mat-card class="section" [hidden]="!showArea('approvals')">
+  <mat-card class="section">
     <h3>Maker / Checker Queue</h3>
     <table class="simple-table"><tr><th>Reference</th><th>Rail</th><th>Amount</th><th>Beneficiary</th><th>Requested</th><th>Actions</th></tr>
       <tr *ngFor="let a of approvals"><td>{{ a.transaction_reference }}</td><td>{{ a.rail }}</td><td>{{ a.amount | number:'1.2-2' }}</td><td>{{ a.destination_name || a.destination_account }}</td><td>{{ a.requested_at | date:'short' }}</td><td><button mat-button color="primary" (click)="approve(a)">Approve</button><button mat-button color="warn" (click)="reject(a)">Reject</button></td></tr>
@@ -323,14 +293,13 @@
     </table>
   </mat-card>
 
-  <div class="two-col" [hidden]="!showArea('approvals')">
+  <div class="two-col">
     <mat-card class="section"><div class="header-row"><h3 id="risk-operations">Operational Alerts</h3><button mat-stroked-button (click)="exportCsv('operational-alerts', alerts)">Export CSV</button></div><div class="list-row" *ngFor="let a of alerts"><div><b>{{ a.severity }} · {{ a.alert_type }} · {{ a.status }}</b><br>{{ a.message }}<br><small>{{ a.created_at | date:'short' }}</small></div><span><button mat-button (click)="updateAlert(a,'ACKNOWLEDGED')">Acknowledge</button><button mat-button (click)="updateAlert(a,'INVESTIGATING')">Investigate</button><button mat-button color="primary" (click)="updateAlert(a,'RESOLVED')">Resolve</button></span></div><p *ngIf="!alerts.length">No active alerts.</p></mat-card>
     <mat-card class="section"><h3>Dispute Case Management</h3><form [formGroup]="disputeForm" (ngSubmit)="createDispute()" class="form-grid"><mat-form-field><mat-label>Transaction reference</mat-label><input matInput formControlName="transactionReference"></mat-form-field><mat-form-field><mat-label>Reason</mat-label><input matInput formControlName="reason"></mat-form-field><mat-form-field class="wide"><mat-label>Description</mat-label><textarea matInput formControlName="description"></textarea></mat-form-field><button mat-raised-button color="primary">Create Case</button></form><div class="header-row"><h4>Cases</h4><button mat-stroked-button (click)="exportCsv('disputes', disputes)">Export CSV</button></div><div class="list-row" *ngFor="let d of disputes | slice:0:25"><div><b>{{ d.case_reference }} · {{ d.status }}</b><br>{{ d.transaction_reference || 'No transaction reference' }} · {{ d.reason }}<br><small>SLA {{ d.sla_due_at | date:'short' }}</small></div><span><button mat-button (click)="updateDisputeStatus(d,'INVESTIGATING')">Investigate</button><button mat-button (click)="updateDisputeStatus(d,'PENDING_PROVIDER')">Provider</button><button mat-button color="primary" (click)="updateDisputeStatus(d,'RESOLVED')">Resolve</button><button mat-button color="warn" (click)="updateDisputeStatus(d,'REJECTED')">Reject</button></span></div></mat-card>
   </div>
 
-  <mat-card class="section" id="pos-admin" [hidden]="!showArea('pos')" *mifosxHasPermission="'READ_BANCRO_POS'">
-    <!-- Compatibility milestone label: MVP10 POS / PTSA / ISO 8583 Administration -->
-    <h3>POS / PTSA / ISO 8583 Administration</h3>
+  <mat-card class="section" *mifosxHasPermission="'READ_BANCRO_POS'">
+    <h3>MVP10 POS / PTSA / ISO 8583 Administration</h3>
     <p>Operational POS configuration is managed here. Live credentials, private keys, HSM keys, PIN/MAC keys and client certificates remain in the deployment secret/HSM boundary and are intentionally not editable in the browser.</p>
     <div class="readiness-grid">
       <div>Mode <b>{{ posStatus?.mode || '—' }}</b></div><div>Provider <b>{{ posStatus?.enabled ? 'ENABLED' : 'SAFE-OFF' }}</b></div>
@@ -355,7 +324,7 @@
     </div>
   </mat-card>
 
-  <div class="two-col" [hidden]="!showArea('pos')">
+  <div class="two-col">
     <mat-card class="section" *mifosxHasPermission="'READ_BANCRO_POS'">
       <h3>Merchant / Terminal / PTSA Configuration</h3>
       <form [formGroup]="merchantForm" (ngSubmit)="createMerchant()" class="form-grid">
@@ -392,7 +361,7 @@
     </mat-card>
 
     <mat-card class="section" *mifosxHasPermission="'READ_BANCRO_POS'">
-      <h3>POS Transaction Test Console</h3>
+      <h3>POS UAT / Transaction Control</h3>
       <form [formGroup]="posForm" (ngSubmit)="processPos()" class="form-grid">
         <mat-form-field><mat-label>Terminal ID</mat-label><input matInput formControlName="terminalId"></mat-form-field>
         <mat-form-field><mat-label>Amount</mat-label><input matInput type="number" formControlName="amount"></mat-form-field>
@@ -416,7 +385,7 @@
     </mat-card>
   </div>
 
-  <mat-card class="section" [hidden]="!showArea('pos')" *mifosxHasPermission="'READ_BANCRO_POS'">
+  <mat-card class="section" *mifosxHasPermission="'READ_BANCRO_POS'">
     <h3>POS Settlement / Reconciliation Preparation</h3>
     <form [formGroup]="posSettlementForm" class="form-grid">
       <mat-form-field><mat-label>Business date</mat-label><input matInput type="date" formControlName="businessDate"></mat-form-field>
@@ -428,7 +397,7 @@
     <div class="list-row" *ngFor="let b of posSettlementBatches | slice:0:10"><div><b>{{ b.batch_reference }}</b><br>{{ b.business_date }} · {{ b.transaction_count }} transaction(s) · net {{ b.net_amount | number:'1.2-2' }}</div><span>{{ b.status }}</span></div>
   </mat-card>
 
-  <div class="two-col" [hidden]="!showArea('approvals')">
+  <div class="two-col">
     <mat-card class="section">
       <h3>Fraud / Risk Rules</h3>
       <form [formGroup]="fraudForm" (ngSubmit)="saveFraudRule()" class="form-grid">
@@ -450,9 +419,8 @@
     </mat-card>
   </div>
 
-  <mat-card class="section" id="cards-admin" [hidden]="!showArea('cards')" *mifosxHasPermission="'READ_BANCRO_CARDS'">
-    <!-- Compatibility milestone label: MVP11 Card Processor / Scheme / HSM Administration -->
-    <h3>Card Processor / Scheme / HSM Administration</h3>
+  <mat-card class="section" *mifosxHasPermission="'READ_BANCRO_CARDS'">
+    <h3>MVP11 Card Processor / Scheme / HSM Administration</h3>
     <p>Configure issuer card products and certified processor/HSM boundaries here. Full PAN, CVV/CVC, PIN/PIN blocks, clear keys and private keys are never accepted or stored by Bancro.</p>
     <div class="status-grid">
       <div>Live processor <b>{{ cardProgramStatus?.liveEnabled ? 'ENABLED' : 'SAFE OFF' }}</b></div>
@@ -465,7 +433,7 @@
     <p><small>PCI baseline: {{ cardProgramStatus?.pciDssBaseline || 'PCI_DSS_4_0_1' }} · cryptography remains inside the certified processor / PCI-approved HSM boundary.</small></p>
   </mat-card>
 
-  <div class="two-col" [hidden]="!showArea('cards')" *mifosxHasPermission="'READ_BANCRO_CARDS'">
+  <div class="two-col" *mifosxHasPermission="'READ_BANCRO_CARDS'">
     <mat-card class="section">
       <h3>Card Processor Profile</h3>
       <form [formGroup]="cardProcessorProfileForm" (ngSubmit)="saveCardProcessorProfile()" class="form-grid">
@@ -505,7 +473,7 @@
     </mat-card>
   </div>
 
-  <div class="two-col" [hidden]="!showArea('cards')" *mifosxHasPermission="'READ_BANCRO_CARDS'">
+  <div class="two-col" *mifosxHasPermission="'READ_BANCRO_CARDS'">
     <mat-card class="section">
       <h3>Card Products</h3>
       <form [formGroup]="cardProductForm" (ngSubmit)="saveCardProduct()" class="form-grid">
@@ -544,7 +512,7 @@
     </mat-card>
   </div>
 
-  <div class="two-col" [hidden]="!showArea('cards')" *mifosxHasPermission="'READ_BANCRO_CARDS'">
+  <div class="two-col" *mifosxHasPermission="'READ_BANCRO_CARDS'">
     <mat-card class="section">
       <h3>Card / Processor / HSM Certification</h3>
       <div class="status-grid"><div>Passed <b>{{ cardCertification?.passed || 0 }}</b></div><div>Pending <b>{{ cardCertification?.pending || 0 }}</b></div><div>Failed <b>{{ cardCertification?.failed || 0 }}</b></div></div>
@@ -569,7 +537,7 @@
     </mat-card>
   </div>
 
-  <mat-card class="section" [hidden]="!showArea('cards')" *mifosxHasPermission="'READ_BANCRO_CARDS'">
+  <mat-card class="section" *mifosxHasPermission="'READ_BANCRO_CARDS'">
     <h3>Card Processor / Scheme Reconciliation</h3>
     <form [formGroup]="cardReconciliationForm" class="form-grid">
       <mat-form-field><mat-label>Business date</mat-label><input matInput type="date" formControlName="businessDate"></mat-form-field>
@@ -592,14 +560,14 @@
     <p><small>This is processor/scheme reconciliation evidence only. It does not create a parallel ledger or post accounting entries; the existing Fineract ledger remains authoritative.</small></p>
   </mat-card>
 
-  <mat-card class="section" [hidden]="!showArea('cards')" *mifosxHasPermission="'READ_BANCRO_CARDS'">
+  <mat-card class="section" *mifosxHasPermission="'READ_BANCRO_CARDS'">
     <h3>Card Processor Exchange Audit</h3>
     <div class="list-row" *ngFor="let x of cardProcessorExchanges | slice:0:12"><div><b>{{ x.operation }} · {{ x.outcome }}</b><br>{{ x.processor_code }} · request {{ x.request_id || '—' }} · card {{ x.card_id || '—' }}</div><span>{{ x.provider_reference || 'No provider reference' }}</span></div>
     <p><small>Only operational metadata and SHA-256 request/response hashes are retained. Raw processor responses and sensitive card data are not stored.</small></p>
   </mat-card>
 
-  <div class="two-col" id="webhooks-admin" [hidden]="!showArea('integrations','cards')">
-    <mat-card class="section" [hidden]="!showArea('integrations')">
+  <div class="two-col">
+    <mat-card class="section">
       <h3>Webhook Delivery History & Replay</h3>
       <form [formGroup]="webhookForm" (ngSubmit)="createWebhook()" class="form-grid">
         <mat-form-field><mat-label>Name</mat-label><input matInput formControlName="name"></mat-form-field>
@@ -613,9 +581,8 @@
       <h4>Outbox</h4><div class="list-row" *ngFor="let e of outbox | slice:0:20"><div><b>{{ e.event_type }} · {{ e.status }}</b><br>{{ e.aggregate_type }} / {{ e.aggregate_id }}<br><small>{{ e.last_error || 'No error' }}</small></div><button mat-button *ngIf="e.status !== 'PUBLISHED'" (click)="replayOutbox(e)">Replay</button></div>
     </mat-card>
 
-    <mat-card class="section" [hidden]="!showArea('cards')">
-      <!-- Compatibility label: Legacy Card Simulator (UAT only) -->
-      <h3>Card Testing Console</h3>
+    <mat-card class="section">
+      <h3>Legacy Card Simulator (UAT only)</h3>
       <form [formGroup]="cardForm" (ngSubmit)="createCard()" class="form-grid">
         <mat-form-field><mat-label>Customer</mat-label><mat-select formControlName="customerId"><mat-option value="">None</mat-option><mat-option *ngFor="let c of clientOptions" [value]="c.id">{{ c.display_name }} · {{ c.account_no }}</mat-option></mat-select></mat-form-field>
         <mat-form-field><mat-label>Savings Account</mat-label><mat-select formControlName="accountId"><mat-option value="">None</mat-option><mat-option *ngFor="let a of savingsAccountOptions" [value]="a.id">{{ a.client_name }} · {{ a.account_no }}</mat-option></mat-select></mat-form-field>
@@ -630,5 +597,5 @@
     </mat-card>
   </div>
 
-  <mat-card class="section" [hidden]="!showArea('overview')"><h3>Platform Inventory / Integration Boundary</h3><p>{{ merchants.length }} merchant(s) · {{ terminals.length }} POS terminal(s) · {{ summary?.activeCards || 0 }} active card(s) · {{ webhooks.length }} webhook subscription(s) · {{ posTransactions.length }} POS UAT transaction(s).</p><p>Live card issuance/lifecycle is controlled by MVP11 maker-checker and the certified processor/HSM boundary. Legacy direct card controls remain simulator-only. Bancro stores only tokenized/masked card metadata.</p></mat-card>
+  <mat-card class="section"><h3>Platform Inventory / Integration Boundary</h3><p>{{ merchants.length }} merchant(s) · {{ terminals.length }} POS terminal(s) · {{ summary?.activeCards || 0 }} active card(s) · {{ webhooks.length }} webhook subscription(s) · {{ posTransactions.length }} POS UAT transaction(s).</p><p>Live card issuance/lifecycle is controlled by MVP11 maker-checker and the certified processor/HSM boundary. Legacy direct card controls remain simulator-only. Bancro stores only tokenized/masked card metadata.</p></mat-card>
 </div>

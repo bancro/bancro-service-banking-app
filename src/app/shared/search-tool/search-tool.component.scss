@@ -1,43 +1,41 @@
 .search-bar {
-  width: 100%;
-
   .search {
-    position: relative;
     display: flex;
     align-items: center;
-    width: 100%;
-    max-width: 230px;
-    height: 40px;
-    box-sizing: border-box;
-    padding: 0 76px 0 16px;
-    border: 0;
-    border-radius: 20px;
-    background: #f8f8f8;
-    color: #3a3a3a;
-    font-family: 'Bancro Dore Nunito', 'Nunito', Arial, sans-serif;
-    font-size: .8rem;
+    width: min(390px, 34vw);
+    min-width: 230px;
+    height: 42px;
+    font-size: 13px;
+    border-radius: 22px;
+    position: relative;
+    padding: 0 86px 0 16px;
+    background: #f5f7f5;
+    border: 1px solid #eef1ee;
+    transition: background 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+
+    &:focus-within {
+      background: #fff;
+      border-color: #b9c9be;
+      box-shadow: 0 0 0 3px rgba(77, 117, 95, 0.08);
+    }
 
     input {
-      width: 100%;
-      min-width: 0;
       border: 0;
       background: transparent;
-      color: #3a3a3a;
       outline: none;
-      font-size: .8rem;
-      line-height: 2;
+      width: 100%;
+      color: #25362e;
+      font-size: 13px;
     }
 
     .search-select {
+      width: 78px;
       position: absolute;
-      right: 10px;
-      width: 62px;
-      color: #8f8f8f;
-      font-size: .72rem;
+      right: 7px;
+      color: #59675f;
+      font-size: 12px;
     }
   }
-
-  .resource { max-width: 90px; width: 100%; font-size: .8rem; }
 }
 
 .search-icon {
@@ -46,9 +44,17 @@
   align-items: center;
 }
 
-:host ::ng-deep .search .mat-select-arrow { color: #8f8f8f; }
-:host ::ng-deep .search .mat-select-value { color: #6d6d6d; }
+.mat-form-field.mat-form-field {
+  font-size: 14px;
+  color: #666;
+}
 
-@media (max-width: 1199px) {
-  .search-bar .search { max-width: 190px; }
+.mat-form-field-appearance-standard .mat-form-field-flex {
+  padding-top: 0;
+}
+
+@media (max-width: 1024px) {
+  .search-bar .search {
+    width: min(320px, 34vw);
+  }
 }

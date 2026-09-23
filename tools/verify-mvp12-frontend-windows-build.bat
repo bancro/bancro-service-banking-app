@@ -3,12 +3,12 @@ setlocal enabledelayedexpansion
 cd /d "%~dp0\.."
 
 echo ============================================================
-echo Bancro MVP12.3 Frontend Dependency and Production Build Check
+echo Bancro MVP12.10 Frontend Dependency and Production Build Check
 echo ============================================================
 where node >nul 2>&1 || (echo ERROR: node.exe was not found on PATH.& exit /b 1)
 where npm >nul 2>&1 || (echo ERROR: npm.cmd was not found on PATH.& exit /b 1)
 
-node -e "const v=process.versions.node; const m=+v.split('.')[0]; console.log('Node '+v); if(m!==16){console.error('ERROR: Bancro is Angular 14.3. Use Node 16.x (recommended 16.20.2) for this build.'); process.exit(2)}"
+node -e "const v=process.versions.node; const m=+v.split('.')[0]; console.log('Node '+v); if(![24,26].includes(m)){console.error('ERROR: Bancro repository policy requires Node 24.x or 26.x.'); process.exit(2)}"
 if errorlevel 1 exit /b %errorlevel%
 
 call npm --version

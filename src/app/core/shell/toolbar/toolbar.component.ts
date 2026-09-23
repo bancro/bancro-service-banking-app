@@ -30,9 +30,9 @@ export class ToolbarComponent implements OnInit {
 
   /** Sets the initial state of sidenav as collapsed. Not collapsed if false. */
   sidenavCollapsed = false;
-  /** Current user summary displayed in the Dore toolbar. */
-  username = '';
+  username = 'User';
   officeName = '';
+
   applications = [
     // {
     //   url: `http://3.16.1.81:777`,
@@ -81,8 +81,9 @@ export class ToolbarComponent implements OnInit {
    */
   ngOnInit() {
     const credentials = this.authenticationService.getCredentials();
-    this.username = credentials?.username || '';
+    this.username = credentials?.staffDisplayName || credentials?.username || 'User';
     this.officeName = credentials?.officeName || '';
+
     this.isHandset$.subscribe(isHandset => {
       if (isHandset && this.sidenavCollapsed) {
         this.toggleSidenavCollapse(false);

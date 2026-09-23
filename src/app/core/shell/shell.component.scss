@@ -1,73 +1,59 @@
 #mifosx-shell-container {
-  width: 100%;
+  --bancro-sidebar-width: 268px;
+  --bancro-sidebar-compact-width: 88px;
   max-width: 100%;
   height: 100vh;
-  overflow: hidden;
-  background: #f8f8f8;
-}
+  background: #f7f8f6;
 
-.dore-route-progress {
-  position: fixed;
-  top: 98px;
-  left: 0;
-  right: 0;
-  z-index: 1002;
-  height: 2px;
-}
-
-.dore-shell-body {
-  position: fixed;
-  inset: 100px 0 0;
-  width: 100%;
-  height: calc(100vh - 100px);
-  background: #f8f8f8;
-}
-
-.sidebar-panel {
-  min-height: 100%;
-  overflow: hidden;
-  border: 0;
-  background: transparent;
-  box-shadow: none;
-  transition: width 300ms ease;
-}
-
-/* Dore reference: 120px main menu + 230px sub-menu. */
-.sidebar-full { width: 350px; }
-.sidebar-compact { width: 120px; }
-
-.dore-page-canvas {
-  min-width: 0;
-  background: #f8f8f8;
-}
-
-@media (max-width: 1439px) {
-  .dore-route-progress { top: 88px; }
-  .dore-shell-body {
-    inset: 90px 0 0;
-    height: calc(100vh - 90px);
+  .sidebar-panel {
+    min-height: 100vh;
+    overflow: hidden;
+    border-right: 0;
+    background: #fff;
+    box-shadow: 0 1px 15px rgba(31, 52, 42, 0.05), 0 1px 6px rgba(31, 52, 42, 0.04);
   }
-  .sidebar-full { width: 340px; }
-  .sidebar-compact { width: 110px; }
-}
 
-@media (max-width: 1199px) {
-  .dore-route-progress { top: 78px; }
-  .dore-shell-body {
-    inset: 80px 0 0;
-    height: calc(100vh - 80px);
+  .sidebar-full {
+    width: var(--bancro-sidebar-width);
   }
-  .sidebar-full { width: 330px; }
-  .sidebar-compact { width: 100px; }
-}
 
-@media (max-width: 767px) {
-  .dore-route-progress { top: 68px; }
-  .dore-shell-body {
-    inset: 70px 0 0;
-    height: calc(100vh - 70px);
+  .sidebar-compact {
+    width: var(--bancro-sidebar-compact-width);
   }
-  .sidebar-panel,
-  .sidebar-full,
-  .sidebar-compact { width: 320px; }
+
+  .bancro-shell-content {
+    background:
+      radial-gradient(circle at 100% 0%, rgba(159, 232, 112, 0.12), transparent 28rem),
+      #f7f8f6;
+  }
+
+  .bancro-progress {
+    position: sticky;
+    top: 78px;
+    z-index: 15;
+    height: 2px;
+  }
+
+  .bancro-page-stage {
+    min-height: calc(100vh - 80px);
+    padding: 0 26px 34px;
+  }
+
+  .bancro-route-content {
+    width: 100%;
+    max-width: 1540px;
+    margin: 0 auto;
+  }
+
+  @media (max-width: 1199px) {
+    .bancro-page-stage {
+      padding: 0 18px 28px;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .bancro-page-stage {
+      padding: 0 10px 24px;
+    }
+  }
 }

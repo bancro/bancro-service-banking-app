@@ -1,12 +1,9 @@
-:host {
-  display: block;
-  min-height: calc(100vh - 230px);
-}
-
 mifosx-content {
   min-height: 100%;
   height: auto !important;
-  margin: 0;
+  height: 100%;
+  margin: 0 auto -30px;
 }
-
-#push { height: 34px; }
+#push {
+  height: 30px;
+}

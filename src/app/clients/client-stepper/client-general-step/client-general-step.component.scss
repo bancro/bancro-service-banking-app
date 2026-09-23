@@ -5,3 +5,22 @@
 .margin-t {
   margin-top: 2em;
 }
+
+:host,
+form {
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+
+mat-form-field {
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+@media (max-width: 959px) {
+  mat-form-field,
+  mat-checkbox {
+    width: 100%;
+  }
+}

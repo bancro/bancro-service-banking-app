@@ -1,26 +1,33 @@
-<!-- Dore-authenticated application shell. Login/pre-authentication routes remain outside this shell. -->
-<div id="mifosx-shell-container" class="dore-authenticated-shell">
-  <mifosx-toolbar [sidenav]="sidenav" (collapse)="toggleCollapse($event)"></mifosx-toolbar>
-  <mat-progress-bar class="dore-route-progress" [mode]="progressBarMode"></mat-progress-bar>
+<!-- Bancro application shell. Login stays outside this shell and keeps its existing design. -->
+<mat-sidenav-container id="mifosx-shell-container" class="bancro-internal-shell" autosize>
 
-  <mat-sidenav-container class="dore-shell-body" autosize>
-    <mat-sidenav
-      #sidenav
-      class="sidebar-panel"
-      [ngClass]="{
-        'sidebar-full': !sidenavCollapsed,
-        'sidebar-compact': sidenavCollapsed
-      }"
-      [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
-      [mode]="(isHandset$ | async) ? 'over' : 'side'"
-      [opened]="!(isHandset$ | async)">
-      <mifosx-sidenav [sidenavCollapsed]="sidenavCollapsed"></mifosx-sidenav>
-    </mat-sidenav>
+  <mat-sidenav
+    #sidenav
+    class="sidebar-panel"
+    [ngClass]="{
+      'sidebar-full': !sidenavCollapsed,
+      'sidebar-compact': sidenavCollapsed
+    }"
+    [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
+    [mode]="(isHandset$ | async) ? 'over' : 'side'"
+    [opened]="!(isHandset$ | async)">
 
-    <mat-sidenav-content class="dore-page-canvas">
+    <mifosx-sidenav [sidenavCollapsed]="sidenavCollapsed"></mifosx-sidenav>
+
+  </mat-sidenav>
+
+  <mat-sidenav-content class="bancro-shell-content">
+    <mifosx-toolbar [sidenav]="sidenav" (collapse)="toggleCollapse($event)"></mifosx-toolbar>
+    <mat-progress-bar class="bancro-progress" [mode]="progressBarMode"></mat-progress-bar>
+
+    <main class="bancro-page-stage">
       <mifosx-breadcrumb></mifosx-breadcrumb>
-      <mifosx-content></mifosx-content>
-      <mifosx-footer></mifosx-footer>
-    </mat-sidenav-content>
-  </mat-sidenav-container>
-</div>
+      <section class="bancro-route-content">
+        <mifosx-content></mifosx-content>
+      </section>
+    </main>
+
+    <mifosx-footer></mifosx-footer>
+  </mat-sidenav-content>
+
+</mat-sidenav-container>
