@@ -1,27 +1,11 @@
-<mat-toolbar fxLayout="row" id="mifosx-toolbar" class="bancro-toolbar">
+<mat-toolbar id="mifosx-toolbar" class="dore-toolbar">
   <div class="toolbar-left">
-    <button
-      mat-icon-button
-      class="mobile-menu-button"
-      (click)="toggleSidenav()"
-      matTooltip="Open navigation"
-      fxHide.gt-sm="true">
+    <button mat-icon-button class="menu-button" *ngIf="(isHandset$ | async)" (click)="toggleSidenav()" aria-label="Open navigation">
       <fa-icon icon="bars"></fa-icon>
     </button>
 
-    <button
-      mat-icon-button
-      *ngIf="sidenav.opened"
-      (click)="toggleSidenavCollapse()"
-      matTooltip="Collapse navigation"
-      fxHide.lt-md="true"
-      class="toggler">
-      <svg xmlns="http://www.w3.org/2000/svg" *ngIf="!sidenavCollapsed" width="22" height="22" viewBox="0 0 24 24" fill="none">
-        <path d="M18 17L13 12L18 7M11 17L6 12L11 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-      </svg>
-      <svg xmlns="http://www.w3.org/2000/svg" *ngIf="sidenavCollapsed" width="22" height="22" viewBox="0 0 24 24" fill="none">
-        <path d="M6 7L11 12L6 17M13 7L18 12L13 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-      </svg>
+    <button mat-icon-button class="menu-button" *ngIf="!(isHandset$ | async)" (click)="toggleSidenavCollapse()" [matTooltip]="sidenavCollapsed ? 'Expand navigation' : 'Collapse navigation'" aria-label="Toggle navigation width">
+      <fa-icon [icon]="sidenavCollapsed ? 'chevron-right' : 'chevron-left'"></fa-icon>
     </button>
 
     <div class="toolbar-search">
@@ -29,95 +13,38 @@
     </div>
   </div>
 
-  <span fxFlex="auto"></span>
+  <span class="toolbar-spacer"></span>
 
   <div class="toolbar-actions">
-    <mifosx-language-selector class="language" fxHide.lt-lg></mifosx-language-selector>
+    <mifosx-language-selector class="language" fxHide.lt-md></mifosx-language-selector>
     <mifosx-notifications-tray fxHide.lt-md></mifosx-notifications-tray>
 
-    <button
-      [matMenuTriggerFor]="applicationMenu"
-      class="user-menu-trigger"
-      matTooltip="Account and sign out">
-      <span class="user-copy" fxHide.lt-md>
-        <strong>{{ username }}</strong>
-        <small>{{ officeName }}</small>
+    <button class="profile-trigger" [matMenuTriggerFor]="applicationMenu" aria-label="Open user menu">
+      <span class="profile-avatar">{{ username ? (username | slice:0:1) : 'B' }}</span>
+      <span class="profile-copy" fxHide.lt-md>
+        <strong>{{ username || 'Bancro User' }}</strong>
+        <small>{{ officeName || 'Bancro' }}</small>
       </span>
-      <img src="assets/images/avax.svg" alt="User" class="user-avatar">
-      <fa-icon icon="chevron-down" size="xs" class="user-chevron" fxHide.lt-sm></fa-icon>
+      <fa-icon icon="chevron-down" class="profile-chevron" fxHide.lt-md></fa-icon>
     </button>
   </div>
 </mat-toolbar>
 
-<mat-menu #institutionMenu="matMenu" [overlapTrigger]="false">
-  <button mat-menu-item routerLink="/clients">Clients</button>
-  <button mat-menu-item routerLink="/groups">Groups</button>
-  <button mat-menu-item routerLink="/centers">Centers</button>
-  <span fxHide.lg>
-    <button mat-menu-item [routerLink]="['/accounting']">Accounting</button>
-    <button mat-menu-item [matMenuTriggerFor]="reportsMenu">Reports</button>
-    <button mat-menu-item [matMenuTriggerFor]="adminMenu">Admin</button>
-    <button mat-menu-item [matMenuTriggerFor]="selfServiceMenu">Self Service</button>
-  </span>
-</mat-menu>
-
-<mat-menu #reportsMenu="matMenu" [overlapTrigger]="false">
-  <button mat-menu-item [routerLink]="['/reports']">All</button>
-  <button mat-menu-item [routerLink]="['/reports', 'Client']">Clients</button>
-  <button mat-menu-item [routerLink]="['/reports', 'Loan']">Loans</button>
-  <button mat-menu-item [routerLink]="['/reports', 'Savings']">Savings</button>
-  <button mat-menu-item [routerLink]="['/reports', 'Fund']">Funds</button>
-  <button mat-menu-item [routerLink]="['/reports', 'Accounting']">Accounting</button>
-  <button mat-menu-item [routerLink]="['/xbrl']">XBRL</button>
-</mat-menu>
-
-<mat-menu #adminMenu="matMenu" [overlapTrigger]="false">
-  <button mat-menu-item [routerLink]="['/appusers']">Users</button>
-  <button mat-menu-item [routerLink]="['/organization']">Organization</button>
-  <button mat-menu-item [routerLink]="['/system']">System</button>
-  <button mat-menu-item [routerLink]="['/products']">Products</button>
-  <button mat-menu-item [routerLink]="['/templates']">Templates</button>
-</mat-menu>
-
-<mat-menu #selfServiceMenu="matMenu" [overlapTrigger]="false">
-  <button mat-menu-item [routerLink]="['/self-service/users']">User Management</button>
-  <button mat-menu-item [routerLink]="['/self-service/app-configuration']">App Configuration</button>
-  <button mat-menu-item [routerLink]="['/self-service/task-management']">Task Management</button>
-</mat-menu>
-
-<mat-menu #applicationMenu="matMenu" [overlapTrigger]="false" class="bancro-user-menu">
+<mat-menu #applicationMenu="matMenu" [overlapTrigger]="false" class="dore-profile-menu">
   <div class="menu-user-summary">
-    <img src="assets/images/avax.svg" alt="User">
-    <div>
-      <strong>{{ username }}</strong>
-      <small>{{ officeName }}</small>
-    </div>
+    <span class="menu-avatar">{{ username ? (username | slice:0:1) : 'B' }}</span>
+    <div><strong>{{ username || 'Bancro User' }}</strong><small>{{ officeName || 'Bancro' }}</small></div>
   </div>
-  <mat-divider></mat-divider>
   <button mat-menu-item [routerLink]="['/profile']">
-    <mat-icon><fa-icon icon="user" size="sm"></fa-icon></mat-icon>
-    <span>Profile</span>
+    <mat-icon><fa-icon icon="user" size="sm"></fa-icon></mat-icon><span>Profile</span>
   </button>
   <button mat-menu-item [routerLink]="['/settings']">
-    <mat-icon><fa-icon icon="cog" size="sm"></fa-icon></mat-icon>
-    <span>Settings</span>
+    <mat-icon><fa-icon icon="cog" size="sm"></fa-icon></mat-icon><span>Settings</span>
   </button>
   <button mat-menu-item (click)="help()">
-    <mat-icon><fa-icon icon="question-circle" size="sm"></fa-icon></mat-icon>
-    <span>Help</span>
+    <mat-icon><fa-icon icon="question-circle" size="sm"></fa-icon></mat-icon><span>Help</span>
   </button>
-  <mat-divider></mat-divider>
-  <button mat-menu-item (click)="logout()" id="logout" class="logout-menu-item">
-    <mat-icon><fa-icon icon="sign-out-alt" size="sm"></fa-icon></mat-icon>
-    <span>Sign Out</span>
+  <button mat-menu-item (click)="logout()" id="logout" class="sign-out-item">
+    <mat-icon><fa-icon icon="sign-out-alt" size="sm"></fa-icon></mat-icon><span>Sign Out</span>
   </button>
-</mat-menu>
-
-<mat-menu #applicationsMenu="matMenu" xPosition="before">
-  <div class="redir-tab">
-    <button mat-menu-item *ngFor="let item of applications; index as i">
-      <img src="{{ item.logo }}" class="mx-auto" />
-      <p>{{ item.title }}</p>
-    </button>
-  </div>
 </mat-menu>

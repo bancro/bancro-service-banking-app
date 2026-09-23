@@ -1,93 +1,65 @@
-<div class="home-page">
-  <section class="home-hero">
-    <div class="home-hero-copy">
-      <span class="eyebrow">Bancro Banking</span>
-      <h1>{{ 'labels.text.Welcome' | translate }}, {{ username }}.</h1>
-      <p>Everything you need for today’s banking operations, customers and branch activity is one search away.</p>
-      <span class="office-pill" *ngIf="officeName"><fa-icon icon="building"></fa-icon> {{ officeName }}</span>
-    </div>
-    <div #buttonDashboard class="hero-action">
-      <button mat-raised-button color="primary" [routerLink]="['/dashboard']">
-        <fa-icon icon="tachometer-alt"></fa-icon>
-        Open dashboard
-      </button>
-    </div>
-  </section>
+<div fxLayput="row" fxLayoutAlign="end" fxLayoutGap="2%" fxLayout.lt-md="column" class="container m-b-20">
 
-  <section class="home-grid">
-    <mat-card class="activity-card">
-      <div class="card-heading">
-        <div>
-          <span class="eyebrow">Quick navigation</span>
-          <h2>Find an activity</h2>
-        </div>
-        <fa-icon icon="search" class="heading-icon"></fa-icon>
-      </div>
+  <div #buttonDashboard class="in-block">
+    <button mat-raised-button color="primary" [routerLink]="['/dashboard']">
+      <fa-icon icon="tachometer-alt" class="m-r-10"></fa-icon>
+      {{ 'labels.buttons.Dashboard' | translate }}
+    </button>
+  </div>
 
-      <mat-card-content #searchActivity>
-        <mat-form-field appearance="outline" class="activity-search">
+</div>
+
+<div class="container">
+
+  <mat-card class="shadow-none">
+
+    <mat-card-header>
+      <mat-card-title class="title">
+        {{ 'labels.text.Welcome' | translate }}, {{ username }}!
+      </mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content #searchActivity>
+
+      <div fxLayout="column">
+         <mat-form-field appearance="outline" >
           <mat-label>{{ 'labels.placeholders.Search Activity' | translate }}</mat-label>
           <input matInput [matAutocomplete]="activitySearch" [formControl]="searchText">
-          <fa-icon matSuffix icon="search"></fa-icon>
         </mat-form-field>
-
-        <mat-autocomplete #activitySearch="matAutocomplete">
-          <mat-option *ngFor="let activity of filteredActivities | async" [routerLink]="activity.path">
-            <span>{{ activity.activity }}</span>
-          </mat-option>
-        </mat-autocomplete>
-      </mat-card-content>
-    </mat-card>
-
-    <mat-card class="quick-card">
-      <div class="card-heading">
-        <div>
-          <span class="eyebrow">Common tasks</span>
-          <h2>Start here</h2>
-        </div>
       </div>
-      <div class="quick-links">
-        <a [routerLink]="['/clients']">
-          <span class="quick-icon"><fa-icon icon="users"></fa-icon></span>
-          <span><strong>Customers</strong><small>Find and manage customer accounts</small></span>
-          <fa-icon icon="chevron-right" size="xs"></fa-icon>
-        </a>
-        <a [routerLink]="['/teller-workstation']" *mifosxHasPermission="'READ_BANCRO_TELLER_WORKSTATION'">
-          <span class="quick-icon"><fa-icon icon="money-bill-alt"></fa-icon></span>
-          <span><strong>Teller workstation</strong><small>Cash, transfers and drawer operations</small></span>
-          <fa-icon icon="chevron-right" size="xs"></fa-icon>
-        </a>
-        <a [routerLink]="['/payments']" *mifosxHasPermission="'READ_BANCRO_PAYMENT'">
-          <span class="quick-icon"><fa-icon icon="money-check"></fa-icon></span>
-          <span><strong>Payments</strong><small>Review and manage payment activity</small></span>
-          <fa-icon icon="chevron-right" size="xs"></fa-icon>
-        </a>
-        <a [routerLink]="['/reconciliation']" *mifosxHasPermission="'READ_BANCRO_RECONCILIATION'">
-          <span class="quick-icon"><fa-icon icon="check-circle"></fa-icon></span>
-          <span><strong>Reconciliation</strong><small>Settlement and exception control</small></span>
-          <fa-icon icon="chevron-right" size="xs"></fa-icon>
-        </a>
-      </div>
-    </mat-card>
-  </section>
+
+      <mat-autocomplete #activitySearch="matAutocomplete">
+        <mat-option *ngFor="let activity of filteredActivities | async" [routerLink]="activity.path">
+          <span>{{activity.activity}}</span>
+        </mat-option>
+      </mat-autocomplete>
+
+    </mat-card-content>
+
+   <div class="p-4">
+    <img mat-card-image src="assets/images/bancro.png" alt="Bancro">
+   </div>
+
+  </mat-card>
+
 </div>
 
 <ng-template #templateButtonDashboard let-popover="popover">
-  <h2>{{"labels.heading.Dashboard" | translate}}</h2>
-  <p class="mw300">{{"labels.text.This will navigate the user to the dashboard component." | translate}}</p>
+  <h2>{{"labels.heading.Dashboard"  |translate}}</h2>
+  <p class="mw300">{{"labels.text.This will navigate the user to the dashboard component."  |translate}}</p>
   <div fxLayout="row" fxLayoutAlign="end" fxLayoutGap="2%" fxLayout.lt-md="column">
-    <button mat-raised-button color="warn" (click)="popover.close();configurationWizardService.closeConfigWizard()">{{"labels.buttons.Close" | translate}}</button>
-    <button mat-raised-button color="primary" (click)="popover.close();previousStep()">{{"labels.buttons.Back" | translate}}</button>
-    <button mat-raised-button color="primary" (click)="popover.close();showPopover(templateSearchActivity, searchActivity,'bottom',true)">{{"labels.buttons.Next" | translate}}</button>
+    <button mat-raised-button color="warn" (click)="popover.close();configurationWizardService.closeConfigWizard()">{{"labels.buttons.Close"  |translate}}</button>
+    <button mat-raised-button color="primary" (click)="popover.close();previousStep()">{{"labels.buttons.Back"  |translate}}</button>
+    <button mat-raised-button color="primary" (click)="popover.close();showPopover(templateSearchActivity, searchActivity,'bottom',true)">{{"labels.buttons.Next"  |translate}}</button>
   </div>
 </ng-template>
 
 <ng-template #templateSearchActivity let-popover="popover">
-  <h2>{{"labels.heading.Search Activity" | translate}}</h2>
-  <p class="mw300">{{"labels.text.This will navigate the user to the searched activity." | translate}}</p>
+  <h2>{{"labels.heading.Search Activity"  |translate}}</h2>
+  <p class="mw300">{{"labels.text.This will navigate the user to the searched activity."  |translate}}</p>
   <div fxLayout="row" fxLayoutAlign="end" fxLayoutGap="2%" fxLayout.lt-md="column">
-    <button mat-raised-button color="warn" (click)="popover.close();configurationWizardService.closeConfigWizard()">{{"labels.buttons.Close" | translate}}</button>
-    <button mat-raised-button color="primary" (click)="popover.close();showPopover(templateButtonDashboard, buttonDashboard,'bottom',true)">{{"labels.buttons.Back" | translate}}</button>
-    <button mat-raised-button color="primary" (click)="popover.close();nextStep()">{{"labels.buttons.Next" | translate}}</button>
+    <button mat-raised-button color="warn" (click)="popover.close();configurationWizardService.closeConfigWizard()">{{"labels.buttons.Close"  |translate}}</button>
+    <button mat-raised-button color="primary" (click)="popover.close();showPopover(templateButtonDashboard, buttonDashboard,'bottom',true)">{{"labels.buttons.Back"  |translate}}</button>
+    <button mat-raised-button color="primary" (click)="popover.close();nextStep()">{{"labels.buttons.Next"  |translate}}</button>
   </div>
 </ng-template>

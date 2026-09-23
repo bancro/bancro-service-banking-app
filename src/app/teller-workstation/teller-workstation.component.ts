@@ -369,6 +369,23 @@ export class TellerWorkstationComponent implements OnInit {
     });
   }
 
+  selectOperation(operation: 'CASH_DEPOSIT' | 'CASH_WITHDRAWAL' | 'INTERNAL_TRANSFER' | 'EXTERNAL_TRANSFER'): void {
+    if (this.form.get('operation').value === operation) { return; }
+    this.form.patchValue({ operation });
+  }
+
+  isOperation(operation: string): boolean { return this.form.get('operation').value === operation; }
+
+  operationLabel(): string {
+    const labels: any = {
+      CASH_DEPOSIT: 'Cash deposit',
+      CASH_WITHDRAWAL: 'Cash withdrawal',
+      INTERNAL_TRANSFER: 'Transfer between Bancro accounts',
+      EXTERNAL_TRANSFER: 'Transfer to another bank'
+    };
+    return labels[this.form.get('operation').value] || 'Customer transaction';
+  }
+
   isInternalTransfer(): boolean { return this.form.get('operation').value === 'INTERNAL_TRANSFER'; }
   isExternalTransfer(): boolean { return this.form.get('operation').value === 'EXTERNAL_TRANSFER'; }
   isNpsExternal(): boolean { return this.isExternalTransfer() && this.form.get('externalRail').value === 'NPS'; }
@@ -388,7 +405,7 @@ export class TellerWorkstationComponent implements OnInit {
   externalConnectionLabel(): string {
     const modes = [this.nibssStatus?.mode, this.npsStatus?.mode].filter(Boolean);
     if (!modes.length) { return 'Not configured'; }
-    return modes.every(x => x === 'SIMULATOR') ? 'Test mode' : 'Connected';
+    return modes.every(x => x === 'SIMULATOR') ? 'Training mode' : 'Available';
   }
 
   private sessionProblemText(e: any): string {

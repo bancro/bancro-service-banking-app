@@ -1,533 +1,101 @@
-<div
-  [ngClass]="{
-    'sidebar-full': !sidenavCollapsed,
-    'sidebar-compact': sidenavCollapsed
-  }"
->
-  <div class="flex justify-between overflow-y-auto navigation-panel flex-column" fxLayout="column">
-    <!-- TODO: Allow customization by organization -->
-    <div>
-      <div
-        class="app-brand pt-[30px]"
-        [routerLink]="['/home']"
-        [ngClass]="{
-          'pl-4': !sidenavCollapsed,
-          'pl-0': sidenavCollapsed
-        }"
-      >
-        <img
-          [ngClass]="{
-            '!hidden': !sidenavCollapsed,
-            show: sidenavCollapsed
-          }"
-          src="assets/images/icon.png"
-          alt="app-logo"
-          class="w-20 h-auto px-3"
-        />
-        <img
-          [ngClass]="{
-            show: !sidenavCollapsed,
-            '!hidden': sidenavCollapsed
-          }"
-          src="assets/images/bancro.png"
-          alt="app-logo"
-          class="w-auto h-7"
-        />
-      </div>
+<div class="dore-sidenav" [class.is-collapsed]="sidenavCollapsed">
+  <div class="dore-brand" [routerLink]="['/home']" aria-label="Bancro home">
+    <img *ngIf="!sidenavCollapsed" src="assets/images/bancro.png" alt="Bancro" class="brand-full" />
+    <img *ngIf="sidenavCollapsed" src="assets/images/icon.png" alt="Bancro" class="brand-mark" />
+  </div>
 
-      <div class="px-5 app-sidenav">
-        <mat-nav-list>
-          <mat-list-item [routerLink]="['/home']" [routerLinkActive]="'is-active'" matTooltipPosition="right" matTooltip="Home"  class="!px-0">
-            <div class="flex items-center gap-x-[10px] text-[#454745] px-[10px] font-medium">
-              <app-home-svg [routerLinkActive]="'svg-active'"></app-home-svg>
+  <div class="dore-nav-scroll">
+    <mat-nav-list class="dore-nav-list">
+      <div class="nav-group-label" *ngIf="!sidenavCollapsed">Workspace</div>
 
-              <a
-                matListItemLine
-                [ngClass]="{
-                  show: !sidenavCollapsed,
-                  '!hidden': sidenavCollapsed
-                }"
-                class="f14"
-                #home
-                >{{ "labels.breadcrumbs.Home" | translate }}</a
-              >
-            </div>
-          </mat-list-item>
-          <mat-list-item [routerLink]="['/dashboard']" [routerLinkActive]="'is-active'" matTooltipPosition="right" matTooltip="Dashboard">
-            <div class="flex items-center gap-x-[10px] text-[#454745] px-[10px] font-medium">
-              <app-dashboard-svg [routerLinkActive]="'svg-active'"></app-dashboard-svg>
+      <a mat-list-item [routerLink]="['/home']" routerLinkActive="is-active" [matTooltip]="sidenavCollapsed ? 'Home' : ''" matTooltipPosition="right">
+        <fa-icon icon="home" class="nav-icon"></fa-icon>
+        <span class="nav-label" *ngIf="!sidenavCollapsed">Home</span>
+      </a>
+      <a mat-list-item [routerLink]="['/dashboard']" routerLinkActive="is-active" [matTooltip]="sidenavCollapsed ? 'Dashboard' : ''" matTooltipPosition="right">
+        <fa-icon icon="tachometer-alt" class="nav-icon"></fa-icon>
+        <span class="nav-label" *ngIf="!sidenavCollapsed">Dashboard</span>
+      </a>
 
-              <a
-                matLine
-                class="f14"
-                [ngClass]="{
-                  show: !sidenavCollapsed,
-                  '!hidden': sidenavCollapsed
-                }"
-                [routerLinkActive]="'!text-[#163300]'"
-                #dashboard
-                >{{ "labels.menus.Dashboard" | translate }}</a
-              >
-            </div>
-          </mat-list-item>
-          <mat-list-item [routerLink]="['/groups']" [routerLinkActive]="'is-active'" matTooltipPosition="right" matTooltip="Groups">
-            <div class="flex items-center gap-x-[10px] text-[#454745] px-[10px] font-medium">
-              <app-groups-svg [routerLinkActive]="'svg-active'"></app-groups-svg>
+      <div class="nav-group-label" *ngIf="!sidenavCollapsed">Customer Banking</div>
+      <a mat-list-item [routerLink]="['/clients']" routerLinkActive="is-active" *mifosxHasPermission="'READ_CLIENT'">
+        <fa-icon icon="user" class="nav-icon"></fa-icon><span class="nav-label" *ngIf="!sidenavCollapsed">Customers</span>
+      </a>
+      <a mat-list-item [routerLink]="['/groups']" routerLinkActive="is-active" *mifosxHasPermission="'READ_GROUP'">
+        <fa-icon icon="users" class="nav-icon"></fa-icon><span class="nav-label" *ngIf="!sidenavCollapsed">Groups</span>
+      </a>
+      <a mat-list-item [routerLink]="['/centers']" routerLinkActive="is-active" *mifosxHasPermission="'READ_CENTER'">
+        <fa-icon icon="building" class="nav-icon"></fa-icon><span class="nav-label" *ngIf="!sidenavCollapsed">Centers</span>
+      </a>
+      <a mat-list-item [routerLink]="['/accounting']" routerLinkActive="is-active" *mifosxHasPermission="'READ_GLACCOUNT'">
+        <fa-icon icon="university" class="nav-icon"></fa-icon><span class="nav-label" *ngIf="!sidenavCollapsed">Accounting</span>
+      </a>
+      <a mat-list-item [routerLink]="['/products']" routerLinkActive="is-active" *mifosxHasPermission="'READ_PRODUCTMIX'">
+        <fa-icon icon="briefcase" class="nav-icon"></fa-icon><span class="nav-label" *ngIf="!sidenavCollapsed">Products</span>
+      </a>
 
-              <a
-                matLine
-                [ngClass]="{
-                  show: !sidenavCollapsed,
-                  '!hidden': sidenavCollapsed
-                }"
-                class="f14"
-                #groups
-                >{{ "labels.menus.Groups" | translate }}</a
-              >
-            </div>
-          </mat-list-item>
-          <mat-list-item [routerLink]="['/centers']" [routerLinkActive]="'is-active'" matTooltipPosition="right" matTooltip="Centers">
-            <div class="flex items-center gap-x-[10px] text-[#454745] px-[10px] font-medium">
-              <app-center-svg [routerLinkActive]="'svg-active'"></app-center-svg>
+      <div class="nav-group-label" *ngIf="!sidenavCollapsed">Branch & Payments</div>
+      <a mat-list-item [routerLink]="['/teller-workstation']" routerLinkActive="is-active" *mifosxHasPermission="'READ_BANCRO_TELLER_WORKSTATION'">
+        <fa-icon icon="money-bill-alt" class="nav-icon"></fa-icon><span class="nav-label" *ngIf="!sidenavCollapsed">Teller Workstation</span>
+      </a>
+      <a mat-list-item [routerLink]="['/organization/tellers']" routerLinkActive="is-active" *mifosxHasPermission="'READ_TELLER'">
+        <fa-icon icon="id-badge" class="nav-icon"></fa-icon><span class="nav-label" *ngIf="!sidenavCollapsed">Teller Management</span>
+      </a>
+      <a mat-list-item [routerLink]="['/operations/teller']" routerLinkActive="is-active" *mifosxHasPermission="'READ_BANCRO_OPERATIONS'">
+        <fa-icon icon="tasks" class="nav-icon"></fa-icon><span class="nav-label" *ngIf="!sidenavCollapsed">Teller Access & Readiness</span>
+      </a>
+      <a mat-list-item [routerLink]="['/payments']" routerLinkActive="is-active" *mifosxHasPermission="'READ_BANCRO_PAYMENT'">
+        <fa-icon icon="money-check" class="nav-icon"></fa-icon><span class="nav-label" *ngIf="!sidenavCollapsed">Payments</span>
+      </a>
+      <a mat-list-item [routerLink]="['/operations/transfers']" routerLinkActive="is-active" *mifosxHasPermission="'READ_BANCRO_PAYMENT'">
+        <fa-icon icon="random" class="nav-icon"></fa-icon><span class="nav-label" *ngIf="!sidenavCollapsed">Transfers & NIBSS</span>
+      </a>
+      <a mat-list-item [routerLink]="['/operations/cards']" routerLinkActive="is-active" *mifosxHasPermission="'READ_BANCRO_CARDS'">
+        <fa-icon icon="id-badge" class="nav-icon"></fa-icon><span class="nav-label" *ngIf="!sidenavCollapsed">Cards</span>
+      </a>
+      <a mat-list-item [routerLink]="['/operations/pos']" routerLinkActive="is-active" *mifosxHasPermission="'READ_BANCRO_POS'">
+        <fa-icon icon="money-check" class="nav-icon"></fa-icon><span class="nav-label" *ngIf="!sidenavCollapsed">POS & Merchants</span>
+      </a>
+      <a mat-list-item [routerLink]="['/reconciliation']" routerLinkActive="is-active" *mifosxHasPermission="'READ_BANCRO_RECONCILIATION'">
+        <fa-icon icon="sync" class="nav-icon"></fa-icon><span class="nav-label" *ngIf="!sidenavCollapsed">Settlement & Reconciliation</span>
+      </a>
 
-              <a
-                matLine
-                [ngClass]="{
-                  show: !sidenavCollapsed,
-                  '!hidden': sidenavCollapsed
-                }"
-                class="f14"
-                #centers
-                >{{ "labels.menus.Centers" | translate }}</a
-              >
-            </div>
-          </mat-list-item>
+      <div class="nav-group-label" *ngIf="!sidenavCollapsed">Control & Administration</div>
+      <a mat-list-item [routerLink]="['/operations']" routerLinkActive="is-active" [routerLinkActiveOptions]="{ exact: true }" *mifosxHasPermission="'READ_BANCRO_OPERATIONS'">
+        <fa-icon icon="tachometer-alt" class="nav-icon"></fa-icon><span class="nav-label" *ngIf="!sidenavCollapsed">Bancro Administration</span>
+      </a>
+      <a mat-list-item [routerLink]="['/operations/approvals']" routerLinkActive="is-active" *mifosxHasPermission="'READ_BANCRO_OPERATIONS'">
+        <fa-icon icon="tasks" class="nav-icon"></fa-icon><span class="nav-label" *ngIf="!sidenavCollapsed">Approvals & Controls</span>
+      </a>
+      <a mat-list-item [routerLink]="['/activity-trail']" routerLinkActive="is-active" *mifosxHasPermission="'READ_BANCRO_ACTIVITY_TRAIL'">
+        <fa-icon icon="list-ul" class="nav-icon"></fa-icon><span class="nav-label" *ngIf="!sidenavCollapsed">Current Activity Trail</span>
+      </a>
+      <a mat-list-item [routerLink]="['/operations/integrations']" routerLinkActive="is-active" *mifosxHasPermission="'READ_BANCRO_OPERATIONS'">
+        <fa-icon icon="cogs" class="nav-icon"></fa-icon><span class="nav-label" *ngIf="!sidenavCollapsed">Integrations</span>
+      </a>
+      <a mat-list-item [routerLink]="['/appusers']" routerLinkActive="is-active" *mifosxHasPermission="'READ_USER'">
+        <fa-icon icon="user-shield" class="nav-icon"></fa-icon><span class="nav-label" *ngIf="!sidenavCollapsed">Users & Roles</span>
+      </a>
+      <a mat-list-item [routerLink]="['/organization']" routerLinkActive="is-active" *mifosxHasPermission="'READ_OFFICE'">
+        <fa-icon icon="building" class="nav-icon"></fa-icon><span class="nav-label" *ngIf="!sidenavCollapsed">Organization</span>
+      </a>
+      <a mat-list-item [routerLink]="['/system']" routerLinkActive="is-active" *mifosxHasPermission="'READ_CONFIGURATION'">
+        <fa-icon icon="cog" class="nav-icon"></fa-icon><span class="nav-label" *ngIf="!sidenavCollapsed">System Administration</span>
+      </a>
+      <a mat-list-item [routerLink]="['/reports']" routerLinkActive="is-active" *mifosxHasPermission="'READ_REPORT'">
+        <fa-icon icon="chart-bar" class="nav-icon"></fa-icon><span class="nav-label" *ngIf="!sidenavCollapsed">Reports</span>
+      </a>
+    </mat-nav-list>
+  </div>
 
-          <mat-list-item [routerLink]="['/clients']" [routerLinkActive]="'is-active'" matTooltipPosition="right" matTooltip="Clients">
-            <div class="flex items-center gap-x-[10px] text-[#454745] px-[10px] font-medium">
-              <app-client-svg [routerLinkActive]="'svg-active'"></app-client-svg>
-
-              <a
-                matLine
-                [ngClass]="{
-                  show: !sidenavCollapsed,
-                  '!hidden': sidenavCollapsed
-                }"
-                class="f14"
-                #clients
-                >{{ "labels.menus.Clients" | translate }}</a
-              >
-            </div>
-          </mat-list-item>
-          <!-- <mat-list-item [routerLink]="['/data-import']" [routerLinkActive]="'is-active'" matTooltipPosition="right" matTooltip="Data Import ">
-            <div class="flex items-center gap-x-[10px] text-[#454745] px-[10px] font-medium">
-              <app-data-import-svg [routerLinkActive]="'svg-active'"></app-data-import-svg>
-
-              <a
-                matLine
-                [ngClass]="{
-                  show: !sidenavCollapsed,
-                  '!hidden': sidenavCollapsed
-                }"
-                class="f14"
-                #DataImport
-                >{{ "labels.menus.Imports" | translate }}</a
-              >
-            </div>
-          </mat-list-item> -->
-          <mat-list-item [routerLink]="['/payments']" [routerLinkActive]="'is-active'" matTooltipPosition="right" matTooltip="Payments" *mifosxHasPermission="'READ_BANCRO_PAYMENT'">
-            <div class="flex items-center gap-x-[10px] text-[#454745] px-[10px] font-medium">
-              <fa-icon icon="money-bill-alt"></fa-icon>
-              <a matLine [ngClass]="{ show: !sidenavCollapsed, '!hidden': sidenavCollapsed }" class="f14">Payments</a>
-            </div>
-          </mat-list-item>
-          <mat-list-item [routerLink]="['/reconciliation']" [routerLinkActive]="'is-active'" matTooltipPosition="right" matTooltip="Settlement & Reconciliation" *mifosxHasPermission="'READ_BANCRO_RECONCILIATION'">
-            <div class="flex items-center gap-x-[10px] text-[#454745] px-[10px] font-medium">
-              <fa-icon icon="money-bill-alt"></fa-icon>
-              <a matLine [ngClass]="{ show: !sidenavCollapsed, '!hidden': sidenavCollapsed }" class="f14">Settlement & Reconciliation</a>
-            </div>
-          </mat-list-item>
-          <mat-list-item [routerLink]="['/operations']" [routerLinkActive]="'is-active'" matTooltipPosition="right" matTooltip="Bancro Administration & Operations" *mifosxHasPermission="'READ_BANCRO_OPERATIONS'">
-            <div class="flex items-center gap-x-[10px] text-[#454745] px-[10px] font-medium">
-              <fa-icon icon="cogs"></fa-icon>
-              <a matLine [ngClass]="{ show: !sidenavCollapsed, '!hidden': sidenavCollapsed }" class="f14">Bancro Administration</a>
-            </div>
-          </mat-list-item>
-          <mat-list-item [routerLink]="['/activity-trail']" [routerLinkActive]="'is-active'" matTooltipPosition="right" matTooltip="Current Activity Trail" *mifosxHasPermission="'READ_BANCRO_ACTIVITY_TRAIL'">
-            <div class="flex items-center gap-x-[10px] text-[#454745] px-[10px] font-medium">
-              <fa-icon icon="list"></fa-icon>
-              <a matLine [ngClass]="{ show: !sidenavCollapsed, '!hidden': sidenavCollapsed }" class="f14">Current Activity Trail</a>
-            </div>
-          </mat-list-item>
-          <mat-list-item [routerLink]="['/teller-workstation']" [routerLinkActive]="'is-active'" matTooltipPosition="right" matTooltip="Teller Workstation" *mifosxHasPermission="'READ_BANCRO_TELLER_WORKSTATION'">
-            <div class="flex items-center gap-x-[10px] text-[#454745] px-[10px] font-medium">
-              <fa-icon icon="money-bill-alt"></fa-icon>
-              <a matLine [ngClass]="{ show: !sidenavCollapsed, '!hidden': sidenavCollapsed }" class="f14">Teller Workstation</a>
-            </div>
-          </mat-list-item>
-          <mat-list-item [routerLink]="['/organization/tellers']" [routerLinkActive]="'is-active'" matTooltipPosition="right" matTooltip="Teller Operations" *mifosxHasPermission="'READ_TELLER'">
-            <div class="flex items-center gap-x-[10px] text-[#454745] px-[10px] font-medium">
-              <fa-icon icon="university"></fa-icon>
-              <a matLine [ngClass]="{ show: !sidenavCollapsed, '!hidden': sidenavCollapsed }" class="f14">Teller Operations</a>
-            </div>
-          </mat-list-item>
-          <mat-list-item [routerLink]="['/accounting']" [routerLinkActive]="'is-active'" matTooltipPosition="right" matTooltip="Accounting">
-            <div class="flex items-center gap-x-[10px] text-[#454745] px-[10px] font-medium">
-              <app-accounting-svg [routerLinkActive]="'svg-active'"></app-accounting-svg>
-
-              <a
-                matLine
-                [ngClass]="{
-                  show: !sidenavCollapsed,
-                  '!hidden': sidenavCollapsed
-                }"
-                class="f14"
-                #accounting
-                >{{ "labels.menus.Accounting" | translate }}</a
-              >
-            </div>
-          </mat-list-item>
-
-          <div class="p-h-8">
-             <mat-accordion class="accordion_class">
-              <mat-expansion-panel
-                (opened)="reportsOpenState = true"
-                (closed)="reportsOpenState = false"
-                [ngClass]="{
-                  transparent: !reportsOpenState
-                }"
-                hideToggle
-              >
-                <mat-expansion-panel-header class="p-h-15">
-                  <mat-panel-title class="!mr-0">
-                    <div class="flex items-center gap-x-[10px] text-[#454745] px-[10px] font-medium">
-                      <app-report-svg (click)="sidenavCollapsed = false"></app-report-svg>
-
-                      <span
-                        [ngClass]="{
-                          '!hidden': sidenavCollapsed,
-                          'text-[#0E0F0C]': reportsOpenState
-                        }"
-                        class="f14"
-                      >
-                        {{ "labels.menus.Reports" | translate }}</span
-                      >
-                    </div>
-                  </mat-panel-title>
-                  <span
-                    [ngClass]="{
-                      show: !sidenavCollapsed,
-                      '!hidden': sidenavCollapsed
-                    }"
-                  >
-                    <app-plus-svg
-                      [ngClass]="{
-                        '!hidden': reportsOpenState
-                      }"
-                    ></app-plus-svg>
-                    <app-minus-svg [ngClass]="{ '!hidden': !reportsOpenState }"></app-minus-svg>
-                  </span>
-                </mat-expansion-panel-header>
-                <div class="overflow-'!hidden'">
-                  <div
-                    [routerLink]="['/reports']"
-                    [routerLinkActive]="'is-sub-active'"
-                    class="f14 text-[#454745] font-medium relative h-[43px] flex items-end"
-                  >
-                    <div
-                      class="h-[50px] w-[20px] border-l border-b rounded-bl-lg mb-[10px] absolute left-0 bottom-0"
-                    ></div>
-                    <span class="pl-6 cursor-pointer"> {{ "labels.menus.All" | translate }}</span>
-                  </div>
-
-                  <div
-                    [routerLink]="['/reports', 'Client']"
-                    [routerLinkActive]="'is-sub-active'"
-                    class="f14 text-[#454745] font-medium relative h-[43px] flex items-end"
-                  >
-                    <div
-                      class="h-[50px] w-[20px] border-l border-b rounded-bl-lg mb-[10px] absolute left-0 bottom-0"
-                    ></div>
-                    <span class="pl-6 cursor-pointer"> {{ "labels.menus.Clients" | translate }}</span>
-                  </div>
-                  <div
-                    [routerLink]="['/reports', 'Loan']"
-                    [routerLinkActive]="'is-sub-active'"
-                    class="f14 text-[#454745] font-medium relative h-[43px] flex items-end"
-                  >
-                    <div
-                      class="h-[50px] w-[20px] border-l border-b rounded-bl-lg mb-[10px] absolute left-0 bottom-0"
-                    ></div>
-                    <span class="pl-6 cursor-pointer"> {{ "labels.menus.Loans" | translate }}</span>
-                  </div>
-                  <div
-                    [routerLink]="['/reports', 'Savings']"
-                    [routerLinkActive]="'is-sub-active'"
-                    class="f14 text-[#454745] font-medium relative h-[43px] flex items-end"
-                  >
-                    <div
-                      class="h-[50px] w-[20px] border-l border-b rounded-bl-lg mb-[10px] absolute left-0 bottom-0"
-                    ></div>
-                    <span class="pl-6 cursor-pointer"> {{ "labels.menus.Savings" | translate }}</span>
-                  </div>
-                  <div
-                    [routerLink]="['/reports', 'Fund']"
-                    [routerLinkActive]="'is-sub-active'"
-                    class="f14 text-[#454745] font-medium relative h-[43px] flex items-end"
-                  >
-                    <div
-                      class="h-[50px] w-[20px] border-l border-b rounded-bl-lg mb-[10px] absolute left-0 bottom-0"
-                    ></div>
-                    <span class="pl-6 cursor-pointer"> {{ "labels.menus.Funds" | translate }}</span>
-                  </div>
-                  <div
-                    [routerLink]="['/reports', 'Accounting']"
-                    [routerLinkActive]="'is-sub-active'"
-                    class="f14 text-[#454745] font-medium relative h-[43px] flex items-end"
-                  >
-                    <div
-                      class="h-[50px] w-[20px] border-l border-b rounded-bl-lg mb-[10px] absolute left-0 bottom-0"
-                    ></div>
-                    <span class="pl-6 cursor-pointer"> {{ "labels.menus.Accounting" | translate }}</span>
-                  </div>
-                  <div
-                    [routerLink]="['/xbrl']"
-                    [routerLinkActive]="'is-sub-active'"
-                    class="f14 text-[#454745] font-medium relative h-[43px] flex items-end"
-                  >
-                    <div
-                      class="h-[50px] w-[20px] border-l border-b rounded-bl-lg mb-[10px] absolute left-0 bottom-0"
-                    ></div>
-                    <span class="pl-6 cursor-pointer"> {{ "labels.menus.XBRL" | translate }}</span>
-                  </div>
-                </div>
-              </mat-expansion-panel>
-            </mat-accordion>
-          </div>
-          <mat-list-item [routerLink]="['/settings']" [routerLinkActive]="'is-active'" matTooltipPosition="right" matTooltip="Settings">
-            <div class="flex items-center gap-x-[10px] text-[#454745] px-[10px] font-medium">
-              <app-settings-svg [routerLinkActive]="'svg-active'"></app-settings-svg>
-
-              <a
-                matLine
-                [ngClass]="{
-                  show: !sidenavCollapsed,
-                  '!hidden': sidenavCollapsed
-                }"
-                class="f14"
-                #settings
-                >{{ "labels.menus.Settings" | translate }}</a
-              >
-            </div>
-          </mat-list-item>
-
-          <div class="p-h-8">
-             <mat-accordion class="accordion_class">
-              <mat-expansion-panel
-                (opened)="panelOpenState = true"
-                (closed)="panelOpenState = false"
-                [ngClass]="{
-                  transparent: !panelOpenState
-                }"
-                hideToggle
-              >
-                <mat-expansion-panel-header class="p-h-15">
-                  <mat-panel-title>
-                    <div class="flex items-center gap-x-[10px] text-[#454745] px-[10px] font-medium">
-                      <app-admin-svg (click)="sidenavCollapsed = false"></app-admin-svg>
-
-                      <span
-                        [ngClass]="{
-                          '!hidden': sidenavCollapsed,
-                          'text-[#0E0F0C]': panelOpenState
-                        }"
-                        class="f14"
-                      >
-                        {{ "labels.menus.Admin" | translate }}</span
-                      >
-                    </div>
-                  </mat-panel-title>
-                  <span
-                    [ngClass]="{
-                      show: !sidenavCollapsed,
-                      '!hidden': sidenavCollapsed
-                    }"
-                  >
-                    <app-plus-svg
-                      [ngClass]="{
-                        '!hidden': panelOpenState
-                      }"
-                    ></app-plus-svg>
-                    <app-minus-svg [ngClass]="{ '!hidden': !panelOpenState }"></app-minus-svg>
-                  </span>
-                </mat-expansion-panel-header>
-                <div class="overflow-'!hidden'">
-                  <div
-                    [routerLink]="['/appusers']"
-                    [routerLinkActive]="'is-sub-active'"
-                    class="f14 text-[#454745] font-medium relative h-[43px] flex items-end"
-                  >
-                    <div
-                      class="h-[50px] w-[20px] border-l border-b rounded-bl-lg mb-[10px] absolute left-0 bottom-0"
-                    ></div>
-                    <span class="pl-6 cursor-pointer"> {{ "labels.menus.Users" | translate }}</span>
-                  </div>
-                  <div
-                    [routerLink]="['/organization']"
-                    [routerLinkActive]="'is-sub-active'"
-                    class="f14 text-[#454745] font-medium relative h-[43px] flex items-end"
-                  >
-                    <div
-                      class="h-[50px] w-[20px] border-l border-b rounded-bl-lg mb-[10px] absolute left-0 bottom-0"
-                    ></div>
-                    <span class="pl-6 cursor-pointer"> {{ "labels.menus.Organization" | translate }}</span>
-                  </div>
-                  <div
-                    [routerLink]="['/system']"
-                    [routerLinkActive]="'is-sub-active'"
-                    class="f14 text-[#454745] font-medium relative h-[43px] flex items-end"
-                  >
-                    <div
-                      class="h-[50px] w-[20px] border-l border-b rounded-bl-lg mb-[10px] absolute left-0 bottom-0"
-                    ></div>
-                    <span class="pl-6 cursor-pointer"> {{ "labels.menus.System" | translate }}</span>
-                  </div>
-                  <div
-                    [routerLink]="['/products']"
-                    [routerLinkActive]="'is-sub-active'"
-                    class="f14 text-[#454745] font-medium relative h-[43px] flex items-end"
-                  >
-                    <div
-                      class="h-[50px] w-[20px] border-l border-b rounded-bl-lg mb-[10px] absolute left-0 bottom-0"
-                    ></div>
-                    <span class="pl-6 cursor-pointer"> {{ "labels.menus.Products" | translate }}</span>
-                  </div>
-                  <div
-                    [routerLink]="['/templates']"
-                    [routerLinkActive]="'is-active'"
-                    class="f14 text-[#454745] font-medium relative h-[43px] flex items-end"
-                  >
-                    <div
-                      class="h-[50px] w-[20px] border-l border-b rounded-bl-lg mb-[10px] absolute left-0 bottom-0"
-                    ></div>
-                    <span class="pl-6 cursor-pointer"> {{ "labels.menus.Templates" | translate }}</span>
-                  </div>
-                </div>
-              </mat-expansion-panel>
-            </mat-accordion>
-          </div>
-          <div class="p-h-8" hideToggle>
-             <mat-accordion class="accordion_class">
-              <mat-expansion-panel
-                (opened)="selfOpenState = true"
-                (closed)="selfOpenState = false"
-                [ngClass]="{
-                  transparent: !selfOpenState
-                }"
-                hideToggle
-              >
-                <mat-expansion-panel-header class="p-h-15">
-                  <mat-panel-title>
-                    <div class="flex items-center gap-x-[10px] text-[#454745] px-[10px] font-medium">
-                      <app-self-service-svg (click)="sidenavCollapsed = false"></app-self-service-svg>
-
-                      <span
-                        [ngClass]="{
-                          '!hidden': sidenavCollapsed,
-                          'text-[#0E0F0C]': selfOpenState
-                        }"
-                        class="f14"
-                      >
-                        {{ "labels.menus.Self Service" | translate }}</span
-                      >
-                    </div>
-                  </mat-panel-title>
-                  <span
-                    [ngClass]="{
-                      show: !sidenavCollapsed,
-                      '!hidden': sidenavCollapsed
-                    }"
-                  >
-                    <app-plus-svg
-                      [ngClass]="{
-                        '!hidden': selfOpenState
-                      }"
-                    ></app-plus-svg>
-                    <app-minus-svg [ngClass]="{ '!hidden': !selfOpenState }"></app-minus-svg>
-                  </span>
-                </mat-expansion-panel-header>
-
-                <div class="overflow-'!hidden'">
-                  <div
-                    [routerLink]="['/self-service/users']"
-                    [routerLinkActive]="'is-sub-active'"
-                    matTooltipPosition="right" matTooltip="User Management"
-                    class="f14 text-[#454745] font-medium relative h-[43px] flex items-end"
-                  >
-                    <div
-                      class="h-[50px] w-[20px] border-l border-b rounded-bl-lg mb-[10px] absolute left-0 bottom-0"
-                    ></div>
-                    <span class="pl-6 cursor-pointer"> {{ "labels.menus.User Management" | translate }}</span>
-                  </div>
-                  <div
-                    [routerLink]="['/self-service/app-configuration']"
-                    [routerLinkActive]="'is-sub-active'"
-                    matTooltipPosition="right" matTooltip="App Configuration"
-                    class="f14 text-[#454745] font-medium relative h-[43px] flex items-end"
-                  >
-                    <div
-                      class="h-[50px] w-[20px] border-l border-b rounded-bl-lg mb-[10px] absolute left-0 bottom-0"
-                    ></div>
-                    <span class="pl-6 cursor-pointer"> {{ "labels.menus.App Configuration" | translate }}</span>
-                  </div>
-                  <div
-                    [routerLink]="['/self-service/task-management']"
-                    [routerLinkActive]="'is-sub-active'"
-                    matTooltipPosition="right" matTooltip="Task Management"
-                    class="f14 text-[#454745] font-medium relative h-[43px] flex items-end"
-                  >
-                    <div
-                      class="h-[50px] w-[20px] border-l border-b rounded-bl-lg mb-[10px] absolute left-0 bottom-0"
-                    ></div>
-                    <span class="pl-6 cursor-pointer"> {{ "labels.menus.Task Management" | translate }}</span>
-                  </div>
-                     <div
-                    [routerLink]="['/self-service/data-import']"
-                    [routerLinkActive]="'is-sub-active'"
-                    matTooltipPosition="right" matTooltip="Data Import"
-                    class="f14 text-[#454745] font-medium relative h-[43px] flex items-end"
-                  >
-                    <div
-                      class="h-[50px] w-[20px] border-l border-b rounded-bl-lg mb-[10px] absolute left-0 bottom-0"
-                    ></div>
-                    <span class="pl-6 cursor-pointer"> {{ "labels.menus.Data Import" | translate }}</span>
-                  </div>
-                </div>
-              </mat-expansion-panel>
-            </mat-accordion>
-          </div>
-        </mat-nav-list>
-      </div>
+  <div class="dore-user-card" [class.compact]="sidenavCollapsed">
+    <div class="user-avatar">{{ username ? (username | slice:0:1) : 'B' }}</div>
+    <div class="user-copy" *ngIf="!sidenavCollapsed">
+      <strong>{{ username }}</strong>
+      <span>{{ officeName || 'Bancro' }}</span>
     </div>
-
-    <div class="sidebar-user-panel" [ngClass]="{ 'is-compact': sidenavCollapsed }">
-      <div class="sidebar-user-main" [matTooltip]="sidenavCollapsed ? username : ''" matTooltipPosition="right">
-        <img src="assets/images/avax.svg" class="sidebar-user-avatar" alt="User" />
-        <div class="sidebar-user-copy" [ngClass]="{ '!hidden': sidenavCollapsed }">
-          <p>{{ username }}</p>
-          <span>{{ officeName }}</span>
-        </div>
-      </div>
-      <button
-        type="button"
-        class="sidebar-signout"
-        (click)="logout()"
-        matTooltip="Sign out"
-        matTooltipPosition="right"
-        aria-label="Sign out">
-        <fa-icon icon="sign-out-alt"></fa-icon>
-        <span [ngClass]="{ '!hidden': sidenavCollapsed }">Sign out</span>
-      </button>
-    </div>
+    <button mat-icon-button (click)="logout()" [matTooltip]="'Sign out'" aria-label="Sign out">
+      <fa-icon icon="sign-out-alt"></fa-icon>
+    </button>
   </div>
 </div>

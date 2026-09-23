@@ -1,0 +1,250 @@
+/*
+ * Bancro authenticated-shell adaptation of the user-supplied Dore admin template.
+ *
+ * Important: every rule is scoped to #mifosx-shell-container so the existing
+ * Bancro login/reset-password experience remains visually unchanged.
+ */
+@font-face {
+  font-family: 'Bancro Dore Nunito';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url('/assets/dore/font/nunito/nunito-300.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Bancro Dore Nunito';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/assets/dore/font/nunito/nunito-regular.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Bancro Dore Nunito';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/assets/dore/font/nunito/nunito-600.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Bancro Dore Nunito';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/assets/dore/font/nunito/nunito-700.woff2') format('woff2');
+}
+
+#mifosx-shell-container {
+  --bancro-dore-primary: #00365a;
+  --bancro-dore-primary-strong: #002743;
+  --bancro-dore-accent: #9fe870;
+  --bancro-dore-accent-ink: #163300;
+  --bancro-dore-bg: #f8f8f8;
+  --bancro-dore-surface: #ffffff;
+  --bancro-dore-border: #e7e7e7;
+  --bancro-dore-text: #3a3a3a;
+  --bancro-dore-muted: #8f8f8f;
+  --bancro-dore-danger: #c43d4b;
+  --bancro-dore-warning: #d59b22;
+  --bancro-dore-success: #2f855a;
+  --bancro-dore-radius: 12px;
+  --bancro-dore-shadow: 0 3px 30px rgba(0, 0, 0, 0.08);
+
+  background: var(--bancro-dore-bg);
+  color: var(--bancro-dore-text);
+  font-family: 'Bancro Dore Nunito', 'Nunito', Arial, sans-serif;
+  letter-spacing: 0.1px;
+
+  .mat-drawer-content,
+  .mat-sidenav-content {
+    background: var(--bancro-dore-bg);
+  }
+
+  h1, h2, h3, h4, h5, h6,
+  .mat-card-title,
+  .mat-card-subtitle,
+  .mat-button,
+  .mat-raised-button,
+  .mat-stroked-button,
+  .mat-flat-button,
+  .mat-form-field,
+  .mat-table,
+  .mat-list-item {
+    font-family: 'Bancro Dore Nunito', 'Nunito', Arial, sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    color: #303030;
+    font-weight: 600;
+  }
+
+  h2 { font-size: 1.6rem; }
+  h3 { font-size: 1.2rem; }
+
+  p { line-height: 1.55; }
+
+  .container,
+  .operations-page,
+  .activity-page {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: none;
+    padding-left: 32px;
+    padding-right: 32px;
+  }
+
+  .mat-card {
+    border: 0;
+    border-radius: var(--bancro-dore-radius);
+    box-shadow: var(--bancro-dore-shadow) !important;
+    background: var(--bancro-dore-surface);
+  }
+
+  .mat-card-title {
+    color: #303030;
+    font-size: 1.05rem;
+    font-weight: 600;
+  }
+
+  .mat-card-subtitle,
+  small,
+  .text-muted {
+    color: var(--bancro-dore-muted);
+  }
+
+  .mat-raised-button.mat-primary,
+  .mat-flat-button.mat-primary {
+    background: var(--bancro-dore-primary);
+    color: #fff;
+  }
+
+  .mat-stroked-button.mat-primary,
+  .mat-button.mat-primary {
+    color: var(--bancro-dore-primary);
+  }
+
+  .mat-raised-button,
+  .mat-flat-button,
+  .mat-stroked-button,
+  .mat-button {
+    min-height: 38px;
+    border-radius: 20px !important;
+    font-weight: 600;
+    letter-spacing: 0.15px;
+  }
+
+  .mat-form-field-appearance-outline .mat-form-field-outline-start {
+    border-radius: 9px 0 0 9px;
+  }
+
+  .mat-form-field-appearance-outline .mat-form-field-outline-end {
+    border-radius: 0 9px 9px 0;
+  }
+
+  .mat-form-field-appearance-outline.mat-focused .mat-form-field-outline-thick {
+    color: var(--bancro-dore-primary);
+  }
+
+  .mat-checkbox-checked.mat-accent .mat-checkbox-background,
+  .mat-checkbox-indeterminate.mat-accent .mat-checkbox-background {
+    background-color: var(--bancro-dore-primary);
+  }
+
+  .mat-table,
+  table.simple-table {
+    width: 100%;
+    background: #fff;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+
+  .mat-header-row,
+  table.simple-table th {
+    background: #f4f5f5;
+  }
+
+  .mat-header-cell,
+  table.simple-table th {
+    color: #5c5c5c;
+    font-size: 0.74rem;
+    font-weight: 700;
+    letter-spacing: 0.35px;
+    text-transform: uppercase;
+  }
+
+  .mat-cell,
+  .mat-header-cell,
+  table.simple-table td,
+  table.simple-table th {
+    border-bottom-color: #ececec;
+  }
+
+  table.simple-table td,
+  table.simple-table th {
+    padding: 12px 14px;
+    text-align: left;
+  }
+
+  table.simple-table tr:last-child td {
+    border-bottom: 0;
+  }
+
+  .notice,
+  .error,
+  .message {
+    border: 0;
+    border-radius: 10px;
+    box-shadow: none;
+  }
+
+  .error,
+  .notice.error {
+    background: #fff0f1;
+    color: #7e2630;
+  }
+
+  .message,
+  .notice.success {
+    background: #edf8f1;
+    color: #245a3d;
+  }
+
+  .mat-progress-bar {
+    height: 2px;
+  }
+
+  .mat-progress-bar-fill::after {
+    background-color: var(--bancro-dore-primary);
+  }
+
+  .mat-progress-bar-buffer {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #d5d5d5;
+    border-radius: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+}
+
+@media (max-width: 800px) {
+  #mifosx-shell-container {
+    .container,
+    .operations-page,
+    .activity-page {
+      padding-left: 16px;
+      padding-right: 16px;
+    }
+  }
+}

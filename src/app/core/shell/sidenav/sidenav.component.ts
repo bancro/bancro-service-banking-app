@@ -47,7 +47,7 @@ export class SidenavComponent implements OnInit {
   constructor(private router: Router,
               public dialog: MatDialog,
               private authenticationService: AuthenticationService) {
-    this.userActivity = JSON.parse(localStorage.getItem('mifosXLocation'));
+    this.userActivity = JSON.parse(localStorage.getItem('mifosXLocation') || '[]');
   }
 
   /**

@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { OperationsService } from './operations.service';
 
 @Component({
@@ -78,6 +79,17 @@ export class OperationsComponent implements OnInit {
   quoteResult: any;
   error = '';
   message = '';
+  activeArea = 'overview';
+
+  private readonly areaCopy: any = {
+    overview: { title: 'Administration & Channel Control', description: 'Control Bancro channels, approvals, readiness and operational exceptions from one administrative workspace.' },
+    teller: { title: 'Teller Management', description: 'Prepare teller users, cashier assignments, branch access and financial controls before a teller opens a cash drawer.' },
+    transfers: { title: 'Transfers & NIBSS', description: 'Manage NIBSS/NIP and NPS integration readiness, certification, directories, policies and operational status.' },
+    cards: { title: 'Cards', description: 'Manage card products, processor/HSM profiles, lifecycle approvals, certification and card reconciliation.' },
+    pos: { title: 'POS & Merchants', description: 'Manage merchants, terminals, PTSA/ISO 8583 readiness, POS controls and settlement preparation.' },
+    approvals: { title: 'Approvals & Controls', description: 'Review maker-checker requests, transaction limits, accounting controls, teller variance and operational exceptions.' },
+    integrations: { title: 'Integrations', description: 'Configure safe non-secret connection profiles and control production activation for external banking rails.' }
+  };
 
   quoteForm: FormGroup;
   policyForm: FormGroup;
@@ -103,7 +115,7 @@ export class OperationsComponent implements OnInit {
   posSettlementForm: FormGroup;
   integrationProfileForm: FormGroup;
 
-  constructor(private fb: FormBuilder, private service: OperationsService) {
+  constructor(private fb: FormBuilder, private service: OperationsService, private route: ActivatedRoute) {
     this.quoteForm = this.fb.group({
       rail: ['NIP', Validators.required], channel: ['TELLER', Validators.required], paymentType: ['TRANSFER', Validators.required],
       sourceAccountId: [''], amount: [null, [Validators.required, Validators.min(0.01)]]
@@ -176,7 +188,17 @@ export class OperationsComponent implements OnInit {
     });
   }
 
-  ngOnInit(): void { this.refresh(); }
+  ngOnInit(): void {
+    this.route.paramMap.subscribe(params => {
+      const requested = (params.get('area') || 'overview').toLowerCase();
+      this.activeArea = this.areaCopy[requested] ? requested : 'overview';
+    });
+    this.refresh();
+  }
+
+  get areaTitle(): string { return this.areaCopy[this.activeArea]?.title || this.areaCopy.overview.title; }
+  get areaDescription(): string { return this.areaCopy[this.activeArea]?.description || this.areaCopy.overview.description; }
+  showArea(...areas: string[]): boolean { return areas.includes(this.activeArea); }
 
   refresh(): void {
     this.error = '';
