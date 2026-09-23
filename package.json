@@ -115,7 +115,7 @@
     "url": "https://github.com/openMF/web-app/issues"
   },
   "engines": {
-    "node": "^14.15.0 || ^16.10.0",
+    "node": "^24.x || ^26.x",
     "npm": ">= 8.11.0"
   }
 }
