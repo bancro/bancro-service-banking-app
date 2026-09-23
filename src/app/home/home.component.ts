@@ -31,6 +31,8 @@ export class HomeComponent implements OnInit, AfterViewInit {
 
   /** Username of authenticated user. */
   username: string;
+  /** Office of authenticated user. */
+  officeName: string;
   /** Activity Form. */
   activityForm: any;
   /** Search Text. */
@@ -71,6 +73,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
   ngOnInit() {
     const credentials = this.authenticationService.getCredentials();
     this.username = credentials.username;
+    this.officeName = credentials.officeName;
     this.setFilteredActivities();
   }
 

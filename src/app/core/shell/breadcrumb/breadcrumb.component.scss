@@ -2,47 +2,60 @@
 
 .breadcrumb-wrapper {
   margin: 0 auto;
-  max-width: 74rem;
-  width: 90%;
+  max-width: 1540px;
+  width: 100%;
   word-wrap: break-word;
 
   .breadcrumb {
     list-style: none;
-    padding: 0;
-    margin: 1.5rem 0 2.5rem;
+    padding: 26px 0 18px;
+    margin: 0;
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 8px 16px;
+    border-bottom: 1px solid rgba(31, 55, 43, 0.07);
 
     .breadcrumb-title {
-      font-size: 18px;
-      font-weight: 600;
-    }
-
-    .separator::before {
-      content: "";
-      border: 1.5px solid #000;
-      margin: 0 0.6rem;
-      font-size: 1.25rem;
-      font-weight: 400;
+      font-size: 24px;
+      line-height: 1.2;
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      color: #24372e !important;
     }
 
     .breadcrumb-label {
       display: inline;
-      font-size: 12px;
+      font-size: 11px;
+      color: #849087;
 
       .breadcrumb-link {
         a {
           text-decoration: none;
-          color: #999999;
+          color: #849087;
 
           &:hover {
-            text-decoration: underline;
+            color: #315b45;
           }
         }
 
         &::after {
-          content: "|";
-          margin: 0 0.2rem;
+          content: "/";
+          margin: 0 0.45rem;
+          color: #c2c9c4;
         }
       }
+    }
+  }
+}
+
+@media (max-width: 767px) {
+  .breadcrumb-wrapper .breadcrumb {
+    padding: 18px 2px 14px;
+
+    .breadcrumb-title {
+      width: 100%;
+      font-size: 21px;
     }
   }
 }

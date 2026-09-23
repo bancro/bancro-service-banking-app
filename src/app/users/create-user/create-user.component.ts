@@ -82,7 +82,7 @@ export class CreateUserComponent implements OnInit, AfterViewInit {
       'email': ['', [Validators.required, Validators.email]],
       'firstname': ['', [Validators.required, Validators.pattern('(^[A-z]).*')]],
       'lastname': ['', [Validators.required, Validators.pattern('(^[A-z]).*')]],
-      'sendPasswordToEmail': [true],
+      'sendPasswordToEmail': [false],
       'passwordNeverExpires': [false],
       'officeId': ['', Validators.required],
       'staffId': [''],
@@ -176,7 +176,7 @@ export class CreateUserComponent implements OnInit, AfterViewInit {
   previousStep() {
     this.configurationWizardService.showUsersForm = false;
     this.configurationWizardService.showUsersList = true;
-    this.router.navigate(['/users']);
+    this.router.navigate(['/appusers']);
   }
 
   /**

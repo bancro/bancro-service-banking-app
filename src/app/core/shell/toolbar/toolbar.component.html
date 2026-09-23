@@ -1,72 +1,50 @@
-<mat-toolbar fxLayout="row" color="basic" id="mifosx-toolbar">
-  <!-- <button mat-icon-button *ngIf="!sidenavCollapsed" (click)="toggleSidenav()" matTooltip="Toggle Hide/Open">
-    <fa-icon icon="bars" size="lg" class="text-grey-3"></fa-icon>
-  </button> -->
+<mat-toolbar fxLayout="row" id="mifosx-toolbar" class="bancro-toolbar">
+  <div class="toolbar-left">
+    <button
+      mat-icon-button
+      class="mobile-menu-button"
+      (click)="toggleSidenav()"
+      matTooltip="Open navigation"
+      fxHide.gt-sm="true">
+      <fa-icon icon="bars"></fa-icon>
+    </button>
 
-  <button
-    mat-icon-button
-    *ngIf="sidenav.opened"
-    (click)="toggleSidenavCollapse()"
-    matTooltip="Toggle Collapse"
-    fxHide.lt-md="true"
-    class="toggler"
-  >
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      *ngIf="!sidenavCollapsed"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-    >
-      <path
-        d="M18 17L13 12L18 7M11 17L6 12L11 7"
-        stroke="#0E0F0C"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      />
-    </svg>
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      *ngIf="sidenavCollapsed"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-    >
-      <path
-        d="M6 6.99951L11 11.9995L6 16.9995M13 6.99951L18 11.9995L13 16.9995"
-        stroke="#0E0F0C"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      />
-    </svg>
-  </button>
+    <button
+      mat-icon-button
+      *ngIf="sidenav.opened"
+      (click)="toggleSidenavCollapse()"
+      matTooltip="Collapse navigation"
+      fxHide.lt-md="true"
+      class="toggler">
+      <svg xmlns="http://www.w3.org/2000/svg" *ngIf="!sidenavCollapsed" width="22" height="22" viewBox="0 0 24 24" fill="none">
+        <path d="M18 17L13 12L18 7M11 17L6 12L11 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+      <svg xmlns="http://www.w3.org/2000/svg" *ngIf="sidenavCollapsed" width="22" height="22" viewBox="0 0 24 24" fill="none">
+        <path d="M6 7L11 12L6 17M13 7L18 12L13 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+    </button>
 
-  <mifosx-search-tool></mifosx-search-tool>
+    <div class="toolbar-search">
+      <mifosx-search-tool></mifosx-search-tool>
+    </div>
+  </div>
 
   <span fxFlex="auto"></span>
 
-  <div class="flex gap-x-5 items-center">
-    <mifosx-language-selector class="ml-1 language" fxHide.lt-md></mifosx-language-selector>
-
-    <!-- <mifosx-theme-picker fxHide.lt-md></mifosx-theme-picker> -->
-
+  <div class="toolbar-actions">
+    <mifosx-language-selector class="language" fxHide.lt-lg></mifosx-language-selector>
     <mifosx-notifications-tray fxHide.lt-md></mifosx-notifications-tray>
-    <!-- <button class="grid-tab bg-gray-100 flex items-center justify-center h-12 w-12 rounded-full"
-    [matMenuTriggerFor]="applicationsMenu">
-    <img src="assets/images/grid.svg" class="h-5 w-5" />
-  </button> -->
 
     <button
-    
-   
       [matMenuTriggerFor]="applicationMenu"
-      class="bg-[#EDEFEB] rounded-full flex items-center justify-center h-[44px] w-[44px] uppercase font-semibold text-sm"
-    >
-    <img src="assets/images/avax.svg" width="40">
+      class="user-menu-trigger"
+      matTooltip="Account and sign out">
+      <span class="user-copy" fxHide.lt-md>
+        <strong>{{ username }}</strong>
+        <small>{{ officeName }}</small>
+      </span>
+      <img src="assets/images/avax.svg" alt="User" class="user-avatar">
+      <fa-icon icon="chevron-down" size="xs" class="user-chevron" fxHide.lt-sm></fa-icon>
     </button>
   </div>
 </mat-toolbar>
@@ -83,7 +61,6 @@
   </span>
 </mat-menu>
 
-<!-- Toolbar Menus -->
 <mat-menu #reportsMenu="matMenu" [overlapTrigger]="false">
   <button mat-menu-item [routerLink]="['/reports']">All</button>
   <button mat-menu-item [routerLink]="['/reports', 'Client']">Clients</button>
@@ -95,7 +72,7 @@
 </mat-menu>
 
 <mat-menu #adminMenu="matMenu" [overlapTrigger]="false">
-  <button mat-menu-item [routerLink]="['/users']">Users</button>
+  <button mat-menu-item [routerLink]="['/appusers']">Users</button>
   <button mat-menu-item [routerLink]="['/organization']">Organization</button>
   <button mat-menu-item [routerLink]="['/system']">System</button>
   <button mat-menu-item [routerLink]="['/products']">Products</button>
@@ -108,41 +85,39 @@
   <button mat-menu-item [routerLink]="['/self-service/task-management']">Task Management</button>
 </mat-menu>
 
-<!-- Application User Help Menu -->
-<mat-menu #applicationMenu="matMenu" [overlapTrigger]="false" class="shadow-sm">
-  <button mat-menu-item (click)="help()">
-    <mat-icon matListIcon>
-      <fa-icon icon="question-circle" size="sm"></fa-icon>
-    </mat-icon>
-    <span>Help</span>
-  </button>
+<mat-menu #applicationMenu="matMenu" [overlapTrigger]="false" class="bancro-user-menu">
+  <div class="menu-user-summary">
+    <img src="assets/images/avax.svg" alt="User">
+    <div>
+      <strong>{{ username }}</strong>
+      <small>{{ officeName }}</small>
+    </div>
+  </div>
+  <mat-divider></mat-divider>
   <button mat-menu-item [routerLink]="['/profile']">
-    <mat-icon>
-      <fa-icon icon="user" size="sm"></fa-icon>
-    </mat-icon>
+    <mat-icon><fa-icon icon="user" size="sm"></fa-icon></mat-icon>
     <span>Profile</span>
   </button>
   <button mat-menu-item [routerLink]="['/settings']">
-    <mat-icon>
-      <fa-icon icon="cog" size="sm"></fa-icon>
-    </mat-icon>
+    <mat-icon><fa-icon icon="cog" size="sm"></fa-icon></mat-icon>
     <span>Settings</span>
   </button>
-  <button mat-menu-item (click)="logout()" id="logout">
-    <mat-icon>
-      <fa-icon icon="sign-out-alt" size="sm"></fa-icon>
-    </mat-icon>
+  <button mat-menu-item (click)="help()">
+    <mat-icon><fa-icon icon="question-circle" size="sm"></fa-icon></mat-icon>
+    <span>Help</span>
+  </button>
+  <mat-divider></mat-divider>
+  <button mat-menu-item (click)="logout()" id="logout" class="logout-menu-item">
+    <mat-icon><fa-icon icon="sign-out-alt" size="sm"></fa-icon></mat-icon>
     <span>Sign Out</span>
   </button>
 </mat-menu>
-<!-- Applications Redirect User Help Menu -->
+
 <mat-menu #applicationsMenu="matMenu" xPosition="before">
   <div class="redir-tab">
     <button mat-menu-item *ngFor="let item of applications; index as i">
       <img src="{{ item.logo }}" class="mx-auto" />
-      <p class="text-[#575267] text-xs font-medium text-center">
-        {{ item.title }}
-      </p>
+      <p>{{ item.title }}</p>
     </button>
   </div>
 </mat-menu>

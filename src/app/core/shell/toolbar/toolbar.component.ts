@@ -30,6 +30,9 @@ export class ToolbarComponent implements OnInit {
 
   /** Sets the initial state of sidenav as collapsed. Not collapsed if false. */
   sidenavCollapsed = false;
+  username = 'User';
+  officeName = '';
+
   applications = [
     // {
     //   url: `http://3.16.1.81:777`,
@@ -77,6 +80,10 @@ export class ToolbarComponent implements OnInit {
    * Subscribes to breakpoint for handset.
    */
   ngOnInit() {
+    const credentials = this.authenticationService.getCredentials();
+    this.username = credentials?.staffDisplayName || credentials?.username || 'User';
+    this.officeName = credentials?.officeName || '';
+
     this.isHandset$.subscribe(isHandset => {
       if (isHandset && this.sidenavCollapsed) {
         this.toggleSidenavCollapse(false);

@@ -510,40 +510,24 @@
       </div>
     </div>
 
-    <div class="bg-[#EDEFEB] w-[90%] px-[10px] py-[14px] rounded-lg mx-auto mb-8 flex justify-start items-center">
-      <!-- <i
-        [ngClass]="{
-          '!hidden': !sidenavCollapsed,
-          show: sidenavCollapsed
-        }"
-        class="text-4xl fa fa-user-circle f28 text-grey-3 app-avatar"
-        aria-'!hidden'="true"
-      ></i> -->
-      <img
-        [ngClass]="{
-          '!hidden': !sidenavCollapsed,
-          show: sidenavCollapsed
-        }"
-        src="assets/images/av.svg"
-        class="rounded-full h-[30px] w-[30px]"
-        alt="Admin"
-        width="30"
-        height="30"
-      />
-      <div
-        class="items-center gap-x-4"
-        [ngClass]="{
-          flex: !sidenavCollapsed,
-          '!hidden': sidenavCollapsed
-        }"
-      >
-        <!-- <i class="fa fa-user-circle text-[30px] text-gray-400 app-avatar" aria-'!hidden'="true"></i> -->
-        <img src="assets/images/avax.svg" class="rounded-full h-[40px] w-[40px]" alt="Admin" width="30" height="30" />
-        <div class="text">
-          <p class="text-xs text-[#0E0F0C] capitalize font-semibold">{{ username }}</p>
-          <p class="text-[10px] text-[#6A6C6A]">{{ officeName }}</p>
+    <div class="sidebar-user-panel" [ngClass]="{ 'is-compact': sidenavCollapsed }">
+      <div class="sidebar-user-main" [matTooltip]="sidenavCollapsed ? username : ''" matTooltipPosition="right">
+        <img src="assets/images/avax.svg" class="sidebar-user-avatar" alt="User" />
+        <div class="sidebar-user-copy" [ngClass]="{ '!hidden': sidenavCollapsed }">
+          <p>{{ username }}</p>
+          <span>{{ officeName }}</span>
         </div>
       </div>
+      <button
+        type="button"
+        class="sidebar-signout"
+        (click)="logout()"
+        matTooltip="Sign out"
+        matTooltipPosition="right"
+        aria-label="Sign out">
+        <fa-icon icon="sign-out-alt"></fa-icon>
+        <span [ngClass]="{ '!hidden': sidenavCollapsed }">Sign out</span>
+      </button>
     </div>
   </div>
 </div>

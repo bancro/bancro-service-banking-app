@@ -57,8 +57,9 @@
 
           <div fxFlex="48%" class="send-password-to-email-wrapper">
             <mat-checkbox labelPosition="before" formControlName="sendPasswordToEmail">
-              {{ 'labels.inputs.Override password expiry policy'  |translate}}
+              Email temporary password to user
             </mat-checkbox>
+            <div class="email-password-hint">Turn this on only when outgoing email is configured. User creation no longer depends on email delivery.</div>
           </div>
 
            <mat-form-field appearance="outline"  fxFlex="48%" *ngIf="!userForm.controls.sendPasswordToEmail.value">

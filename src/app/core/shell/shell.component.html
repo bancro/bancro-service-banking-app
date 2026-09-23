@@ -1,7 +1,6 @@
-<!-- Application Shell -->
-<mat-sidenav-container id="mifosx-shell-container" autosize>
+<!-- Bancro application shell. Login stays outside this shell and keeps its existing design. -->
+<mat-sidenav-container id="mifosx-shell-container" class="bancro-internal-shell" autosize>
 
-  <!-- Sidenav -->
   <mat-sidenav
     #sidenav
     class="sidebar-panel"
@@ -17,21 +16,18 @@
 
   </mat-sidenav>
 
-  <!-- Content -->
-  <mat-sidenav-content>
-
-    <!-- Toolbar -->
+  <mat-sidenav-content class="bancro-shell-content">
     <mifosx-toolbar [sidenav]="sidenav" (collapse)="toggleCollapse($event)"></mifosx-toolbar>
-    <!-- Progress Bar -->
-    <mat-progress-bar [mode]="progressBarMode"></mat-progress-bar>
+    <mat-progress-bar class="bancro-progress" [mode]="progressBarMode"></mat-progress-bar>
 
-    <!-- Breadcrumb -->
-    <mifosx-breadcrumb></mifosx-breadcrumb>
-    <!-- Content -->
-    <mifosx-content></mifosx-content>
-    <!-- Footer -->
+    <main class="bancro-page-stage">
+      <mifosx-breadcrumb></mifosx-breadcrumb>
+      <section class="bancro-route-content">
+        <mifosx-content></mifosx-content>
+      </section>
+    </main>
+
     <mifosx-footer></mifosx-footer>
-
   </mat-sidenav-content>
 
 </mat-sidenav-container>

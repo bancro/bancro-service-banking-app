@@ -51,6 +51,13 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
       log.error(`Request Error: ${errorMessage}`);
     }
 
+    // A 409 from the teller-session endpoint is an expected operational state
+    // (for example, no active cashier assignment yet). The workstation renders
+    // a friendly setup message, so do not also raise a global technical snackbar.
+    if (status === 409 && response.url?.includes('/bancro/teller/session')) {
+      throw response;
+    }
+
     if (status === 401 || (environment.oauth.enabled && status === 400)) {
       this.alertService.alert({ type: 'Authentication Error', message: 'Invalid User Details. Please try again!' });
     } else if (status === 403 && errorMessage === 'The provided one time token is invalid') {

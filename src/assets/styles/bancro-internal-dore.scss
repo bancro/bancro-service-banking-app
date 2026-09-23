@@ -1,0 +1,199 @@
+/*
+ * Bancro internal application skin, adapted from the layout language of the
+ * supplied Dore HTML template. The selector is deliberately scoped to the
+ * authenticated shell so the existing login experience is not changed.
+ */
+mifosx-shell {
+  --bancro-ink: #24372e;
+  --bancro-muted: #7b8780;
+  --bancro-line: #e6e9e5;
+  --bancro-surface: #ffffff;
+  --bancro-surface-soft: #f7f8f6;
+  --bancro-brand: #234f3b;
+  --bancro-brand-soft: #edf6e8;
+  --bancro-lime: #9fe870;
+  color: var(--bancro-ink);
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    color: #23372e;
+    letter-spacing: -0.015em;
+  }
+
+  a {
+    transition: color 150ms ease;
+  }
+
+  .mat-card {
+    border-radius: 14px;
+    border: 1px solid rgba(31, 55, 43, 0.07);
+    box-shadow: 0 1px 15px rgba(30, 54, 42, 0.045), 0 1px 6px rgba(30, 54, 42, 0.035) !important;
+    background: var(--bancro-surface);
+  }
+
+  .mat-card.shadow-none,
+  .shadow-none.mat-card {
+    border: 1px solid rgba(31, 55, 43, 0.08);
+    box-shadow: 0 1px 12px rgba(30, 54, 42, 0.035) !important;
+  }
+
+  .mat-card-title,
+  .mat-card-header .mat-card-title {
+    color: #23372e;
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.35;
+  }
+
+  .mat-card-subtitle {
+    color: var(--bancro-muted);
+  }
+
+  .mat-form-field {
+    color: var(--bancro-ink);
+  }
+
+  .mat-form-field-appearance-outline .mat-form-field-outline {
+    color: #dce2dd;
+  }
+
+  .mat-form-field-appearance-outline.mat-focused .mat-form-field-outline-thick {
+    color: #527762;
+  }
+
+  .mat-form-field-appearance-outline .mat-form-field-outline-start {
+    border-radius: 9px 0 0 9px;
+  }
+
+  .mat-form-field-appearance-outline .mat-form-field-outline-end {
+    border-radius: 0 9px 9px 0;
+  }
+
+  .mat-form-field-label,
+  .mat-hint {
+    color: #7c8781;
+  }
+
+  .mat-input-element,
+  .mat-select-value {
+    color: #2a3b33;
+  }
+
+  .mat-raised-button,
+  .mat-flat-button,
+  .mat-stroked-button,
+  .mat-button {
+    min-height: 38px;
+    border-radius: 9px !important;
+    font-weight: 700;
+    letter-spacing: 0;
+  }
+
+  .mat-stroked-button {
+    border-color: #d8dfda;
+    background: #fff;
+  }
+
+  .mat-raised-button.mat-primary,
+  .mat-flat-button.mat-primary {
+    box-shadow: 0 6px 14px rgba(49, 94, 70, 0.14) !important;
+  }
+
+  .mat-table {
+    width: 100%;
+    background: transparent;
+  }
+
+  .mat-header-row,
+  .mat-header-cell {
+    background: #f7f8f6;
+    color: #66726b;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+  }
+
+  .mat-header-cell:first-child {
+    border-top-left-radius: 10px;
+  }
+
+  .mat-header-cell:last-child {
+    border-top-right-radius: 10px;
+  }
+
+  .mat-cell,
+  .mat-footer-cell {
+    color: #34473d;
+    border-bottom-color: #eef0ed;
+  }
+
+  .mat-row {
+    transition: background 140ms ease;
+  }
+
+  .mat-row:hover {
+    background: #fafbf9;
+  }
+
+  .mat-paginator,
+  .mat-paginator-container {
+    background: transparent;
+    color: #68746d;
+  }
+
+  .mat-tab-group,
+  .mat-tab-nav-bar {
+    background: transparent;
+  }
+
+  .mat-tab-label {
+    color: #66736c;
+    font-weight: 700;
+  }
+
+  .mat-tab-label.mat-tab-label-active {
+    color: #274d3a;
+  }
+
+  .mat-expansion-panel {
+    border-radius: 12px !important;
+  }
+
+  .mat-chip,
+  .mat-standard-chip {
+    border-radius: 999px;
+  }
+
+  .mat-divider {
+    border-top-color: #edf0ed;
+  }
+
+  .mat-elevation-z8,
+  .mat-elevation-z4,
+  .mat-elevation-z2 {
+    box-shadow: 0 1px 15px rgba(30, 54, 42, 0.045), 0 1px 6px rgba(30, 54, 42, 0.035) !important;
+  }
+
+  .status-approved,
+  .status-active {
+    color: #2e6c48;
+  }
+
+  .bancro-section-label {
+    color: #819087;
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  @media (max-width: 767px) {
+    .mat-card {
+      border-radius: 11px;
+    }
+  }
+}

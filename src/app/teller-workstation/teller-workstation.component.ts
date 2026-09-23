@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TellerWorkstationService } from './teller-workstation.service';
+import { AuthenticationService } from '../core/authentication/authentication.service';
 
 @Component({
   selector: 'mifosx-teller-workstation',
@@ -29,9 +30,13 @@ export class TellerWorkstationComponent implements OnInit {
   enquiring = false;
   error = '';
   message = '';
+  sessionUnavailable = false;
+  sessionSetupMessage = '';
+  private permissions: string[] = [];
   displayedColumns = ['reference', 'type', 'account', 'amount', 'status', 'created', 'actions'];
 
-  constructor(private fb: FormBuilder, private tellerService: TellerWorkstationService) {
+  constructor(private fb: FormBuilder, private tellerService: TellerWorkstationService, private authenticationService: AuthenticationService) {
+    this.permissions = this.authenticationService.getCredentials()?.permissions || [];
     this.balanceForm = this.fb.group({
       declaredCash: [null, [Validators.required, Validators.min(0)]],
       note: ['']
@@ -68,32 +73,49 @@ export class TellerWorkstationComponent implements OnInit {
     this.form.get('destinationBankCode').valueChanges.subscribe(() => this.nameEnquiryResult = null);
     this.form.get('beneficiaryAccount').valueChanges.subscribe(() => this.nameEnquiryResult = null);
     this.form.get('externalRail').valueChanges.subscribe(() => { this.nameEnquiryResult = null; this.form.patchValue({ destinationBankCode: '', beneficiaryName: '' }, { emitEvent: false }); });
-    this.loadNibssReferenceData();
+    if (this.canReadPayments()) {
+      this.loadNibssReferenceData();
+    }
     this.refresh();
   }
 
   refresh(): void {
     this.loading = true;
     this.error = '';
+    this.sessionUnavailable = false;
+    this.sessionSetupMessage = '';
     this.tellerService.session('NGN').subscribe({
       next: (session: any) => {
         this.session = session;
+        this.sessionUnavailable = false;
         if (!this.form.get('paymentTypeId').value && session?.paymentTypes?.length) {
           this.form.patchValue({ paymentTypeId: session.paymentTypes[0].id });
         }
         this.loading = false;
+        this.loadTransactions();
+        this.loadControls();
         this.loadEod();
       },
       error: (e: any) => {
-        this.error = this.errorText(e, 'No active cashier session is available for this user.');
+        this.session = null;
         this.loading = false;
+        if (e?.status === 409) {
+          this.sessionUnavailable = true;
+          this.sessionSetupMessage = this.sessionProblemText(e);
+          this.error = '';
+        } else {
+          this.error = this.errorText(e, 'We could not load your teller workspace. Please try again or contact a supervisor.');
+        }
       }
     });
-    this.loadTransactions();
-    this.loadControls();
   }
 
   loadControls(): void {
+    if (!this.hasPermission('READ_BANCRO_TELLER_CONTROL')) {
+      this.pendingCommands = [];
+      this.pendingCashControls = [];
+      return;
+    }
     this.tellerService.commands('PENDING_APPROVAL').subscribe({ next: x => this.pendingCommands = x || [], error: () => this.pendingCommands = [] });
     this.tellerService.cashControl('PENDING').subscribe({ next: x => this.pendingCashControls = x || [], error: () => this.pendingCashControls = [] });
   }
@@ -353,6 +375,32 @@ export class TellerWorkstationComponent implements OnInit {
   externalInstitutions(): any[] { return this.isNpsExternal() ? this.npsParticipants.map(x => ({ institutionCode: x.participantCode, institutionName: x.participantName })) : this.institutions; }
   externalMode(): any { return this.isNpsExternal() ? this.npsStatus : this.nibssStatus; }
   isCashOperation(): boolean { return ['CASH_DEPOSIT', 'CASH_WITHDRAWAL'].includes(this.form.get('operation').value); }
+
+
+  hasPermission(permission: string): boolean {
+    return this.permissions.includes('ALL_FUNCTIONS') || this.permissions.includes(permission);
+  }
+
+  canReadPayments(): boolean {
+    return this.hasPermission('READ_BANCRO_PAYMENT');
+  }
+
+  externalConnectionLabel(): string {
+    const modes = [this.nibssStatus?.mode, this.npsStatus?.mode].filter(Boolean);
+    if (!modes.length) { return 'Not configured'; }
+    return modes.every(x => x === 'SIMULATOR') ? 'Test mode' : 'Connected';
+  }
+
+  private sessionProblemText(e: any): string {
+    const raw = this.errorText(e, 'No active cashier assignment is available.');
+    if (/not linked to a staff record/i.test(raw)) {
+      return 'Your login is not linked to a staff profile. A supervisor or administrator must link this user to the correct staff record before teller transactions can be posted.';
+    }
+    if (/no active cashier assignment/i.test(raw)) {
+      return 'You are signed in successfully, but there is no active cashier assignment for your shift. Ask a supervisor to assign you to a teller/cashier for today and allocate your opening cash.';
+    }
+    return 'Your teller access is valid, but your cash-drawer setup is not ready for the current business day. Ask a supervisor to confirm your staff link, cashier assignment and opening cash allocation.';
+  }
 
   private generatedIdempotencyKey(operation: string): string {
     return `TELLER-${operation}-${Date.now()}-${Math.floor(Math.random() * 100000)}`;
