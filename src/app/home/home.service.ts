@@ -19,6 +19,23 @@ export class HomeService {
   constructor(private http: HttpClient) { }
 
   /**
+   * Returns a single-page client search response so the dashboard can use
+   * the authoritative `totalElements` value as the total client count.
+   *
+   * @returns {Observable<any>}
+   */
+  getTotalClients(): Observable<any> {
+    const request = {
+      request: {
+        text: ''
+      },
+      page: 0,
+      size: 1
+    };
+    return this.http.post('/v2/clients/search', request);
+  }
+
+  /**
    * @param {number} officeId Office Id.
    * @returns {Observable<any>}
    */

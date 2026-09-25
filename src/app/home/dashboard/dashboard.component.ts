@@ -57,12 +57,12 @@ export class DashboardComponent implements OnInit {
   loadSummary() {
     const officeId = 1;
     forkJoin([
-      this.homeService.getClientTrendsByDay(officeId).pipe(catchError(() => of(null))),
+      this.homeService.getTotalClients().pipe(catchError(() => of(null))),
       this.homeService.getLoanTrendsByDay(officeId).pipe(catchError(() => of(null))),
       this.homeService.getCollectedAmount(officeId).pipe(catchError(() => of(null))),
       this.homeService.getDisbursedAmount(officeId).pipe(catchError(() => of(null)))
     ]).subscribe((responses: any[]) => {
-      this.summary.clients = this.sumField(responses[0], 'count');
+      this.summary.clients = this.totalElements(responses[0]);
       this.summary.loans = this.sumField(responses[1], 'lcount');
       this.summary.collected = this.secondNumericValue(responses[2]);
       this.summary.disbursed = this.secondNumericValue(responses[3]);
@@ -70,6 +70,15 @@ export class DashboardComponent implements OnInit {
     }, () => {
       this.summaryLoading = false;
     });
+  }
+
+  /** Read the paged client search total used by the Clients screen. */
+  private totalElements(response: any): number {
+    if (!response) {
+      return null;
+    }
+    const value = Number(response.totalElements);
+    return Number.isFinite(value) ? value : null;
   }
 
   /** Sum a numeric field from a report response. */
