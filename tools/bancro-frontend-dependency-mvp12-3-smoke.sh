@@ -12,6 +12,6 @@ if(l.packages?.['node_modules/ng-apexcharts']) fail('ng-apexcharts must be remov
 if(l.dependencies?.['ng-apexcharts']) fail('ng-apexcharts must be removed from package-lock dependency graph');
 if(p.dependencies?.['@angular/common'] !== '14.3.0') fail('Angular common baseline changed unexpectedly');
 if(!p.dependencies?.apexcharts) fail('Standalone apexcharts runtime must remain present');
-if(p.engines?.node !== '^14.15.0 || ^16.10.0') fail('Angular 14 Node engine guard missing');
+if(p.engines?.node !== '^24.x || ^26.x') fail('Bancro Node 24/26 engine policy missing');
 console.log('Bancro MVP12.3 frontend dependency compatibility smoke: PASS');
 NODE

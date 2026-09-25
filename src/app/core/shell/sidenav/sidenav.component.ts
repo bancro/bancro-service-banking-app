@@ -1,8 +1,7 @@
 /** Angular Imports */
 import { Component, OnInit, Input } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { Router } from '@angular/router';
-
+import { NavigationEnd, Router } from '@angular/router';
 
 /** Custom Components */
 import { KeyboardShortcutsDialogComponent } from 'app/shared/keyboard-shortcuts-dialog/keyboard-shortcuts-dialog.component';
@@ -35,10 +34,9 @@ export class SidenavComponent implements OnInit {
   mappedActivities: any[] = [];
   /** Collection of possible frequent activities */
   frequentActivities: any[] = frequentActivities;
-  panelOpenState = false;
-  linksOpenState = false;
-  reportsOpenState = false;
-  selfOpenState = false;
+  activeSection = 'workspace';
+  reportsOpenState = true;
+
   /**
    * @param {Router} router Router for navigation.
    * @param {MatDialog} dialog Mat Dialog
@@ -59,6 +57,54 @@ export class SidenavComponent implements OnInit {
     this.username = credentials?.staffDisplayName || credentials?.username || 'User';
     this.officeName = credentials?.officeName || '';
     this.setMappedAcitivites();
+    this.syncSectionWithRoute(this.router.url);
+    this.router.events.subscribe((event: any) => {
+      if (event instanceof NavigationEnd) {
+        this.syncSectionWithRoute(event.urlAfterRedirects || event.url);
+      }
+    });
+  }
+
+  selectSection(section: string) {
+    this.activeSection = section;
+    if (section === 'control') {
+      this.reportsOpenState = true;
+    }
+  }
+
+  toggleReports() {
+    this.reportsOpenState = !this.reportsOpenState;
+  }
+
+  isReportsRoute() {
+    return this.router.url.startsWith('/reports') || this.router.url.startsWith('/xbrl');
+  }
+
+  private syncSectionWithRoute(url: string) {
+    if (url.startsWith('/clients') || url.startsWith('/groups') || url.startsWith('/centers')) {
+      this.activeSection = 'customer';
+      return;
+    }
+    if (url.startsWith('/teller-workstation') || url.startsWith('/payments') || url.startsWith('/reconciliation') ||
+        url.startsWith('/organization/tellers')) {
+      this.activeSection = 'branch';
+      return;
+    }
+    if (url.startsWith('/self-service')) {
+      this.activeSection = 'self-service';
+      return;
+    }
+    if (url.startsWith('/accounting') || url.startsWith('/reports') || url.startsWith('/xbrl') ||
+        url.startsWith('/operations') || url.startsWith('/activity-trail') || url.startsWith('/appusers') ||
+        url.startsWith('/organization') || url.startsWith('/products') || url.startsWith('/system') ||
+        url.startsWith('/templates') || url.startsWith('/settings')) {
+      this.activeSection = 'control';
+      if (url.startsWith('/reports') || url.startsWith('/xbrl')) {
+        this.reportsOpenState = true;
+      }
+      return;
+    }
+    this.activeSection = 'workspace';
   }
 
   /**
@@ -88,8 +134,8 @@ export class SidenavComponent implements OnInit {
    * Returns top three frequent activities.
    */
   getFrequentActivities() {
-    const frequencyCounts: any  = {};
-    let index  = (this.userActivity || []).length;
+    const frequencyCounts: any = {};
+    let index = (this.userActivity || []).length;
     while (index) {
       frequencyCounts[this.userActivity[--index]] = (frequencyCounts[this.userActivity[index]] || 0) + 1;
     }
@@ -131,7 +177,7 @@ export class SidenavComponent implements OnInit {
         this.pushActivity('/templates');
       } else if (activity.includes('/self-service')) {
         this.pushActivity('/self-service');
-        } else if (activity.includes('/data-import')) {
+      } else if (activity.includes('/data-import')) {
         this.pushActivity('/data-import');
       }
     });

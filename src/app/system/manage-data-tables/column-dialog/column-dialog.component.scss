@@ -1,0 +1,24 @@
+.column-dialog-form {
+  min-width: 330px;
+}
+
+.column-options {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 2px;
+  padding: 14px 16px;
+  border: 1px solid #eef0ed;
+  border-radius: 10px;
+  background: #fafbf9;
+}
+
+@media (max-width: 599px) {
+  .column-dialog-form {
+    min-width: 0;
+  }
+
+  .column-options {
+    grid-template-columns: 1fr;
+  }
+}

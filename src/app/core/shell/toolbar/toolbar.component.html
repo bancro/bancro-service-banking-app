@@ -29,12 +29,9 @@
     </div>
   </div>
 
-  <nav class="toolbar-primary-nav" fxHide.lt-lg="true" aria-label="Quick navigation">
-    <a mat-button class="top-nav-link" [routerLink]="['/home']" routerLinkActive="active-top-link" [routerLinkActiveOptions]="{ exact: true }">Home</a>
-    <a mat-button class="top-nav-link" [routerLink]="['/accounting']" routerLinkActive="active-top-link">Accounting</a>
-    <button mat-button type="button" class="top-nav-link" [matMenuTriggerFor]="reportsMenu">Reports</button>
-    <button mat-button type="button" class="top-nav-link" [matMenuTriggerFor]="adminMenu">Admin</button>
-  </nav>
+  <a class="toolbar-brand" [routerLink]="['/home']" aria-label="Bancro home">
+    <img src="assets/images/bancro.png" alt="Bancro" />
+  </a>
 
   <span fxFlex="auto"></span>
 

@@ -1,43 +1,75 @@
-<div class="container">
-  <div class="m-b-40 flex gap-x-5">
-    <!--
+<div class="container bancro-dashboard">
+  <div class="dashboard-summary-grid" aria-label="Dashboard summary">
+    <a class="dashboard-summary-card" [routerLink]="['/clients']">
+      <span class="summary-icon summary-icon-clients"><fa-icon icon="users"></fa-icon></span>
+      <span class="summary-copy">
+        <span class="summary-value" *ngIf="!summaryLoading && summary.clients !== null; else summaryPlaceholder">
+          {{ summary.clients | number:'1.0-0' }}
+        </span>
+        <span class="summary-label">New Clients</span>
+      </span>
+    </a>
 
-      <mat-card class="frequent-activities">
+    <a class="dashboard-summary-card" [routerLink]="['/reports', 'Loan']">
+      <span class="summary-icon summary-icon-loans"><fa-icon icon="money-check"></fa-icon></span>
+      <span class="summary-copy">
+        <span class="summary-value" *ngIf="!summaryLoading && summary.loans !== null; else summaryPlaceholder">
+          {{ summary.loans | number:'1.0-0' }}
+        </span>
+        <span class="summary-label">Loans Disbursed</span>
+      </span>
+    </a>
 
-        <mat-card-header class="header">
-          <h3><fa-icon icon="laptop"></fa-icon>
-          &nbsp;&nbsp; {{"labels.heading.Frequent Activities"  |translate}}</h3>
-        </mat-card-header>
+    <a class="dashboard-summary-card" [routerLink]="['/reports', 'Savings']">
+      <span class="summary-icon summary-icon-collected"><fa-icon icon="coins"></fa-icon></span>
+      <span class="summary-copy">
+        <span class="summary-value" *ngIf="!summaryLoading && summary.collected !== null; else summaryPlaceholder">
+          {{ summary.collected | number:'1.0-0' }}
+        </span>
+        <span class="summary-label">Amount Collected</span>
+      </span>
+    </a>
 
-        <mat-card-content>
-          <mat-action-list class="list">
-            <button mat-list-item *ngFor="let activity of frequentActivities"
-            [routerLink]="activity"> {{ activity | urlToString }} </button>
-          </mat-action-list>
-        </mat-card-content>
-        
-      </mat-card> -->
-
-    <div class="flex-1">
-      <mifosx-client-trends-bar></mifosx-client-trends-bar>
-    </div>
-    <div class="w-[250px] rounded-lg overflow-hidden border border-gray-200 bg-white hidden lg:flex">
-      <mat-card class="recent-activities w-full">
-        <h3 class="font-medium text-base mb-4">{{ "labels.heading.Recent Activities" | translate }}</h3>
-
-        <mat-card-content class="w-full">
-          <ul class="list text-sm w-full pl-0 grid gap-y-2">
-            <li class="!text-sm flex items-center gap-x-1 justify-between py-1 w-full px-0 cursor-pointer hover:underline hover:text-green-900" mat-list-item *ngFor="let activity of recentActivities" (click)="navigatetoActivity(activity)">
-              {{ activity | urlToString }}  <fa-icon icon="chevron-right" size="xs" class="m-r-2 text-xs"></fa-icon> 
-            </li>
-          </ul>
-        </mat-card-content>
-      </mat-card>
-    </div>
+    <a class="dashboard-summary-card" [routerLink]="['/reports', 'Loan']">
+      <span class="summary-icon summary-icon-disbursed"><fa-icon icon="university"></fa-icon></span>
+      <span class="summary-copy">
+        <span class="summary-value" *ngIf="!summaryLoading && summary.disbursed !== null; else summaryPlaceholder">
+          {{ summary.disbursed | number:'1.0-0' }}
+        </span>
+        <span class="summary-label">Amount Disbursed</span>
+      </span>
+    </a>
   </div>
 
-  <div class="flex flex-col lg:flex-row gap-6">
-    <mifosx-amount-disbursed-pie class="w-full"></mifosx-amount-disbursed-pie>
-    <mifosx-amount-collected-pie class="w-full"></mifosx-amount-collected-pie>
+  <ng-template #summaryPlaceholder><span class="summary-value summary-placeholder">—</span></ng-template>
+
+  <div class="dashboard-primary-grid">
+    <div class="dashboard-chart-card">
+      <mifosx-client-trends-bar></mifosx-client-trends-bar>
+    </div>
+
+    <mat-card class="recent-activities" *ngIf="recentActivities?.length">
+      <mat-card-content>
+        <div class="dashboard-card-heading">
+          <div>
+            <span class="dashboard-eyebrow">Workspace</span>
+            <h3>{{ "labels.heading.Recent Activities" | translate }}</h3>
+          </div>
+          <fa-icon icon="clock"></fa-icon>
+        </div>
+
+        <ul class="activity-list">
+          <li *ngFor="let activity of recentActivities" (click)="navigatetoActivity(activity)">
+            <span>{{ activity | urlToString }}</span>
+            <fa-icon icon="chevron-right" size="xs"></fa-icon>
+          </li>
+        </ul>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <div class="dashboard-chart-grid">
+    <div class="dashboard-chart-card"><mifosx-amount-disbursed-pie></mifosx-amount-disbursed-pie></div>
+    <div class="dashboard-chart-card"><mifosx-amount-collected-pie></mifosx-amount-collected-pie></div>
   </div>
 </div>
